@@ -19,20 +19,20 @@
 
                 <TextBlock x:Uid="TxtSettingsTitle" Text="USTAWIENIA" FontSize="40" FontWeight="Light" Margin="0,0,0,30"/>
 
-                <TextBlock x:Name="LblAccountHeader" Text="Konto InPost" FontSize="24" Foreground="#FFCC00" Margin="0,0,0,10"/>
+                <TextBlock x:Name="LblAccountHeader" x:Uid="LblAccountHeader" Text="Konto InPost" FontSize="24" Foreground="#FFCC00" Margin="0,0,0,10"/>
 
                 <StackPanel x:Name="PanelLoggedOut" Visibility="Collapsed" Margin="0,0,0,30">
-                    <TextBlock x:Name="LblNotLoggedIn" Text="Zaloguj się, aby pobierać paczki automatycznie." Foreground="Gray" TextWrapping="Wrap" Margin="0,0,0,15"/>
-                    <Button x:Name="BtnLogin" Content="ZALOGUJ SIĘ" Click="Login_Click" 
+                    <TextBlock x:Name="LblNotLoggedIn" x:Uid="LblNotLoggedIn" Text="Zaloguj się, aby pobierać paczki automatycznie." Foreground="Gray" TextWrapping="Wrap" Margin="0,0,0,15"/>
+                    <Button x:Name="BtnLogin" x:Uid="BtnLogin" Content="ZALOGUJ SIĘ" Click="Login_Click" 
                             Background="#FFCC00" Foreground="Black" FontWeight="Bold"
                             HorizontalAlignment="Stretch" Height="50"/>
                 </StackPanel>
 
                 <StackPanel x:Name="PanelLoggedIn" Visibility="Collapsed" Margin="0,0,0,30">
-                    <TextBlock Text="Zalogowano jako:" Foreground="Gray" FontSize="14"/>
+                    <TextBlock x:Uid="LblLoggedInAs" Text="Zalogowano jako:" Foreground="Gray" FontSize="14"/>
                     <TextBlock x:Name="LblUserPhone" Text="+48 000 000 000" FontSize="22" Foreground="White" Margin="0,0,0,15" FontWeight="SemiBold"/>
 
-                    <Button x:Name="BtnLogout" Content="WYLOGUJ SIĘ" Click="Logout_Click" 
+                    <Button x:Name="BtnLogout" x:Uid="BtnLogout" Content="WYLOGUJ SIĘ" Click="Logout_Click" 
                             Background="Transparent" Foreground="White" BorderBrush="White" BorderThickness="2"
                             HorizontalAlignment="Stretch" Height="50"/>
                 </StackPanel>

@@ -446,9 +446,6 @@ Legal form: Spółka z ograniczoną odpowiedzialnością. All trademarks belong 
   <data name="TxtCreditsTitle.Text" xml:space="preserve">
     <value>CREDITS</value>
   </data>
-  <data name="TxtCreditsInspirationHeader.Text" xml:space="preserve">
-    <value>InPost3DS</value>
-  </data>
   <data name="TxtCreditsInspirationBody.Text" xml:space="preserve">
     <value>For inspiration, reverse engineering, and API analysis.</value>
   </data>
@@ -463,5 +460,8 @@ Legal form: Spółka z ograniczoną odpowiedzialnością. All trademarks belong 
   </data>
   <data name="TxtCreditsTestersHeader.Text" xml:space="preserve">
     <value>Beta testers:</value>
+  </data>
+  <data name="BtnLogout.Content" xml:space="preserve">
+    <value>LOG OUT</value>
   </data>
 </root>

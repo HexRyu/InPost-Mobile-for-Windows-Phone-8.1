@@ -30,6 +30,9 @@ The application was created for every Windows Phone, even with 512MB of RAM.
 ### ✨ Key Features (Current Status)
 * ✅ **Parcel Tracking** (Statuses: Sent, Ready for pickup, Delivered).
 * ✅ **Logging in via phone number and adding packages assigned to it to the application.
+* ✅ **Archiving packages.
+* ✅ **Opening lockers using a QR code.
+* ✅ **Displaying information about the parcel pickup location."
 * 🚧 **Push notifications**
 * 🚧 **Live title**
 * 🚧 **Remote Locker Opening** 

@@ -446,9 +446,6 @@ Forma prawna: Spółka z ograniczoną odpowiedzialnością. Wszelkie znaki towar
   <data name="TxtCreditsTitle.Text" xml:space="preserve">
     <value>PODZIĘKOWANIA</value>
   </data>
-  <data name="TxtCreditsInspirationHeader.Text" xml:space="preserve">
-    <value>InPost3DS</value>
-  </data>
   <data name="TxtCreditsInspirationBody.Text" xml:space="preserve">
     <value>Za inspirację, inżynierię wsteczną i analizę API.</value>
   </data>
@@ -463,5 +460,8 @@ Forma prawna: Spółka z ograniczoną odpowiedzialnością. Wszelkie znaki towar
   </data>
   <data name="TxtCreditsTestersHeader.Text" xml:space="preserve">
     <value>Beta testerzy:</value>
+  </data>
+  <data name="BtnLogout.Content" xml:space="preserve">
+    <value>WYLOGUJ SIĘ</value>
   </data>
 </root>
