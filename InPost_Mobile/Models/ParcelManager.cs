@@ -55,6 +55,40 @@ namespace InPost_Mobile.Models
             await SaveDataAsync();
         }
 
+        // REFRESH TOKEN
+        private static async Task<bool> RefreshAuthTokenAsync()
+        {
+            if (!_localSettings.Values.ContainsKey("RefreshToken")) return false;
+
+            try
+            {
+                string refreshToken = _localSettings.Values["RefreshToken"].ToString();
+                JsonObject json = new JsonObject();
+                json.SetNamedValue("refreshToken", JsonValue.CreateStringValue(refreshToken));
+
+                using (var client = CreateHttpClient())
+                {
+                    var content = new HttpStringContent(json.ToString(), Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json");
+                    var response = await client.PostAsync(new Uri(AppSecrets.BaseUrl + "v1/account/token/refresh"), content);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string respStr = await response.Content.ReadAsStringAsync();
+                        JsonObject obj = JsonObject.Parse(respStr);
+                        if (obj.ContainsKey("authToken"))
+                        {
+                            _localSettings.Values["AuthToken"] = obj.GetNamedString("authToken");
+                            if (obj.ContainsKey("refreshToken"))
+                                _localSettings.Values["RefreshToken"] = obj.GetNamedString("refreshToken");
+                            return true;
+                        }
+                    }
+                }
+            }
+            catch { }
+            return false;
+        }
+
         public static async Task UpdateAllParcelsAsync()
         {
             bool wasUpdated = false;
@@ -87,11 +121,31 @@ namespace InPost_Mobile.Models
         {
             try
             {
+                if (!_localSettings.Values.ContainsKey("AuthToken")) return false;
                 string token = _localSettings.Values["AuthToken"].ToString();
+
                 using (var client = CreateHttpClient())
                 {
                     client.DefaultRequestHeaders.Authorization = new Windows.Web.Http.Headers.HttpCredentialsHeaderValue("Bearer", token);
                     var response = await client.GetAsync(new Uri(url));
+
+                    // --- OBSŁUGA WYGAŚNIĘCIA TOKENA (401) ---
+                    if (response.StatusCode == HttpStatusCode.Unauthorized)
+                    {
+                        bool refreshed = await RefreshAuthTokenAsync();
+                        if (refreshed)
+                        {
+                            // Pobierz nowy token i spróbuj jeszcze raz
+                            token = _localSettings.Values["AuthToken"].ToString();
+                            client.DefaultRequestHeaders.Authorization = new Windows.Web.Http.Headers.HttpCredentialsHeaderValue("Bearer", token);
+                            response = await client.GetAsync(new Uri(url));
+                        }
+                        else
+                        {
+                            return false; // Nie udało się odświeżyć
+                        }
+                    }
+
                     if (response.IsSuccessStatusCode)
                     {
                         IBuffer buffer = await response.Content.ReadAsBufferAsync();
@@ -149,6 +203,8 @@ namespace InPost_Mobile.Models
         {
             string apiStatus = "unknown";
             if (json.ContainsKey("status")) apiStatus = json.GetNamedString("status");
+
+            parcel.OriginalStatus = apiStatus;
             parcel.Status = GetTranslatedStatus(apiStatus);
 
             if (string.IsNullOrEmpty(parcel.Sender) || parcel.Sender == "Nadawca")
@@ -159,13 +215,10 @@ namespace InPost_Mobile.Models
 
             if (json.ContainsKey("openCode")) parcel.PickupCode = json.GetNamedString("openCode");
 
-            // --- NAPRAWA ROZMIARU PACZKI ---
-            // Tego brakowało! Teraz pobieramy "parcelSize" (np. "A", "B", "C")
             if (json.ContainsKey("parcelSize"))
             {
                 parcel.Size = json.GetNamedString("parcelSize");
             }
-            // --------------------------------
 
             bool isCourier = false;
             string newPointName = "";
@@ -279,7 +332,15 @@ namespace InPost_Mobile.Models
                 {
                     string originalStatusName = item.Status;
                     string translatedDesc = GetTranslatedStatus(originalStatusName);
-                    finalHistory.Add(new ParcelEvent { Description = translatedDesc, Date = item.RealDate.ToString("dd.MM HH:mm"), Color = GetColorForStatus(originalStatusName), Opacity = (finalHistory.Count == 0) ? 1.0 : 0.6, IsFirst = false });
+                    finalHistory.Add(new ParcelEvent
+                    {
+                        Description = translatedDesc,
+                        OriginalStatus = originalStatusName,
+                        Date = item.RealDate.ToString("dd.MM HH:mm"),
+                        Color = GetColorForStatus(originalStatusName),
+                        Opacity = (finalHistory.Count == 0) ? 1.0 : 0.6,
+                        IsFirst = false
+                    });
                 }
                 if (finalHistory.Count > 0) { finalHistory[0].IsFirst = true; parcel.LastUpdateDate = finalHistory[0].Date; parcel.Status = finalHistory[0].Description; }
                 parcel.History = finalHistory;
@@ -290,9 +351,61 @@ namespace InPost_Mobile.Models
 
         private static string GetTranslatedStatus(string apiStatus)
         {
-            string key = "Status_" + apiStatus; string translated = _loader.GetString(key);
-            if (!string.IsNullOrEmpty(translated)) return translated; if (string.IsNullOrEmpty(apiStatus)) return ""; return apiStatus.Replace("_", " ");
+            if (string.IsNullOrEmpty(apiStatus)) return "";
+
+            string cleanStatus = apiStatus.Replace(" ", "_")
+                                          .Replace("/", "_")
+                                          .Replace("(", "")
+                                          .Replace(")", "")
+                                          .Trim();
+
+            string key = "Status_" + cleanStatus;
+            string translated = _loader.GetString(key);
+
+            if (!string.IsNullOrEmpty(translated)) return translated;
+
+            return apiStatus;
         }
+
+        // Wywołaj to po zmianie języka w SettingsPage
+        public static async Task ReloadAllParcelsTranslation()
+        {
+            _loader = new ResourceLoader();
+
+            foreach (var parcel in AllParcels)
+            {
+                // 1. Przetłumacz główny 
+                if (!string.IsNullOrEmpty(parcel.OriginalStatus))
+                {
+                    parcel.Status = GetTranslatedStatus(parcel.OriginalStatus);
+                }
+
+                // 2. Przetłumacz historię 
+                if (parcel.History != null)
+                {
+                    foreach (var ev in parcel.History)
+                    {
+                        if (!string.IsNullOrEmpty(ev.OriginalStatus))
+                        {
+                            ev.Description = GetTranslatedStatus(ev.OriginalStatus);
+                        }
+                    }
+                    // Zaktualizuj status główny na podstawie najnowszego zdarzenia
+                    if (parcel.History.Count > 0)
+                    {
+                        parcel.Status = parcel.History[0].Description;
+                    }
+                }
+
+                if (parcel.PickupPointName == "Kurier" || parcel.PickupPointAddress == "Doręczenie kurierem" || parcel.PickupPointAddress == "Courier delivery")
+                {
+                    parcel.PickupPointAddress = _loader.GetString("Txt_CourierDelivery");
+                }
+            }
+            await SaveDataAsync();
+        }
+
+
         private static string GetIconForStatus(string s)
         {
             s = s.ToLower(); if (s.Contains("delivered") || s.Contains("odebrana") || s.Contains("dostarczona")) return "\uE10B";

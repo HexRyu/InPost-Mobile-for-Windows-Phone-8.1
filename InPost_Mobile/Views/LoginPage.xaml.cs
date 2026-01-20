@@ -4,6 +4,11 @@ using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
+using Windows.UI.Xaml.Documents;
+using Windows.UI.Xaml.Media;
+using Windows.UI;
+using Windows.UI.Popups;
+using Windows.ApplicationModel.Resources;
 using InPost_Mobile.Models;
 
 namespace InPost_Mobile.Views
@@ -22,6 +27,8 @@ namespace InPost_Mobile.Views
 
         private void UpdateTexts()
         {
+            if (TbTerms != null) TbTerms.Inlines.Clear();
+
             if (_isPl)
             {
                 LblPhone.Text = "Numer telefonu";
@@ -30,6 +37,9 @@ namespace InPost_Mobile.Views
                 BtnVerify.Content = "ZALOGUJ SIĘ";
                 BtnBack.Content = "ZMIEŃ NUMER";
                 BtnSkip.Content = "POMIŃ / SKIP";
+
+                BuildTermsText("Przez zalogowanie się numerem telefonu zgadzam się na warunki użytkowania i informacje prawne zawarte w sekcji ",
+                               "Informacje prawne i użytkowania");
             }
             else
             {
@@ -39,68 +49,87 @@ namespace InPost_Mobile.Views
                 BtnVerify.Content = "LOG IN";
                 BtnBack.Content = "CHANGE NUMBER";
                 BtnSkip.Content = "SKIP LOGIN";
+
+                BuildTermsText("By logging in with a phone number, I agree to the terms of use and legal information contained in the section ",
+                               "Legal Information and Terms of Use");
             }
+        }
+
+        private void BuildTermsText(string prefix, string linkText)
+        {
+            if (TbTerms == null) return;
+
+            TbTerms.Inlines.Add(new Run { Text = prefix });
+
+            Hyperlink link = new Hyperlink();
+            link.Foreground = new SolidColorBrush(Colors.Gray);
+             // tekst linku
+            Run linkRun = new Run { Text = linkText };
+            link.Inlines.Add(linkRun);
+
+            // Obsługa kliknięcia - nawigacja do LegalPage
+            link.Click += (s, args) => { Frame.Navigate(typeof(LegalPage)); };
+
+            TbTerms.Inlines.Add(link);
         }
 
         private async void SendSms_Click(object sender, RoutedEventArgs e)
         {
-            // 1. Czyścimy numer (usuwamy spacje i myślniki)
-            string rawPhone = PhoneInput.Text;
-            string phone = rawPhone.Replace(" ", "").Replace("-", "").Trim();
-
-            // 2. Walidacja (musi być 9 cyfr dla Polski)
-            if (phone.Length != 9 || !IsDigitsOnly(phone))
+            // 1. Walidacja Zgody (Checkbox)
+            if (CbTerms.IsChecked != true)
             {
-                StatusText.Text = _isPl ? "Wpisz poprawny 9-cyfrowy numer." : "Enter valid 9-digit number.";
+                var loader = new ResourceLoader();
+                var dialog = new MessageDialog(loader.GetString("Dialog_TermsRequiredContent"), loader.GetString("Dialog_TermsRequiredTitle"));
+                await dialog.ShowAsync();
                 return;
             }
 
-            // BLOKOWANIE UI
-            LoginProgress.Visibility = Visibility.Visible;
+            // 2. Walidacja Numeru
+            string phone = PhoneInput.Text.Trim();
+            if (string.IsNullOrWhiteSpace(phone) || phone.Length < 9 || !IsDigitsOnly(phone))
+            {
+                StatusText.Text = _isPl ? "Błędny numer telefonu." : "Invalid phone number.";
+                return;
+            }
+
+            // 3. Wysyłanie
             StatusText.Text = "";
             TogglePanel(StepPhone, false);
+            LoginProgress.Visibility = Visibility.Visible;
 
-            // Wywołujemy Managera (przekazujemy czyste 9 cyfr)
-            bool sent = await ParcelManager.RequestSmsCode(phone);
+            bool success = await ParcelManager.RequestSmsCode(phone);
 
-            // ODBLOKOWANIE UI
             LoginProgress.Visibility = Visibility.Collapsed;
             TogglePanel(StepPhone, true);
 
-            if (sent)
+            if (success)
             {
                 StepPhone.Visibility = Visibility.Collapsed;
                 StepSms.Visibility = Visibility.Visible;
                 BtnSkip.Visibility = Visibility.Collapsed;
-                // Czyścimy pole kodu dla wygody
-                SmsInput.Text = "";
             }
             else
             {
-                StatusText.Text = _isPl ? "Błąd wysyłania. Sprawdź numer lub spróbuj później." : "Send error. Check number.";
+                StatusText.Text = _isPl ? "Błąd połączenia. Spróbuj ponownie." : "Connection error. Try again.";
             }
         }
 
         private async void VerifySms_Click(object sender, RoutedEventArgs e)
         {
+            string phone = PhoneInput.Text.Trim();
             string code = SmsInput.Text.Trim();
-            // Pobieramy numer ponownie i czyścimy, żeby mieć pewność
-            string phone = PhoneInput.Text.Replace(" ", "").Replace("-", "").Trim();
 
-            if (code.Length < 6)
+            if (code.Length < 6 || !IsDigitsOnly(code))
             {
-                StatusText.Text = _isPl ? "Kod musi mieć 6 cyfr." : "Code too short.";
+                StatusText.Text = _isPl ? "Kod musi mieć 6 cyfr." : "Code must be 6 digits.";
                 return;
             }
 
-            // BLOKOWANIE UI
-            LoginProgress.Visibility = Visibility.Visible;
-            StatusText.Text = "";
             TogglePanel(StepSms, false);
+            LoginProgress.Visibility = Visibility.Visible;
 
             bool success = await ParcelManager.VerifySmsCode(phone, code);
 
-            // ODBLOKOWANIE UI
             LoginProgress.Visibility = Visibility.Collapsed;
             TogglePanel(StepSms, true);
 

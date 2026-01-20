@@ -38,7 +38,7 @@ namespace InPost_Mobile.Models
                 throw new Exception("Błąd lokalizacji: Współrzędne paczkomatu wynoszą 0. Odśwież listę paczek na ekranie głównym i spróbuj ponownie.");
             }
 
-            // 2. Przygotowanie numeru telefonu (Ostatnie 9 cyfr)
+            // 2. Przygotowanie numeru telefonu 
             string rawPhone = _localSettings.Values["UserPhone"].ToString().Replace(" ", "").Replace("-", "").Trim();
             string phone = rawPhone;
             if (phone.Length > 9) phone = phone.Substring(phone.Length - 9);
@@ -60,7 +60,7 @@ namespace InPost_Mobile.Models
             JsonObject geoObj = new JsonObject();
             geoObj.SetNamedValue("latitude", JsonValue.CreateNumberValue(lat));
             geoObj.SetNamedValue("longitude", JsonValue.CreateNumberValue(lon));
-            geoObj.SetNamedValue("accuracy", JsonValue.CreateNumberValue(13.365)); // Wartość z kodu 3DS
+            geoObj.SetNamedValue("accuracy", JsonValue.CreateNumberValue(13.365));
 
             json.SetNamedValue("parcel", parcelObj);
             json.SetNamedValue("geoPoint", geoObj);

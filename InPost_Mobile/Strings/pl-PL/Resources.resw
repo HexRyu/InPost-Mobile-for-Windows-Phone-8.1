@@ -113,6 +113,9 @@
   <data name="Status_canceled" xml:space="preserve">
     <value>Anulowana</value>
   </data>
+  <data name="Status_Canceled" xml:space="preserve">
+    <value>Anulowana</value>
+  </data>
   <data name="Status_confirmed" xml:space="preserve">
     <value>Przesyłka utworzona</value>
   </data>
@@ -124,6 +127,46 @@
   </data>
    <data name="Status_stack_in_box_machine" xml:space="preserve">
     <value>Umieszczona w Paczkomacie (Stack)</value>
+  </data>
+
+  <data name="Status_Doręczona" xml:space="preserve">
+    <value>Doręczona</value>
+  </data>
+  <data name="Status_Gotowa_do_odbioru" xml:space="preserve">
+    <value>Gotowa do odbioru</value>
+  </data>
+  <data name="Status_Wydana_do_doręczenia" xml:space="preserve">
+    <value>Wydana do doręczenia</value>
+  </data>
+  <data name="Status_Przyjęta_w_Centrum_Logistycznym" xml:space="preserve">
+    <value>Przyjęta w Centrum Logistycznym</value>
+  </data>
+  <data name="Status_W_trasie" xml:space="preserve">
+    <value>W trasie</value>
+  </data>
+  <data name="Status_Odebrana_przez_Kuriera" xml:space="preserve">
+    <value>Odebrana przez Kuriera</value>
+  </data>
+  <data name="Status_Nadana_przez_Paczkomat_PaczkoPunkt" xml:space="preserve">
+    <value>Nadana przez Paczkomat/PaczkoPunkt</value>
+  </data>
+  <data name="Status_Przesyłka_utworzona" xml:space="preserve">
+    <value>Przesyłka utworzona</value>
+  </data>
+  <data name="Status_Zwrot_dostarczony" xml:space="preserve">
+    <value>Zwrot dostarczony</value>
+  </data>
+  <data name="Status_Zwrot_nadany" xml:space="preserve">
+    <value>Zwrot nadany</value>
+  </data>
+  <data name="Status_Zwrot_gotowy_do_nadania" xml:space="preserve">
+    <value>Zwrot gotowy do nadania</value>
+  </data>
+  <data name="Status_Umieszczona_w_Paczkomacie_Stack" xml:space="preserve">
+    <value>Umieszczona w Paczkomacie (Stack)</value>
+  </data>
+  <data name="Status_Awizowana" xml:space="preserve">
+    <value>Awizowana</value>
   </data>
 
   <data name="Desc_out_for_delivery" xml:space="preserve">
@@ -307,7 +350,7 @@
     <value>Aplikacja stworzona przez:</value>
   </data>
   <data name="TxtAboutDescription.Text" xml:space="preserve">
-    <value>Nieoficjalna fanowska aplikacja InPostu. W razie problemów napisz na discordzie nick: "hexryu" bądź napisz email na adres contact@hexryu.net</value>
+    <value>Nieoficjalny klient InPost Mobile na Windows Phone. Aplikacja pozwala na śledzenie paczek i zdalne otwieranie skrytek.</value>
   </data>
   <data name="Txt_CheckSms" xml:space="preserve">
     <value>Sprawdź w SMS</value>
@@ -353,7 +396,7 @@
     <value>Czy na pewno chcesz otworzyć skrytkę?</value>
   </data>
   <data name="Dialog_OpenErrorContent" xml:space="preserve">
-    <value>Nie udało się otworzyć skrytki.</value>
+    <value>Nie udało się otworzyć skrytki. Upewnij się, że jesteś blisko Paczkomatu i masz włączony GPS.</value>
   </data>
   <data name="Dialog_ErrorTitle" xml:space="preserve">
     <value>Błąd</value>
@@ -367,6 +410,12 @@
   <data name="Dialog_OpenTimeoutContent" xml:space="preserve">
     <value>Nie wykryto zamknięcia skrytki. Sprawdź status ręcznie.</value>
   </data>
+  <data name="Dialog_TermsRequiredTitle" xml:space="preserve">
+    <value>Wymagana zgoda</value>
+  </data>
+  <data name="Dialog_TermsRequiredContent" xml:space="preserve">
+    <value>Do zalogowania się numerem telefonu potrzeba akceptacji informacji prawnych i warunków użytkowania.</value>
+  </data>
 
   <data name="TxtLegalTitle.Text" xml:space="preserve">
     <value>INFORMACJE PRAWNE</value>
@@ -375,20 +424,24 @@
     <value>Nota prawna</value>
   </data>
   <data name="TxtLegalDisclaimerBody.Text" xml:space="preserve">
-    <value>Aplikacja nie pochodzi od firmy InPost. Jest to projekt fanowski. Twórca "hexryu" nie posiada bądź nie ma praw znaku towarowego logo i nazwę bądź innych powiązań z firmą.</value>
+    <value>Ta aplikacja jest projektem nieoficjalnym i hobbystycznym. Nie jest powiązana, autoryzowana ani wspierana przez INPOST SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ
+NIP: 6793108059
+REGON: 360781085
+KRS: 0000543759
+Siedziba: ul. Pana Tadeusza 4, 30-727 Kraków
+Forma prawna: Spółka z ograniczoną odpowiedzialnością. Wszelkie znaki towarowe należą do ich właścicieli.</value>
   </data>
   <data name="TxtLegalLiabilityHeader.Text" xml:space="preserve">
     <value>Odpowiedzialność</value>
   </data>
   <data name="TxtLegalLiabilityBody.Text" xml:space="preserve">
-    <value>Autor nie ponosi odpowiedzialności za jakiekolwiek szkody wynikłe z użytkowania aplikacji lub błąd powstały z winy użytkownika, w tym problemy z otwieraniem skrytek lub błędne działanie API.</value>
+    <value>Autor nie ponosi odpowiedzialności za jakiekolwiek szkody wynikłe z użytkowania aplikacji, w tym problemy z otwieraniem skrytek lub błędne działanie API.</value>
   </data>
   <data name="TxtLegalPrivacyHeader.Text" xml:space="preserve">
     <value>Prywatność</value>
   </data>
   <data name="TxtLegalPrivacyBody.Text" xml:space="preserve">
-    <value>Wszystkie dane są przechowywane na urządzeniu i nigdzie nie są wysyłane w celach reklamowych bądź na szkodę użytkownika.
-Dane logowania (token) lub dane wrażliwe typu adres IP bądź MAC nie przechodzą przez żadne serwery twórcy "hexryu". Dane przechodzą jedynie przez serwery firmy InPost.</value>
+    <value>Dane logowania (tokeny) i numer telefonu są przechowywane wyłącznie lokalnie na Twoim urządzeniu. Aplikacja łączy się tylko z oficjalnymi serwerami InPost.</value>
   </data>
   <data name="TxtCreditsTitle.Text" xml:space="preserve">
     <value>PODZIĘKOWANIA</value>

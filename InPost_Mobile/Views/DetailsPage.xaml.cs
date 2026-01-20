@@ -57,27 +57,26 @@ namespace InPost_Mobile.Views
             confirmDialog.Commands.Add(new UICommand(_loader.GetString("BtnNo")));
             await confirmDialog.ShowAsync();
         }
-
         private async Task ProcessRemoteOpening()
         {
             string sessionUuid = null;
 
             try
             {
-                // Próba otwarcia
+                // Jeśli LockerManager wyrzuci błąd
                 sessionUuid = await LockerManager.ValidateAndOpenAsync(_currentParcel);
             }
             catch (Exception ex)
             {
-                // TUTAJ POKAŻE SIĘ PRAWDZIWY BŁĄD Z API
-                var failDialog = new MessageDialog("Wystąpił błąd:\n" + ex.Message, "Błąd API");
+                // Wyświetlanie dokładnego powódu błędu zamiast zamykać aplikację
+                var failDialog = new MessageDialog("Nie udało się otworzyć skrytki:\n" + ex.Message, "Błąd otwierania");
                 await failDialog.ShowAsync();
-                return;
+                return; // Przerwij działanie, nie idź do pętli sprawdzania
             }
 
             if (string.IsNullOrEmpty(sessionUuid)) return;
 
-            // Pętla sprawdzania statusu (Czy zamknięto?)
+            // Pętla sprawdzania statusu 
             bool isClosed = false;
             for (int i = 0; i < 24; i++) // 2 minuty czekania
             {

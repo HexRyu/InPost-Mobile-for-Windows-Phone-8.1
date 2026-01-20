@@ -30,6 +30,8 @@ The application was created for every Windows Phone, even with 512MB of RAM.
 ### ✨ Key Features (Current Status)
 * ✅ **Parcel Tracking** (Statuses: Sent, Ready for pickup, Delivered).
 * ✅ **Logging in via phone number and adding packages assigned to it to the application.
+* 🚧 **Push notifications**
+* 🚧 **Live title**
 * 🚧 **Remote Locker Opening** 
 * 🚧 **Dark/Light Theme** (Follows system settings).
 * 🚧 **Multilocker Support**.
@@ -89,6 +91,6 @@ Legal form: Limited liability company
 
 Have questions? Found a bug?
 
-* **E-mail:** [contact@hexryu.net]
+* **E-mail:** contact@hexryu.net
 * **GitHub Issues:** [Report a bug](../../issues)
-* **Discord:** [hexryu]
+* **Discord:** hexryu

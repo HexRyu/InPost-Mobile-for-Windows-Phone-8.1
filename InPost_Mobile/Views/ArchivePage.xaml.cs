@@ -8,7 +8,7 @@ namespace InPost_Mobile.Views
 {
     public sealed partial class ArchivePage : Page
     {
-        // Zmienna statyczna - pamięta wartość nawet jak wyjdziesz ze strony
+       
         private static int _lastSectionIndex = 0;
 
         public ArchivePage()
@@ -18,14 +18,14 @@ namespace InPost_Mobile.Views
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            // Po wejściu na stronę - przewiń do zapamiętanej sekcji
+            // przewiń do zapamiętanej sekcji
             if (ArchiveHub.Sections.Count > _lastSectionIndex)
             {
                 ArchiveHub.ScrollToSection(ArchiveHub.Sections[_lastSectionIndex]);
             }
         }
 
-        // --- ŁADOWANIE LIST (Bez zmian) ---
+        // --- ŁADOWANIE LIST  ---
         private void ArchivedReceiveList_Loaded(object sender, RoutedEventArgs e)
         {
             var listView = sender as ListView;
@@ -58,7 +58,7 @@ namespace InPost_Mobile.Views
                     default: _lastSectionIndex = 0; break;
                 }
 
-                // TU ZMIANA: Wysyłamy tylko numer
+                // Wysyłamy tylko numer
                 Frame.Navigate(typeof(DetailsPage), clickedParcel.TrackingNumber);
             }
         }

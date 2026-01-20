@@ -113,6 +113,9 @@
   <data name="Status_canceled" xml:space="preserve">
     <value>Canceled</value>
   </data>
+  <data name="Status_Canceled" xml:space="preserve">
+    <value>Canceled</value>
+  </data>
   <data name="Status_confirmed" xml:space="preserve">
     <value>Shipment created</value>
   </data>
@@ -124,6 +127,46 @@
   </data>
    <data name="Status_stack_in_box_machine" xml:space="preserve">
     <value>Placed in Parcel Locker (Stack)</value>
+  </data>
+
+  <data name="Status_Doręczona" xml:space="preserve">
+    <value>Delivered</value>
+  </data>
+  <data name="Status_Gotowa_do_odbioru" xml:space="preserve">
+    <value>Ready for pickup</value>
+  </data>
+  <data name="Status_Wydana_do_doręczenia" xml:space="preserve">
+    <value>Out for delivery</value>
+  </data>
+  <data name="Status_Przyjęta_w_Centrum_Logistycznym" xml:space="preserve">
+    <value>Accepted at Sorting Center</value>
+  </data>
+  <data name="Status_W_trasie" xml:space="preserve">
+    <value>In transit</value>
+  </data>
+  <data name="Status_Odebrana_przez_Kuriera" xml:space="preserve">
+    <value>Picked up by courier</value>
+  </data>
+  <data name="Status_Nadana_przez_Paczkomat_PaczkoPunkt" xml:space="preserve">
+    <value>Dropped off at Parcel Locker/Point</value>
+  </data>
+  <data name="Status_Przesyłka_utworzona" xml:space="preserve">
+    <value>Shipment created</value>
+  </data>
+  <data name="Status_Zwrot_dostarczony" xml:space="preserve">
+    <value>Return delivered</value>
+  </data>
+  <data name="Status_Zwrot_nadany" xml:space="preserve">
+    <value>Return sent</value>
+  </data>
+  <data name="Status_Zwrot_gotowy_do_nadania" xml:space="preserve">
+    <value>Return ready to be sent</value>
+  </data>
+  <data name="Status_Umieszczona_w_Paczkomacie_Stack" xml:space="preserve">
+    <value>Placed in Locker (Stack)</value>
+  </data>
+  <data name="Status_Awizowana" xml:space="preserve">
+    <value>Delivery attempted</value>
   </data>
 
   <data name="Desc_out_for_delivery" xml:space="preserve">
@@ -307,8 +350,7 @@
     <value>App created by:</value>
   </data>
   <data name="TxtAboutDescription.Text" xml:space="preserve">
-    <value>
-Unofficial InPost fan app. If you have any problems, please contact us on Discord using the nickname "hexryu" or send an email to contact@hexryu.net</value>
+    <value>Unofficial InPost Mobile client for Windows Phone. The app allows parcel tracking and remote locker opening.</value>
   </data>
   <data name="Txt_CheckSms" xml:space="preserve">
     <value>Check SMS</value>
@@ -354,7 +396,7 @@ Unofficial InPost fan app. If you have any problems, please contact us on Discor
     <value>Are you sure you want to open the locker?</value>
   </data>
   <data name="Dialog_OpenErrorContent" xml:space="preserve">
-    <value>Failed to open locker.</value>
+    <value>Failed to open locker. Make sure you are near the Parcel Locker and GPS is on.</value>
   </data>
   <data name="Dialog_ErrorTitle" xml:space="preserve">
     <value>Error</value>
@@ -368,6 +410,12 @@ Unofficial InPost fan app. If you have any problems, please contact us on Discor
   <data name="Dialog_OpenTimeoutContent" xml:space="preserve">
     <value>Locker close not detected. Check status manually.</value>
   </data>
+  <data name="Dialog_TermsRequiredTitle" xml:space="preserve">
+    <value>Consent required</value>
+  </data>
+  <data name="Dialog_TermsRequiredContent" xml:space="preserve">
+    <value>To log in with a phone number, you need to accept the legal information and terms of use.</value>
+  </data>
 
   <data name="TxtLegalTitle.Text" xml:space="preserve">
     <value>LEGAL INFORMATION</value>
@@ -376,19 +424,24 @@ Unofficial InPost fan app. If you have any problems, please contact us on Discor
     <value>Disclaimer</value>
   </data>
   <data name="TxtLegalDisclaimerBody.Text" xml:space="preserve">
-    <value>The app is not from InPost. It is a fan project. The creator, "hexryu," does not own or have any trademark rights to the logo, name, or other affiliation with the company.</value>
+    <value>This application is an unofficial hobby project. It is not affiliated with, authorized, or endorsed by INPOST SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ
+NIP: 6793108059
+REGON: 360781085
+KRS: 0000543759
+Place: ul. Pana Tadeusza 4, 30-727 Kraków
+Legal form: Spółka z ograniczoną odpowiedzialnością. All trademarks belong to their respective owners.</value>
   </data>
   <data name="TxtLegalLiabilityHeader.Text" xml:space="preserve">
     <value>Liability</value>
   </data>
   <data name="TxtLegalLiabilityBody.Text" xml:space="preserve">
-    <value>The author is not responsible for any damage resulting from the use of the application or any error caused by the user, including problems with opening caches or incorrect operation of the API.</value>
+    <value>The author is not responsible for any damages resulting from the use of this application, including issues with locker opening or API errors.</value>
   </data>
   <data name="TxtLegalPrivacyHeader.Text" xml:space="preserve">
     <value>Privacy</value>
   </data>
   <data name="TxtLegalPrivacyBody.Text" xml:space="preserve">
-    <value>All data is stored on the device and is not sent anywhere for advertising purposes or to the user's detriment. Login data (token) or sensitive information such as IP or MAC addresses do not pass through any servers belonging to the creator of "hexryu." The data passes only through InPost servers.</value>
+    <value>Login data (tokens) and phone number are stored locally on your device only. The app connects exclusively to official InPost servers.</value>
   </data>
   <data name="TxtCreditsTitle.Text" xml:space="preserve">
     <value>CREDITS</value>

@@ -11,8 +11,13 @@ namespace InPost_Mobile.Models
     {
         [DataMember]
         public string TrackingNumber { get; set; }
+
         [DataMember]
-        public string Status { get; set; }
+        public string Status { get; set; } 
+
+        [DataMember]
+        public string OriginalStatus { get; set; } 
+
         [DataMember]
         public string Sender { get; set; }
         [DataMember]
@@ -36,37 +41,39 @@ namespace InPost_Mobile.Models
         [DataMember]
         public string CustomName { get; set; }
 
-        // --- NOWE POLA DO SPOOFINGU ---
         [DataMember]
         public double Latitude { get; set; }
         [DataMember]
         public double Longitude { get; set; }
-
-        // --- LOGIKA WIDOKU ---
 
         [IgnoreDataMember]
         public Visibility SenderSectionVisibility
         {
             get
             {
-                bool hasCustomName = !string.IsNullOrWhiteSpace(CustomName);
-                bool hasRealSender = !string.IsNullOrWhiteSpace(Sender)
-                                     && Sender != "Nieznany nadawca"
-                                     && Sender != "Nadawca";
-                return (hasCustomName || hasRealSender) ? Visibility.Visible : Visibility.Collapsed;
+                bool hasRealSender = !string.IsNullOrEmpty(Sender) && Sender != "Nadawca";
+                return hasRealSender ? Visibility.Visible : Visibility.Collapsed;
+            }
+        }
+
+        [IgnoreDataMember]
+        public string SenderDisplay
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(Sender) || Sender == "Nadawca") return "InPost";
+                return Sender;
             }
         }
 
         [IgnoreDataMember]
         public string SenderLabel
         {
-            get { return !string.IsNullOrWhiteSpace(CustomName) ? "Nazwa przesyłki" : "Nadawca"; }
-        }
-
-        [IgnoreDataMember]
-        public string SenderDisplay
-        {
-            get { return !string.IsNullOrWhiteSpace(CustomName) ? CustomName : Sender; }
+            get
+            {
+                var loader = new ResourceLoader();
+                return loader.GetString("LblSender/Text");
+            }
         }
 
         [IgnoreDataMember]
@@ -74,7 +81,7 @@ namespace InPost_Mobile.Models
         {
             get
             {
-                bool hasRealSender = !string.IsNullOrWhiteSpace(Sender) && Sender != "Nieznany nadawca" && Sender != "Nadawca";
+                bool hasRealSender = !string.IsNullOrEmpty(Sender) && Sender != "Nadawca";
                 return hasRealSender ? Visibility.Visible : Visibility.Collapsed;
             }
         }

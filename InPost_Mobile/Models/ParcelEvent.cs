@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using Windows.UI; // Potrzebne do kolorów
-using Windows.UI.Xaml.Media; // Potrzebne do pędzla (Brush)
+using Windows.UI;
+using Windows.UI.Xaml.Media;
 
 namespace InPost_Mobile.Models
 {
@@ -10,23 +10,25 @@ namespace InPost_Mobile.Models
     {
         [DataMember]
         public string Date { get; set; }
+
         [DataMember]
-        public string Description { get; set; }
+        public string Description { get; set; } 
+
         [DataMember]
-        public string Color { get; set; } // To jest tekst (np. "#FFCC00")
+        public string OriginalStatus { get; set; }
+
+        [DataMember]
+        public string Color { get; set; }
         [DataMember]
         public double Opacity { get; set; }
         [DataMember]
         public bool IsFirst { get; set; }
 
-        // --- TEGO BRAKOWAŁO W TWOIM PLIKU! ---
-        // Ta funkcja tłumaczy tekst na kolor dla ekranu
         [IgnoreDataMember]
         public SolidColorBrush BrushColor
         {
             get
             {
-                // Zabezpieczenie: jak nie ma koloru, daj żółty
                 if (string.IsNullOrEmpty(Color)) return new SolidColorBrush(Colors.Orange);
 
                 try

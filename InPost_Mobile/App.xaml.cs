@@ -14,17 +14,14 @@ namespace InPost_Mobile
     {
         private TransitionCollection transitions;
 
-        // --- TU BYŁ BŁĄD: Teraz jest tylko jeden konstruktor ---
         public App()
         {
-            // 1. Najpierw ładujemy język (zanim załaduje się UI)
             InPost_Mobile.Helpers.LanguageManager.InitializeLanguage();
 
-            // 2. Inicjalizacja komponentów XAML
             this.InitializeComponent();
             this.Suspending += this.OnSuspending;
 
-            // 3. Obsługa fizycznego przycisku "Wstecz"
+            // Obsługa fizycznego przycisku "Wstecz"
             HardwareButtons.BackPressed += HardwareButtons_BackPressed;
         }
 
@@ -78,7 +75,6 @@ namespace InPost_Mobile
                 rootFrame.ContentTransitions = null;
                 rootFrame.Navigated += this.RootFrame_FirstNavigated;
 
-                // --- LOGIKA STARTOWA (Logowanie vs Główna) ---
                 var settings = ApplicationData.Current.LocalSettings;
                 bool isLoggedIn = InPost_Mobile.Models.ParcelManager.IsLoggedIn();
                 bool isSetupDone = settings.Values.ContainsKey("IsSetupDone");
