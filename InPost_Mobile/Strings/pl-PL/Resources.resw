@@ -1,0 +1,414 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <data name="Status_created" xml:space="preserve">
+    <value>Wygenerowano etykietę</value>
+  </data>
+  <data name="Status_offers_prepared" xml:space="preserve">
+    <value>Przygotowana przez nadawcę</value>
+  </data>
+  <data name="Status_collected_from_sender" xml:space="preserve">
+    <value>Odebrana od nadawcy</value>
+  </data>
+  <data name="Status_adopted_at_source_branch" xml:space="preserve">
+    <value>W oddziale nadawczym</value>
+  </data>
+  <data name="Status_sent_from_source_branch" xml:space="preserve">
+    <value>W drodze (wyjechała)</value>
+  </data>
+  <data name="Status_adopted_at_sorting_center" xml:space="preserve">
+    <value>W sortowni</value>
+  </data>
+  <data name="Status_sent_from_sorting_center" xml:space="preserve">
+    <value>W drodze (z sortowni)</value>
+  </data>
+  <data name="Status_adopted_at_destination_branch" xml:space="preserve">
+    <value>W oddziale docelowym</value>
+  </data>
+  <data name="Status_out_for_delivery" xml:space="preserve">
+    <value>Wydana do doręczenia</value>
+  </data>
+  <data name="Status_ready_to_pickup" xml:space="preserve">
+    <value>Gotowa do odbioru</value>
+  </data>
+  <data name="Status_picked_up" xml:space="preserve">
+    <value>Odebrana</value>
+  </data>
+  <data name="Status_delivered" xml:space="preserve">
+    <value>Dostarczona</value>
+  </data>
+  <data name="Status_returned_to_sender" xml:space="preserve">
+    <value>Zwrócona do nadawcy</value>
+  </data>
+  <data name="Status_taken_by_courier" xml:space="preserve">
+    <value>Odebrana przez kuriera</value>
+  </data>
+  <data name="Status_dispatched_by_sender" xml:space="preserve">
+    <value>Nadana przez nadawcę</value>
+  </data>
+  <data name="Status_out_for_delivery_to_address" xml:space="preserve">
+    <value>Wydana do doręczenia</value>
+  </data>
+  <data name="Status_adopted_at_target_branch" xml:space="preserve">
+    <value>W oddziale docelowym</value>
+  </data>
+  <data name="Status_canceled" xml:space="preserve">
+    <value>Anulowana</value>
+  </data>
+  <data name="Status_confirmed" xml:space="preserve">
+    <value>Przesyłka utworzona</value>
+  </data>
+  <data name="Status_avizo" xml:space="preserve">
+    <value>Awizowana</value>
+  </data>
+  <data name="Status_not_found" xml:space="preserve">
+    <value>Nie znaleziono przesyłki</value>
+  </data>
+   <data name="Status_stack_in_box_machine" xml:space="preserve">
+    <value>Umieszczona w Paczkomacie (Stack)</value>
+  </data>
+
+  <data name="Desc_out_for_delivery" xml:space="preserve">
+    <value>Kurier jedzie z paczką</value>
+  </data>
+  <data name="Desc_ready_to_pickup" xml:space="preserve">
+    <value>Czeka na Ciebie w Paczkomacie</value>
+  </data>
+  <data name="Desc_delivered" xml:space="preserve">
+    <value>Paczka odebrana</value>
+  </data>
+  <data name="Desc_default" xml:space="preserve">
+    <value>Zmiana statusu przesyłki</value>
+  </data>
+  <data name="Txt_CourierDelivery" xml:space="preserve">
+    <value>Doręczenie kurierem</value>
+  </data>
+
+  <data name="Lbl_Size_Small" xml:space="preserve">
+    <value>Mała</value>
+  </data>
+  <data name="Lbl_Size_Medium" xml:space="preserve">
+    <value>Średnia</value>
+  </data>
+  <data name="Lbl_Size_Large" xml:space="preserve">
+    <value>Duża</value>
+  </data>
+  <data name="Lbl_Size_Mini" xml:space="preserve">
+    <value>Mini</value>
+  </data>
+
+  <data name="HubSectionReceive.Header" xml:space="preserve">
+    <value>Odbieram</value>
+  </data>
+  <data name="HubSectionSend.Header" xml:space="preserve">
+    <value>Nadaję</value>
+  </data>
+  <data name="HubSectionReturn.Header" xml:space="preserve">
+    <value>Zwracam</value>
+  </data>
+  
+  <data name="Hub_Receive.Header" xml:space="preserve">
+    <value>Odbieram</value>
+  </data>
+  <data name="Hub_Send.Header" xml:space="preserve">
+    <value>Nadaję</value>
+  </data>
+  <data name="Hub_Return.Header" xml:space="preserve">
+    <value>Zwracam</value>
+  </data>
+
+  <data name="LblSender.Text" xml:space="preserve">
+    <value>Nadawca</value>
+  </data>
+  <data name="LblReceiver.Text" xml:space="preserve">
+    <value>Odbiorca</value>
+  </data>
+  <data name="LblStore.Text" xml:space="preserve">
+    <value>Sklep</value>
+  </data>
+  <data name="LblTrackingNum.Text" xml:space="preserve">
+    <value>Numer przesyłki</value>
+  </data>
+  <data name="LblSize.Text" xml:space="preserve">
+    <value>Rozmiar</value>
+  </data>
+  <data name="LblReturnCode.Text" xml:space="preserve">
+    <value>Kod zwrotu</value>
+  </data>
+  <data name="Lbl_Sender.Text" xml:space="preserve">
+    <value>Nadawca</value>
+  </data>
+  <data name="Lbl_TrackingNum.Text" xml:space="preserve">
+    <value>Numer przesyłki</value>
+  </data>
+  <data name="LblPickupPoint.Text" xml:space="preserve">
+    <value>MIEJSCE ODBIORU</value>
+  </data>
+  <data name="Lbl_PickupPoint.Text" xml:space="preserve">
+    <value>MIEJSCE ODBIORU</value>
+  </data>
+  <data name="LblHistory.Text" xml:space="preserve">
+    <value>Historia przesyłki</value>
+  </data>
+  <data name="Lbl_HistoryHeader.Text" xml:space="preserve">
+    <value>Historia przesyłki</value>
+  </data>
+  <data name="Lbl_PickupCode.Text" xml:space="preserve">
+    <value>Kod odbioru:</value>
+  </data>
+  <data name="Lbl_NameHeader" xml:space="preserve">
+    <value>NAZWA PRZESYŁKI</value>
+  </data>
+  <data name="Lbl_OnlyPl" xml:space="preserve">
+    <value>(Obsługiwane tylko polskie numery +48)</value>
+  </data>
+
+  <data name="BtnNewParcel.Label" xml:space="preserve">
+    <value>Dodaj paczkę</value>
+  </data>
+  <data name="BtnRefresh.Label" xml:space="preserve">
+    <value>Odśwież</value>
+  </data>
+  <data name="BtnSettings.Label" xml:space="preserve">
+    <value>Ustawienia</value>
+  </data>
+  <data name="BtnBack.Content" xml:space="preserve">
+    <value>Wróć</value>
+  </data>
+  <data name="BtnArchive.Label" xml:space="preserve">
+    <value>Archiwum</value>
+  </data>
+  <data name="Btn_Archive.Label" xml:space="preserve">
+    <value>Archiwizuj</value>
+  </data>
+  <data name="Btn_Restore.Label" xml:space="preserve">
+    <value>Przywróć</value>
+  </data>
+  <data name="Btn_Delete.Label" xml:space="preserve">
+    <value>Usuń</value>
+  </data>
+  <data name="MenuArchive.Label" xml:space="preserve">
+    <value>Archiwizuj</value>
+  </data>
+  <data name="MenuDelete.Label" xml:space="preserve">
+    <value>Usuń</value>
+  </data>
+  <data name="Btn_NamePlaceholder" xml:space="preserve">
+    <value>Nazwij swoją przesyłkę</value>
+  </data>
+  <data name="BtnOpenRemote.Content" xml:space="preserve">
+    <value>Otwórz skrytkę zdalnie</value>
+  </data>
+  <data name="Btn_NotTaken" xml:space="preserve">
+    <value>Nie, otwórz ponownie</value>
+  </data>
+  <data name="BtnLegal.Content" xml:space="preserve">
+    <value>Informacje prawne</value>
+  </data>
+  <data name="BtnAbout.Content" xml:space="preserve">
+    <value>O aplikacji</value>
+  </data>
+  <data name="BtnCredits.Content" xml:space="preserve">
+    <value>Podziękowania</value>
+  </data>
+  <data name="BtnYes" xml:space="preserve">
+    <value>Tak</value>
+  </data>
+  <data name="BtnNo" xml:space="preserve">
+    <value>Nie</value>
+  </data>
+
+  <data name="PageTitleDetails.Text" xml:space="preserve">
+    <value>Szczegóły przesyłki</value>
+  </data>
+  <data name="PageTitleArchive.Text" xml:space="preserve">
+    <value>ARCHIWUM</value>
+  </data>
+  <data name="TxtSettingsTitle.Text" xml:space="preserve">
+    <value>USTAWIENIA</value>
+  </data>
+  <data name="TxtLanguageLabel.Text" xml:space="preserve">
+    <value>Język aplikacji</value>
+  </data>
+  <data name="TxtRestartInfo.Text" xml:space="preserve">
+    <value>*Zmiana języka wymaga ponownego uruchomienia aplikacji.</value>
+  </data>
+  <data name="AboutTitle" xml:space="preserve">
+    <value>O aplikacji</value>
+  </data>
+  <data name="TxtAppName.Text" xml:space="preserve">
+    <value>INPOST MOBILE</value>
+  </data>
+  <data name="TxtAboutHeader.Text" xml:space="preserve">
+    <value>o aplikacji</value>
+  </data>
+  <data name="TxtVersionLabel" xml:space="preserve">
+    <value>Wersja</value>
+  </data>
+  <data name="TxtCreatedBy.Text" xml:space="preserve">
+    <value>Aplikacja stworzona przez:</value>
+  </data>
+  <data name="TxtAboutDescription.Text" xml:space="preserve">
+    <value>Nieoficjalna fanowska aplikacja InPostu. W razie problemów napisz na discordzie nick: "hexryu" bądź napisz email na adres contact@hexryu.net</value>
+  </data>
+  <data name="Txt_CheckSms" xml:space="preserve">
+    <value>Sprawdź w SMS</value>
+  </data>
+
+  <data name="DialogArchiveTitle" xml:space="preserve">
+    <value>Archiwizacja</value>
+  </data>
+  <data name="DialogArchiveContent" xml:space="preserve">
+    <value>Czy przenieść tę paczkę do archiwum?</value>
+  </data>
+  <data name="DialogDeleteTitle" xml:space="preserve">
+    <value>Usuwanie przesyłki</value>
+  </data>
+  <data name="DialogDeleteContent" xml:space="preserve">
+    <value>Czy na pewno chcesz usunąć tę przesyłkę z listy?</value>
+  </data>
+  <data name="Dialog_NameTitle" xml:space="preserve">
+    <value>Nazwa przesyłki</value>
+  </data>
+  <data name="Dialog_Save" xml:space="preserve">
+    <value>Zapisz</value>
+  </data>
+  <data name="Dialog_Cancel" xml:space="preserve">
+    <value>Anuluj</value>
+  </data>
+  <data name="DialogRestoreTitle" xml:space="preserve">
+    <value>Przywracanie</value>
+  </data>
+  <data name="DialogRestoreContent" xml:space="preserve">
+    <value>Czy przywrócić paczkę do listy?</value>
+  </data>
+  <data name="ErrorStartTitle" xml:space="preserve">
+    <value>Błąd</value>
+  </data>
+  <data name="ErrorStartContent" xml:space="preserve">
+    <value>Nie udało się załadować szczegółów paczki.</value>
+  </data>
+  <data name="Dialog_OpenConfirmTitle" xml:space="preserve">
+    <value>Otwieranie skrytki</value>
+  </data>
+  <data name="Dialog_OpenConfirmContent" xml:space="preserve">
+    <value>Czy na pewno chcesz otworzyć skrytkę?</value>
+  </data>
+  <data name="Dialog_OpenErrorContent" xml:space="preserve">
+    <value>Nie udało się otworzyć skrytki.</value>
+  </data>
+  <data name="Dialog_ErrorTitle" xml:space="preserve">
+    <value>Błąd</value>
+  </data>
+  <data name="Dialog_ParcelTakenTitle" xml:space="preserve">
+    <value>Potwierdzenie odbioru</value>
+  </data>
+  <data name="Dialog_ParcelTakenContent" xml:space="preserve">
+    <value>Czy paczka została wyciągnięta ze skrytki?</value>
+  </data>
+  <data name="Dialog_OpenTimeoutContent" xml:space="preserve">
+    <value>Nie wykryto zamknięcia skrytki. Sprawdź status ręcznie.</value>
+  </data>
+
+  <data name="TxtLegalTitle.Text" xml:space="preserve">
+    <value>INFORMACJE PRAWNE</value>
+  </data>
+  <data name="TxtLegalDisclaimerHeader.Text" xml:space="preserve">
+    <value>Nota prawna</value>
+  </data>
+  <data name="TxtLegalDisclaimerBody.Text" xml:space="preserve">
+    <value>Aplikacja nie pochodzi od firmy InPost. Jest to projekt fanowski. Twórca "hexryu" nie posiada bądź nie ma praw znaku towarowego logo i nazwę bądź innych powiązań z firmą.</value>
+  </data>
+  <data name="TxtLegalLiabilityHeader.Text" xml:space="preserve">
+    <value>Odpowiedzialność</value>
+  </data>
+  <data name="TxtLegalLiabilityBody.Text" xml:space="preserve">
+    <value>Autor nie ponosi odpowiedzialności za jakiekolwiek szkody wynikłe z użytkowania aplikacji lub błąd powstały z winy użytkownika, w tym problemy z otwieraniem skrytek lub błędne działanie API.</value>
+  </data>
+  <data name="TxtLegalPrivacyHeader.Text" xml:space="preserve">
+    <value>Prywatność</value>
+  </data>
+  <data name="TxtLegalPrivacyBody.Text" xml:space="preserve">
+    <value>Wszystkie dane są przechowywane na urządzeniu i nigdzie nie są wysyłane w celach reklamowych bądź na szkodę użytkownika.
+Dane logowania (token) lub dane wrażliwe typu adres IP bądź MAC nie przechodzą przez żadne serwery twórcy "hexryu". Dane przechodzą jedynie przez serwery firmy InPost.</value>
+  </data>
+  <data name="TxtCreditsTitle.Text" xml:space="preserve">
+    <value>PODZIĘKOWANIA</value>
+  </data>
+  <data name="TxtCreditsInspirationHeader.Text" xml:space="preserve">
+    <value>InPost3DS</value>
+  </data>
+  <data name="TxtCreditsInspirationBody.Text" xml:space="preserve">
+    <value>Za inspirację, inżynierię wsteczną i analizę API.</value>
+  </data>
+  <data name="TxtCreditsCommunityHeader.Text" xml:space="preserve">
+    <value>Społeczność</value>
+  </data>
+  <data name="TxtCreditsCommunityBody.Text" xml:space="preserve">
+    <value>Za testowanie, zgłaszanie błędów i wsparcie projektu.</value>
+  </data>
+  <data name="TxtCreditsApiHeader.Text" xml:space="preserve">
+    <value>Za pomoc z API:</value>
+  </data>
+  <data name="TxtCreditsTestersHeader.Text" xml:space="preserve">
+    <value>Beta testerzy:</value>
+  </data>
+</root>

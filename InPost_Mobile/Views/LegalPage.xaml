@@ -1,0 +1,39 @@
+﻿<Page
+    x:Class="InPost_Mobile.Views.LegalPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:InPost_Mobile.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="Black">
+
+    <ScrollViewer>
+        <StackPanel Margin="20">
+            <TextBlock x:Uid="TxtLegalTitle" 
+                       Text="INFORMACJE PRAWNE" 
+                       FontSize="30" FontWeight="Light" Foreground="White" Margin="0,0,0,20"/>
+
+            <TextBlock x:Uid="TxtLegalDisclaimerHeader" 
+                       Text="Nota prawna" 
+                       FontSize="20" FontWeight="Bold" Foreground="#FFCC00" Margin="0,0,0,10"/>
+            <TextBlock x:Uid="TxtLegalDisclaimerBody" 
+                       Text="Ta aplikacja..." 
+                       FontSize="16" Foreground="White" TextWrapping="Wrap" Margin="0,0,0,20"/>
+
+            <TextBlock x:Uid="TxtLegalLiabilityHeader" 
+                       Text="Odpowiedzialność" 
+                       FontSize="20" FontWeight="Bold" Foreground="#FFCC00" Margin="0,0,0,10"/>
+            <TextBlock x:Uid="TxtLegalLiabilityBody" 
+                       Text="Autor nie ponosi..." 
+                       FontSize="16" Foreground="White" TextWrapping="Wrap" Margin="0,0,0,20"/>
+
+            <TextBlock x:Uid="TxtLegalPrivacyHeader" 
+                       Text="Prywatność" 
+                       FontSize="20" FontWeight="Bold" Foreground="#FFCC00" Margin="0,0,0,10"/>
+            <TextBlock x:Uid="TxtLegalPrivacyBody" 
+                       Text="Dane logowania..." 
+                       FontSize="16" Foreground="White" TextWrapping="Wrap" Margin="0,0,0,20"/>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

@@ -1,0 +1,414 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <data name="Status_created" xml:space="preserve">
+    <value>Label created</value>
+  </data>
+  <data name="Status_offers_prepared" xml:space="preserve">
+    <value>Prepared by sender</value>
+  </data>
+  <data name="Status_collected_from_sender" xml:space="preserve">
+    <value>Collected from sender</value>
+  </data>
+  <data name="Status_adopted_at_source_branch" xml:space="preserve">
+    <value>At source branch</value>
+  </data>
+  <data name="Status_sent_from_source_branch" xml:space="preserve">
+    <value>On the way (departed)</value>
+  </data>
+  <data name="Status_adopted_at_sorting_center" xml:space="preserve">
+    <value>At sorting center</value>
+  </data>
+  <data name="Status_sent_from_sorting_center" xml:space="preserve">
+    <value>On the way (from sorting)</value>
+  </data>
+  <data name="Status_adopted_at_destination_branch" xml:space="preserve">
+    <value>At destination branch</value>
+  </data>
+  <data name="Status_out_for_delivery" xml:space="preserve">
+    <value>Out for delivery</value>
+  </data>
+  <data name="Status_ready_to_pickup" xml:space="preserve">
+    <value>Ready for pickup</value>
+  </data>
+  <data name="Status_picked_up" xml:space="preserve">
+    <value>Picked up</value>
+  </data>
+  <data name="Status_delivered" xml:space="preserve">
+    <value>Delivered</value>
+  </data>
+  <data name="Status_returned_to_sender" xml:space="preserve">
+    <value>Returned to sender</value>
+  </data>
+  <data name="Status_taken_by_courier" xml:space="preserve">
+    <value>Taken by courier</value>
+  </data>
+  <data name="Status_dispatched_by_sender" xml:space="preserve">
+    <value>Dispatched by sender</value>
+  </data>
+  <data name="Status_out_for_delivery_to_address" xml:space="preserve">
+    <value>Out for delivery</value>
+  </data>
+  <data name="Status_adopted_at_target_branch" xml:space="preserve">
+    <value>At target branch</value>
+  </data>
+  <data name="Status_canceled" xml:space="preserve">
+    <value>Canceled</value>
+  </data>
+  <data name="Status_confirmed" xml:space="preserve">
+    <value>Shipment created</value>
+  </data>
+  <data name="Status_avizo" xml:space="preserve">
+    <value>Advised (Avizo)</value>
+  </data>
+  <data name="Status_not_found" xml:space="preserve">
+    <value>Parcel not found</value>
+  </data>
+   <data name="Status_stack_in_box_machine" xml:space="preserve">
+    <value>Placed in Parcel Locker (Stack)</value>
+  </data>
+
+  <data name="Desc_out_for_delivery" xml:space="preserve">
+    <value>Courier is on the way</value>
+  </data>
+  <data name="Desc_ready_to_pickup" xml:space="preserve">
+    <value>Waiting in Parcel Locker</value>
+  </data>
+  <data name="Desc_delivered" xml:space="preserve">
+    <value>Parcel collected</value>
+  </data>
+  <data name="Desc_default" xml:space="preserve">
+    <value>Status update</value>
+  </data>
+  <data name="Txt_CourierDelivery" xml:space="preserve">
+    <value>Courier delivery</value>
+  </data>
+
+  <data name="Lbl_Size_Small" xml:space="preserve">
+    <value>Small</value>
+  </data>
+  <data name="Lbl_Size_Medium" xml:space="preserve">
+    <value>Medium</value>
+  </data>
+  <data name="Lbl_Size_Large" xml:space="preserve">
+    <value>Large</value>
+  </data>
+  <data name="Lbl_Size_Mini" xml:space="preserve">
+    <value>Mini</value>
+  </data>
+
+  <data name="HubSectionReceive.Header" xml:space="preserve">
+    <value>Receive</value>
+  </data>
+  <data name="HubSectionSend.Header" xml:space="preserve">
+    <value>Send</value>
+  </data>
+  <data name="HubSectionReturn.Header" xml:space="preserve">
+    <value>Return</value>
+  </data>
+  
+  <data name="Hub_Receive.Header" xml:space="preserve">
+    <value>Receive</value>
+  </data>
+  <data name="Hub_Send.Header" xml:space="preserve">
+    <value>Send</value>
+  </data>
+  <data name="Hub_Return.Header" xml:space="preserve">
+    <value>Return</value>
+  </data>
+
+  <data name="LblSender.Text" xml:space="preserve">
+    <value>Sender</value>
+  </data>
+  <data name="LblReceiver.Text" xml:space="preserve">
+    <value>Receiver</value>
+  </data>
+  <data name="LblStore.Text" xml:space="preserve">
+    <value>Store</value>
+  </data>
+  <data name="LblTrackingNum.Text" xml:space="preserve">
+    <value>Tracking number</value>
+  </data>
+  <data name="LblSize.Text" xml:space="preserve">
+    <value>Size</value>
+  </data>
+  <data name="LblReturnCode.Text" xml:space="preserve">
+    <value>Return code</value>
+  </data>
+  <data name="Lbl_Sender.Text" xml:space="preserve">
+    <value>Sender</value>
+  </data>
+  <data name="Lbl_TrackingNum.Text" xml:space="preserve">
+    <value>Tracking number</value>
+  </data>
+  <data name="LblPickupPoint.Text" xml:space="preserve">
+    <value>PICKUP POINT</value>
+  </data>
+  <data name="Lbl_PickupPoint.Text" xml:space="preserve">
+    <value>PICKUP POINT</value>
+  </data>
+  <data name="LblHistory.Text" xml:space="preserve">
+    <value>Parcel history</value>
+  </data>
+  <data name="Lbl_HistoryHeader.Text" xml:space="preserve">
+    <value>Parcel history</value>
+  </data>
+  <data name="Lbl_PickupCode.Text" xml:space="preserve">
+    <value>Pickup code:</value>
+  </data>
+  <data name="Lbl_NameHeader" xml:space="preserve">
+    <value>PARCEL NAME</value>
+  </data>
+  <data name="Lbl_OnlyPl" xml:space="preserve">
+    <value>(Only Polish numbers +48 supported)</value>
+  </data>
+
+  <data name="BtnNewParcel.Label" xml:space="preserve">
+    <value>Add parcel</value>
+  </data>
+  <data name="BtnRefresh.Label" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="BtnSettings.Label" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="BtnBack.Content" xml:space="preserve">
+    <value>Back</value>
+  </data>
+  <data name="BtnArchive.Label" xml:space="preserve">
+    <value>Archive</value>
+  </data>
+  <data name="Btn_Archive.Label" xml:space="preserve">
+    <value>Archive</value>
+  </data>
+  <data name="Btn_Restore.Label" xml:space="preserve">
+    <value>Restore</value>
+  </data>
+  <data name="Btn_Delete.Label" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="MenuArchive.Label" xml:space="preserve">
+    <value>Archive</value>
+  </data>
+  <data name="MenuDelete.Label" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="Btn_NamePlaceholder" xml:space="preserve">
+    <value>Name your parcel</value>
+  </data>
+  <data name="BtnOpenRemote.Content" xml:space="preserve">
+    <value>Open remotely</value>
+  </data>
+  <data name="Btn_NotTaken" xml:space="preserve">
+    <value>No, open again</value>
+  </data>
+  <data name="BtnLegal.Content" xml:space="preserve">
+    <value>Legal Info</value>
+  </data>
+  <data name="BtnAbout.Content" xml:space="preserve">
+    <value>About App</value>
+  </data>
+  <data name="BtnCredits.Content" xml:space="preserve">
+    <value>Credits</value>
+  </data>
+  <data name="BtnYes" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="BtnNo" xml:space="preserve">
+    <value>No</value>
+  </data>
+
+  <data name="PageTitleDetails.Text" xml:space="preserve">
+    <value>Parcel details</value>
+  </data>
+  <data name="PageTitleArchive.Text" xml:space="preserve">
+    <value>ARCHIVE</value>
+  </data>
+  <data name="TxtSettingsTitle.Text" xml:space="preserve">
+    <value>SETTINGS</value>
+  </data>
+  <data name="TxtLanguageLabel.Text" xml:space="preserve">
+    <value>App language</value>
+  </data>
+  <data name="TxtRestartInfo.Text" xml:space="preserve">
+    <value>*Language change requires app restart.</value>
+  </data>
+  <data name="AboutTitle" xml:space="preserve">
+    <value>About</value>
+  </data>
+  <data name="TxtAppName.Text" xml:space="preserve">
+    <value>INPOST MOBILE</value>
+  </data>
+  <data name="TxtAboutHeader.Text" xml:space="preserve">
+    <value>about</value>
+  </data>
+  <data name="TxtVersionLabel" xml:space="preserve">
+    <value>Version</value>
+  </data>
+  <data name="TxtCreatedBy.Text" xml:space="preserve">
+    <value>App created by:</value>
+  </data>
+  <data name="TxtAboutDescription.Text" xml:space="preserve">
+    <value>
+Unofficial InPost fan app. If you have any problems, please contact us on Discord using the nickname "hexryu" or send an email to contact@hexryu.net</value>
+  </data>
+  <data name="Txt_CheckSms" xml:space="preserve">
+    <value>Check SMS</value>
+  </data>
+
+  <data name="DialogArchiveTitle" xml:space="preserve">
+    <value>Archive parcel</value>
+  </data>
+  <data name="DialogArchiveContent" xml:space="preserve">
+    <value>Do you want to move this parcel to archive?</value>
+  </data>
+  <data name="DialogDeleteTitle" xml:space="preserve">
+    <value>Delete parcel</value>
+  </data>
+  <data name="DialogDeleteContent" xml:space="preserve">
+    <value>Are you sure you want to delete this parcel?</value>
+  </data>
+  <data name="Dialog_NameTitle" xml:space="preserve">
+    <value>Parcel name</value>
+  </data>
+  <data name="Dialog_Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="Dialog_Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="DialogRestoreTitle" xml:space="preserve">
+    <value>Restore parcel</value>
+  </data>
+  <data name="DialogRestoreContent" xml:space="preserve">
+    <value>Do you want to restore this parcel to the active list?</value>
+  </data>
+  <data name="ErrorStartTitle" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="ErrorStartContent" xml:space="preserve">
+    <value>Failed to load parcel details.</value>
+  </data>
+  <data name="Dialog_OpenConfirmTitle" xml:space="preserve">
+    <value>Opening locker</value>
+  </data>
+  <data name="Dialog_OpenConfirmContent" xml:space="preserve">
+    <value>Are you sure you want to open the locker?</value>
+  </data>
+  <data name="Dialog_OpenErrorContent" xml:space="preserve">
+    <value>Failed to open locker.</value>
+  </data>
+  <data name="Dialog_ErrorTitle" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="Dialog_ParcelTakenTitle" xml:space="preserve">
+    <value>Pickup confirmation</value>
+  </data>
+  <data name="Dialog_ParcelTakenContent" xml:space="preserve">
+    <value>Was the parcel taken out of the locker?</value>
+  </data>
+  <data name="Dialog_OpenTimeoutContent" xml:space="preserve">
+    <value>Locker close not detected. Check status manually.</value>
+  </data>
+
+  <data name="TxtLegalTitle.Text" xml:space="preserve">
+    <value>LEGAL INFORMATION</value>
+  </data>
+  <data name="TxtLegalDisclaimerHeader.Text" xml:space="preserve">
+    <value>Disclaimer</value>
+  </data>
+  <data name="TxtLegalDisclaimerBody.Text" xml:space="preserve">
+    <value>The app is not from InPost. It is a fan project. The creator, "hexryu," does not own or have any trademark rights to the logo, name, or other affiliation with the company.</value>
+  </data>
+  <data name="TxtLegalLiabilityHeader.Text" xml:space="preserve">
+    <value>Liability</value>
+  </data>
+  <data name="TxtLegalLiabilityBody.Text" xml:space="preserve">
+    <value>The author is not responsible for any damage resulting from the use of the application or any error caused by the user, including problems with opening caches or incorrect operation of the API.</value>
+  </data>
+  <data name="TxtLegalPrivacyHeader.Text" xml:space="preserve">
+    <value>Privacy</value>
+  </data>
+  <data name="TxtLegalPrivacyBody.Text" xml:space="preserve">
+    <value>All data is stored on the device and is not sent anywhere for advertising purposes or to the user's detriment. Login data (token) or sensitive information such as IP or MAC addresses do not pass through any servers belonging to the creator of "hexryu." The data passes only through InPost servers.</value>
+  </data>
+  <data name="TxtCreditsTitle.Text" xml:space="preserve">
+    <value>CREDITS</value>
+  </data>
+  <data name="TxtCreditsInspirationHeader.Text" xml:space="preserve">
+    <value>InPost3DS</value>
+  </data>
+  <data name="TxtCreditsInspirationBody.Text" xml:space="preserve">
+    <value>For inspiration, reverse engineering, and API analysis.</value>
+  </data>
+  <data name="TxtCreditsCommunityHeader.Text" xml:space="preserve">
+    <value>Community</value>
+  </data>
+  <data name="TxtCreditsCommunityBody.Text" xml:space="preserve">
+    <value>For testing, bug reporting, and project support.</value>
+  </data>
+  <data name="TxtCreditsApiHeader.Text" xml:space="preserve">
+    <value>For API help:</value>
+  </data>
+  <data name="TxtCreditsTestersHeader.Text" xml:space="preserve">
+    <value>Beta testers:</value>
+  </data>
+</root>

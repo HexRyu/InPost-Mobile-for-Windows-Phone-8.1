@@ -1,0 +1,81 @@
+﻿<Page
+    x:Class="InPost_Mobile.Views.CreditsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:InPost_Mobile.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="Black">
+
+    <ScrollViewer>
+        <StackPanel Margin="24,20,0,40">
+
+            <TextBlock x:Uid="TxtCreditsTitle" 
+                       Text="PODZIĘKOWANIA" 
+                       FontSize="40" 
+                       FontWeight="Light" 
+                       Foreground="White" 
+                       Margin="-2,0,0,40"/>
+
+            <TextBlock x:Uid="TxtCreditsApiHeader" 
+                       Text="Za pomoc z API:" 
+                       FontSize="20" 
+                       Foreground="White" 
+                       Margin="0,0,0,20"
+                       Opacity="0.8"/>
+
+            <Grid Margin="0,0,0,40">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Image Source="ms-appx:///Assets/avatar_api.png" 
+                       Width="100" 
+                       Height="100" 
+                       Stretch="UniformToFill" 
+                       VerticalAlignment="Top"/>
+
+                <TextBlock Text="TehFridge" 
+                           Grid.Column="1" 
+                           FontSize="32" 
+                           Foreground="#3399FF" 
+                           VerticalAlignment="Center" 
+                           Margin="15,0,0,0" 
+                           FontWeight="Normal"
+                           TextWrapping="Wrap"/>
+            </Grid>
+
+            <TextBlock x:Uid="TxtCreditsTestersHeader" 
+                       Text="Beta testerzy:" 
+                       FontSize="20" 
+                       Foreground="White" 
+                       Margin="0,0,0,20"
+                       Opacity="0.8"/>
+
+            <Grid Margin="0,0,0,30">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Image Source="ms-appx:///Assets/avatar_tester.png" 
+                       Width="100" 
+                       Height="100" 
+                       Stretch="UniformToFill" 
+                       VerticalAlignment="Top"/>
+
+                <TextBlock Text="Kitxchi" 
+                           Grid.Column="1" 
+                           FontSize="32" 
+                           Foreground="#3399FF" 
+                           VerticalAlignment="Center" 
+                           Margin="15,0,0,0" 
+                           FontWeight="Normal"
+                           TextWrapping="Wrap"/>
+            </Grid>
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>

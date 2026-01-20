@@ -1,0 +1,112 @@
+﻿<Page
+    x:Class="InPost_Mobile.Views.DetailsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:InPost_Mobile.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="#1F1F1F">
+
+    <Grid>
+        <ScrollViewer>
+            <Border Padding="20">
+                <StackPanel>
+
+                    <Border Background="#2D2D2D" Padding="15" Margin="0,0,0,20">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="{Binding Status}" FontSize="24" FontWeight="Bold" Foreground="White" TextWrapping="Wrap"/>
+                                <Border Background="#3D3D3D" Height="1" Margin="0,15,0,15"/>
+
+                                <StackPanel Visibility="{Binding DetailsSenderVisibility}">
+                                    <TextBlock x:Uid="Lbl_Sender" Text="Nadawca" FontSize="12" Foreground="#AAAAAA" Opacity="0.7"/>
+                                    <TextBlock Text="{Binding Sender}" FontSize="16" Foreground="#DDDDDD" Margin="0,0,0,10"/>
+                                </StackPanel>
+
+                                <TextBlock x:Uid="Lbl_TrackingNum" Text="Numer przesyłki" FontSize="12" Foreground="#AAAAAA" Opacity="0.7"/>
+                                <TextBlock Text="{Binding TrackingNumber}" FontSize="16" Foreground="#DDDDDD" Margin="0,0,0,15"/>
+
+                                <TextBlock x:Uid="Lbl_NameHeader" Text="NAZWA PRZESYŁKI" FontSize="12" Foreground="#AAAAAA" Opacity="0.7"/>
+                                <Button x:Name="BtnRename" Click="Rename_Click" HorizontalAlignment="Left" Background="Transparent" Padding="0" BorderThickness="0" Margin="-2,0,0,0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding NameButtonText}" Foreground="{Binding NameButtonColor}" FontSize="18" FontWeight="SemiBold" Margin="0,0,10,0"/>
+                                        <TextBlock Text="&#xE104;" FontFamily="Segoe UI Symbol" Foreground="White" FontSize="16" VerticalAlignment="Center" Opacity="0.7"/>
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Right">
+                                <Border BorderBrush="White" BorderThickness="2" Width="50" Height="50">
+                                    <TextBlock Text="{Binding Icon}" FontFamily="Segoe UI Symbol" FontSize="24" Foreground="White" 
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <TextBlock x:Uid="LblSize" Text="Rozmiar" FontSize="12" Foreground="#AAAAAA" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                                <TextBlock Text="{Binding SizeName}" FontSize="16" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <StackPanel Visibility="{Binding PickupSectionVisibility}" Margin="0,0,0,20">
+                        <TextBlock x:Uid="Lbl_PickupPoint" Text="MIEJSCE ODBIORU" FontSize="15" FontWeight="Bold" Foreground="#888888" Margin="0,0,0,5"/>
+                        <TextBlock Text="{Binding PickupPointName}" FontSize="28" FontWeight="Bold" Foreground="White" TextWrapping="Wrap"/>
+                        <TextBlock Text="{Binding PickupPointAddress}" FontSize="16" Foreground="#DDDDDD"/>
+                    </StackPanel>
+
+                    <StackPanel x:Name="CodeSection" Margin="0,10,0,25" HorizontalAlignment="Center" Visibility="Collapsed">
+
+                        <TextBlock x:Uid="Lbl_PickupCode" Text="Kod odbioru:" FontSize="14" Foreground="#AAAAAA" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+                        <TextBlock Text="{Binding PickupCode}" FontSize="36" FontWeight="Bold" Foreground="#FFCC00" HorizontalAlignment="Center" Margin="0,0,0,15" CharacterSpacing="50"/>
+
+                        <Border Background="White" Padding="15" CornerRadius="12" HorizontalAlignment="Center" Margin="0,0,0,20">
+                            <Image x:Name="QrImage" Width="220" Height="220"/>
+                        </Border>
+
+                        <Button x:Uid="BtnOpenRemote" Content="Otwórz skrytkę zdalnie" 
+                                Click="OpenRemote_Click"
+                                Background="#FFCC00" Foreground="Black" FontWeight="Bold" FontSize="20"
+                                HorizontalAlignment="Stretch" Height="60" Margin="10,0,10,0"/>
+                    </StackPanel>
+
+                    <TextBlock x:Uid="Lbl_HistoryHeader" Text="Historia przesyłki" FontSize="20" FontWeight="Bold" Foreground="White" Margin="0,10,0,15"/>
+
+                    <ListView ItemsSource="{Binding History}" SelectionMode="None">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,0,0,20">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="30"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Rectangle Width="2" Fill="{Binding BrushColor}" HorizontalAlignment="Center" VerticalAlignment="Stretch" Grid.Column="0" Opacity="0.5"/>
+                                    <Ellipse Width="12" Height="12" Fill="{Binding BrushColor}" VerticalAlignment="Top" HorizontalAlignment="Center" Grid.Column="0" Margin="0,6,0,0"/>
+
+                                    <StackPanel Grid.Column="1" Margin="10,0,0,0" Opacity="{Binding Opacity}">
+                                        <TextBlock Text="{Binding Description}" FontSize="16" FontWeight="Bold" Foreground="White"/>
+                                        <TextBlock Text="{Binding Date}" FontSize="14" Foreground="Gray"/>
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+
+                </StackPanel>
+            </Border>
+        </ScrollViewer>
+    </Grid>
+
+    <Page.BottomAppBar>
+        <CommandBar Background="#1F1F1F" Foreground="White">
+            <AppBarButton x:Name="BtnRestore" x:Uid="Btn_Restore" Icon="Undo" Label="Przywróć" Click="Restore_Click" Visibility="Collapsed"/>
+            <AppBarButton x:Name="BtnArchive" x:Uid="Btn_Archive" Icon="Download" Label="Archiwizuj" Click="Archive_Click"/>
+            <AppBarButton Icon="Delete" x:Uid="Btn_Delete" Label="Usuń" Click="Delete_Click"/>
+        </CommandBar>
+    </Page.BottomAppBar>
+
+</Page>

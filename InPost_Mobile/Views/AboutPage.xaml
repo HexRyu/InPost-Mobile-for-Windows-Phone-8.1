@@ -1,0 +1,83 @@
+﻿<Page
+    x:Class="InPost_Mobile.Views.AboutPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:InPost_Mobile.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="Black">
+
+    <ScrollViewer>
+        <StackPanel Margin="24,20,0,40">
+
+            <TextBlock x:Uid="TxtAppName" 
+                       Text="INPOST MOBILE" 
+                       FontSize="14" 
+                       FontWeight="Bold" 
+                       Foreground="White" 
+                       Opacity="0.8"/>
+
+            <TextBlock x:Uid="TxtAboutHeader" 
+                       Text="o aplikacji" 
+                       FontSize="50" 
+                       FontWeight="Light" 
+                       Foreground="White" 
+                       Margin="-2,-5,0,30"/>
+
+            <TextBlock x:Name="VersionTextBlock" 
+                       FontSize="20" 
+                       Foreground="White" 
+                       Margin="0,0,0,5"/>
+
+            <TextBlock x:Uid="TxtCreatedBy" 
+                       Text="Aplikacja stworzona przez:" 
+                       FontSize="20" 
+                       Foreground="White" 
+                       Margin="0,0,0,20"/>
+
+            <Grid Margin="0,0,0,30">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Image Source="ms-appx:///Assets/avatar.png" 
+                       Width="100" 
+                       Height="100" 
+                       Stretch="UniformToFill" 
+                       VerticalAlignment="Top"/>
+
+                <TextBlock Text="HexRyu" 
+                           Grid.Column="1" 
+                           FontSize="32" 
+                           Foreground="#3399FF" 
+                           VerticalAlignment="Center" 
+                           Margin="15,0,0,0" 
+                           FontWeight="Normal"/>
+            </Grid>
+
+            <TextBlock x:Uid="TxtAboutDescription" 
+                       Text="Opis..." 
+                       FontSize="18" 
+                       Foreground="White" 
+                       TextWrapping="Wrap" 
+                       Margin="0,10,24,30"
+                       Opacity="0.9"/>
+
+            <Button x:Uid="BtnCredits" 
+                    Content="Podziękowania" 
+                    Click="Credits_Click" 
+                    HorizontalAlignment="Center" 
+                    Background="Transparent" 
+                    Foreground="White"
+                    BorderBrush="White" 
+                    BorderThickness="2"
+                    Padding="30,10"
+                    FontSize="18"
+                    FontWeight="SemiBold"
+                    Margin="0,10,0,0"/>
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>

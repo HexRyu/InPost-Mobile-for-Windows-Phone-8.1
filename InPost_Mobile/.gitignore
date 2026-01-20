@@ -1,0 +1,26 @@
+# --- PLIK GITIGNORE DLA INPOST MOBILE WP8.1 ---
+
+.vs/
+bin/
+obj/
+[Bb]in/
+[Oo]bj/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+
+AppPackages/
+BundleArtifacts/
+*_TemporaryKey.pfx
+*.appx
+*.appxbundle
+*.appxupload
+
+
+packages/
+
+**/AppSecrets.cs
+**/Assets/
+

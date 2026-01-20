@@ -1,0 +1,181 @@
+﻿<Page
+    x:Class="InPost_Mobile.Views.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:InPost_Mobile.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <ProgressBar x:Name="LoadingBar" IsIndeterminate="True" VerticalAlignment="Top" Visibility="Collapsed" Canvas.ZIndex="99"/>
+        <Hub>
+            <Hub.Header>
+                <Border HorizontalAlignment="Left" Margin="0,20,0,10">
+                    <Image Source="ms-appx:///Assets/header_logo.jpg" Height="80" Stretch="Uniform" Width="205" RenderTransformOrigin="1,0.557"/>
+                </Border>
+            </Hub.Header>
+
+            <HubSection x:Uid="HubSectionReceive">
+                <HubSection.HeaderTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}" FontSize="28" FontWeight="Medium" Foreground="White" Margin="0,0,10,0"/>
+                    </DataTemplate>
+                </HubSection.HeaderTemplate>
+
+                <DataTemplate>
+                    <ListView x:Name="ParcelsList" Loaded="ParcelsList_Loaded" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Parcel_ItemClick">
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                <Setter Property="Margin" Value="0"/>
+                                <Setter Property="Padding" Value="0"/>
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="#1F1F1F" Margin="0,0,0,20" Padding="15">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="{Binding Status}" FontSize="22" FontWeight="SemiBold" Foreground="White" TextWrapping="Wrap" Margin="0,0,0,15"/>
+
+                                            <StackPanel Visibility="{Binding SenderSectionVisibility}" Margin="0,0,0,12">
+                                                <TextBlock Text="{Binding SenderLabel}" FontSize="11" Foreground="Gray" Opacity="0.8"/>
+                                                <TextBlock Text="{Binding SenderDisplay}" FontSize="15" Foreground="#EEEEEE" TextTrimming="CharacterEllipsis"/>
+                                            </StackPanel>
+
+                                            <TextBlock x:Uid="LblTrackingNum" FontSize="11" Foreground="Gray" Opacity="0.8"/>
+                                            <TextBlock Text="{Binding TrackingNumber}" FontSize="15" Foreground="#EEEEEE"/>
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Top" Margin="10,0,0,0">
+                                            <Border BorderBrush="White" BorderThickness="2" Width="46" Height="36" Margin="0,0,0,5">
+                                                <TextBlock Text="{Binding Icon}" FontFamily="Segoe UI Symbol" FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
+                                            </Border>
+                                            <TextBlock x:Uid="LblSize" FontSize="10" Foreground="Gray" HorizontalAlignment="Center"/>
+                                            <TextBlock Text="{Binding SizeName}" FontSize="15" Foreground="White" HorizontalAlignment="Center" FontWeight="Bold"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </DataTemplate>
+            </HubSection>
+
+            <HubSection x:Uid="HubSectionSend">
+                <HubSection.HeaderTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}" FontSize="28" FontWeight="Medium" Foreground="White" Margin="0,0,10,0"/>
+                    </DataTemplate>
+                </HubSection.HeaderTemplate>
+
+                <DataTemplate>
+                    <ListView x:Name="SendingList" Loaded="SendingList_Loaded" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Parcel_ItemClick">
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                <Setter Property="Margin" Value="0"/>
+                                <Setter Property="Padding" Value="0"/>
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="#1F1F1F" Margin="0,0,0,20" Padding="15">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="{Binding Status}" FontSize="22" FontWeight="SemiBold" Foreground="White" TextWrapping="Wrap" Margin="0,0,0,15"/>
+
+                                            <StackPanel Visibility="{Binding SenderSectionVisibility}" Margin="0,0,0,12">
+                                                <TextBlock Text="{Binding SenderLabel}" FontSize="11" Foreground="Gray" Opacity="0.8"/>
+                                                <TextBlock Text="{Binding SenderDisplay}" FontSize="15" Foreground="#EEEEEE" TextTrimming="CharacterEllipsis"/>
+                                            </StackPanel>
+
+                                            <TextBlock x:Uid="LblTrackingNum" FontSize="11" Foreground="Gray" Opacity="0.8"/>
+                                            <TextBlock Text="{Binding TrackingNumber}" FontSize="15" Foreground="#EEEEEE"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Top" Margin="10,0,0,0">
+                                            <Border BorderBrush="White" BorderThickness="2" Width="46" Height="36" Margin="0,0,0,5">
+                                                <TextBlock Text="{Binding Icon}" FontFamily="Segoe UI Symbol" FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
+                                            </Border>
+                                            <TextBlock x:Uid="LblSize" FontSize="10" Foreground="Gray" HorizontalAlignment="Center"/>
+                                            <TextBlock Text="{Binding SizeName}" FontSize="15" Foreground="White" HorizontalAlignment="Center" FontWeight="Bold"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </DataTemplate>
+            </HubSection>
+
+            <HubSection x:Uid="HubSectionReturn">
+                <HubSection.HeaderTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}" FontSize="28" FontWeight="Medium" Foreground="White" Margin="0,0,10,0"/>
+                    </DataTemplate>
+                </HubSection.HeaderTemplate>
+
+                <DataTemplate>
+                    <ListView x:Name="ReturnsList" Loaded="ReturnsList_Loaded" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Parcel_ItemClick">
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                <Setter Property="Margin" Value="0"/>
+                                <Setter Property="Padding" Value="0"/>
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="#1F1F1F" Margin="0,0,0,20" Padding="15">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="{Binding Status}" FontSize="22" FontWeight="SemiBold" Foreground="White" TextWrapping="Wrap" Margin="0,0,0,15"/>
+
+                                            <StackPanel Visibility="{Binding SenderSectionVisibility}" Margin="0,0,0,12">
+                                                <TextBlock Text="{Binding SenderLabel}" FontSize="11" Foreground="Gray" Opacity="0.8"/>
+                                                <TextBlock Text="{Binding SenderDisplay}" FontSize="15" Foreground="#EEEEEE" TextTrimming="CharacterEllipsis"/>
+                                            </StackPanel>
+
+                                            <TextBlock x:Uid="LblReturnCode" FontSize="11" Foreground="Gray" Opacity="0.8"/>
+                                            <TextBlock Text="{Binding TrackingNumber}" FontSize="15" Foreground="#EEEEEE"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Top" Margin="10,0,0,0">
+                                            <Border BorderBrush="White" BorderThickness="2" Width="46" Height="36" Margin="0,0,0,5">
+                                                <TextBlock Text="{Binding Icon}" FontFamily="Segoe UI Symbol" FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
+                                            </Border>
+                                            <TextBlock x:Uid="LblSize" FontSize="10" Foreground="Gray" HorizontalAlignment="Center"/>
+                                            <TextBlock Text="{Binding SizeName}" FontSize="15" Foreground="White" HorizontalAlignment="Center" FontWeight="Bold"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </DataTemplate>
+            </HubSection>
+        </Hub>
+    </Grid>
+
+    <Page.BottomAppBar>
+        <CommandBar Background="#1F1F1F" Foreground="White">
+            <AppBarButton x:Uid="BtnNewParcel" Icon="Add" Label="nowa paczka" Click="AddParcel_Click"/>
+            <AppBarButton x:Uid="BtnRefresh" Icon="Refresh" Label="odśwież" Click="Refresh_Click"/>
+            <AppBarButton x:Uid="BtnArchive" Icon="Folder" Label="archiwum" Click="Archive_Click"/>
+            <AppBarButton x:Uid="BtnSettings" Icon="Setting" Label="ustawienia" Click="Settings_Click"/>
+        </CommandBar>
+    </Page.BottomAppBar>
+</Page>
