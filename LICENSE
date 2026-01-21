@@ -1,5 +1,3 @@
-Copyright for writen code (c) 2026 HexRyu
-
 Trademarks are owned by:
 INPOST LIMITED LIABILITY COMPANY
 NIP: 6793108059
@@ -8,16 +6,3 @@ KRS: 0000543759
 Registered office (main address): ul. Pana Tadeusza 4, 30-727 Kraków
 Legal form: Limited liability company
 
-The source code of this project is made publicly available solely for the following purposes:
-1. Educational purposes (as an example of the Windows Phone 8.1 project).
-2. Verifying the security and transparency of the application.
-
-THE FOLLOWING IS PROHIBITED:
-- Copying the code to create and publish a competing application.
-- Compiling the source code without the author's consent.
-- Using code snippets for commercial purposes.
-
-THE FOLLOWING IS ALLOWED:
-- Reviewing the code.
-- Downloading and installing the completed .appx files provided by the author in the "Releases" section for personal use.
-- Forking the repository solely for the purpose of submitting patches (Pull Requests) to the original project.
