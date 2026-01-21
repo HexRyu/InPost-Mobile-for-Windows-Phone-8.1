@@ -10,7 +10,7 @@
 
 ## ⚠️ PROJECT IN BETA
 **Please Note:** This application is currently under active development. Some features may be incomplete, and you might experience bugs. Stability is not guaranteed yet.
-
+ UPDATED VERSION 0.8.9.5 IS NOW AVAILABLE!!
 ---
 
 ## 📸 Gallery
@@ -34,11 +34,11 @@ The application was created for every Windows Phone, even with 512MB of RAM.
 * ✅ **Archiving packages.
 * ✅ **Opening lockers using a QR code.
 * ✅ **Displaying information about the parcel pickup location."
+* ⚠️ **Multilocker Support**.(May cause problems when receiving the parcel)
+* 🚧 **Remote Locker Opening** (I am in the process of fixing this error) 
 * 🚧 **Push notifications**
 * 🚧 **Live title**
-* 🚧 **Remote Locker Opening** 
 * 🚧 **Dark/Light Theme** (Follows system settings).
-* 🚧 **Multilocker Support**.
 * 🚧 *More features coming soon...*
 
 ---

@@ -106,6 +106,7 @@
             <AppBarButton x:Name="BtnRestore" x:Uid="Btn_Restore" Icon="Undo" Label="Przywróć" Click="Restore_Click" Visibility="Collapsed"/>
             <AppBarButton x:Name="BtnArchive" x:Uid="Btn_Archive" Icon="Download" Label="Archiwizuj" Click="Archive_Click"/>
             <AppBarButton Icon="Delete" x:Uid="Btn_Delete" Label="Usuń" Click="Delete_Click"/>
+
         </CommandBar>
     </Page.BottomAppBar>
 

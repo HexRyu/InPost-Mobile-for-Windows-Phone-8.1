@@ -55,7 +55,7 @@ namespace InPost_Mobile.Models
             JsonObject phoneObj = new JsonObject();
             phoneObj.SetNamedValue("prefix", JsonValue.CreateStringValue("+48"));
             phoneObj.SetNamedValue("value", JsonValue.CreateStringValue(phone));
-            parcelObj.SetNamedValue("recieverPhoneNumber", phoneObj);
+            parcelObj.SetNamedValue("receiverPhoneNumber", phoneObj);
 
             JsonObject geoObj = new JsonObject();
             geoObj.SetNamedValue("latitude", JsonValue.CreateNumberValue(lat));
@@ -67,41 +67,50 @@ namespace InPost_Mobile.Models
 
             using (var client = CreateHttpClient())
             {
-                client.DefaultRequestHeaders.Authorization = new Windows.Web.Http.Headers.HttpCredentialsHeaderValue("Bearer", token);
+                bool retry = true;
+                while (true)
+                { 
+                    token = _localSettings.Values["AuthToken"].ToString();
+                    client.DefaultRequestHeaders.Authorization = new Windows.Web.Http.Headers.HttpCredentialsHeaderValue("Bearer", token);
 
-                // A. VALIDATE
-                var validateResp = await client.PostAsync(
-                    new Uri(AppSecrets.BaseUrl + "v2/collect/validate"),
-                    new HttpStringContent(json.ToString(), Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json"));
+                    // A. VALIDATE
+                    var validateResp = await client.PostAsync(
+                        new Uri(AppSecrets.BaseUrl + "v2/collect/validate"),
+                        new HttpStringContent(json.ToString(), Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json"));
 
-                string valResponseStr = await validateResp.Content.ReadAsStringAsync();
+                    if (validateResp.StatusCode == HttpStatusCode.Unauthorized && retry)
+                    {
+                        retry = false;
+                        if (await ParcelManager.RefreshAuthTokenAsync()) continue;
+                    }
 
-                if (!validateResp.IsSuccessStatusCode)
-                {
-                    // Zwracamy dokładny błąd z API
-                    throw new Exception($"Błąd walidacji ({validateResp.StatusCode}): {valResponseStr}");
+                    string valResponseStr = await validateResp.Content.ReadAsStringAsync();
+
+                    if (!validateResp.IsSuccessStatusCode)
+                    {
+                        // Zwracamy dokładny błąd z API
+                        throw new Exception($"Błąd walidacji ({validateResp.StatusCode}): {valResponseStr}");
+                    }
+
+                    JsonObject valObj = JsonObject.Parse(valResponseStr);
+                    string sessionUuid = "";
+                    if (valObj.ContainsKey("sessionUuid")) sessionUuid = valObj.GetNamedString("sessionUuid");
+                    else throw new Exception("Brak sessionUuid w odpowiedzi.");
+
+                    // B. OPEN
+                    JsonObject openJson = new JsonObject();
+                    openJson.SetNamedValue("sessionUuid", JsonValue.CreateStringValue(sessionUuid));
+
+                    var openResp = await client.PostAsync(
+                        new Uri(AppSecrets.BaseUrl + "v1/collect/compartment/open"),
+                        new HttpStringContent(openJson.ToString(), Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json"));
+
+                    if (openResp.IsSuccessStatusCode) return sessionUuid;
+
+                    // Obsługa błędu otwarcia
+                     string openErr = await openResp.Content.ReadAsStringAsync();
+                     throw new Exception($"Błąd otwarcia ({openResp.StatusCode}): {openErr}");
                 }
-
-                JsonObject valObj = JsonObject.Parse(valResponseStr);
-                string sessionUuid = "";
-                if (valObj.ContainsKey("sessionUuid")) sessionUuid = valObj.GetNamedString("sessionUuid");
-                else throw new Exception("Brak sessionUuid w odpowiedzi.");
-
-                // B. OPEN
-                JsonObject openJson = new JsonObject();
-                openJson.SetNamedValue("sessionUuid", JsonValue.CreateStringValue(sessionUuid));
-
-                var openResp = await client.PostAsync(
-                    new Uri(AppSecrets.BaseUrl + "v1/collect/compartment/open"),
-                    new HttpStringContent(openJson.ToString(), Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json"));
-
-                if (!openResp.IsSuccessStatusCode)
-                {
-                    string openErr = await openResp.Content.ReadAsStringAsync();
-                    throw new Exception($"Błąd otwarcia ({openResp.StatusCode}): {openErr}");
-                }
-
-                return sessionUuid;
             }
         }
 

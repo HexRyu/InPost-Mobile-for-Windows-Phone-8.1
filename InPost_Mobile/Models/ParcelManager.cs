@@ -56,7 +56,7 @@ namespace InPost_Mobile.Models
         }
 
         // REFRESH TOKEN
-        private static async Task<bool> RefreshAuthTokenAsync()
+        public static async Task<bool> RefreshAuthTokenAsync()
         {
             if (!_localSettings.Values.ContainsKey("RefreshToken")) return false;
 
@@ -101,15 +101,15 @@ namespace InPost_Mobile.Models
             }
             var manualParcels = AllParcels.Where(p => !p.IsArchived && !IsDeliveredStatus(p.Status) && string.IsNullOrEmpty(p.PickupCode)).ToList();
 
-            // Parallelize updates for faster background refresh
-            var tasks = manualParcels.Select(async parcel =>
+            foreach (var parcel in manualParcels)
             {
                  if (await RefreshSingleParcel(parcel)) wasUpdated = true;
-            });
-            await Task.WhenAll(tasks);
+            }
 
             if (wasUpdated) await SaveDataAsync();
         }
+
+        public static string LastDebugLog = ""; // Debug field
 
         private static bool IsDeliveredStatus(string status)
         {
@@ -221,11 +221,19 @@ namespace InPost_Mobile.Models
             if (json.ContainsKey("openCode"))
             {
                 string newCode = json.GetNamedString("openCode");
-                // Fix: Only overwrite if new code is present, or if we don't have one yet.
-                // If we have a code and API returns empty/null, keep ours.
-                if (!string.IsNullOrWhiteSpace(newCode))
+                if (!string.IsNullOrWhiteSpace(newCode)) parcel.PickupCode = newCode;
+            }
+            if (string.IsNullOrEmpty(parcel.PickupCode) || parcel.PickupCode == "---")
+            {
+                if (json.ContainsKey("pickupCode"))
                 {
-                   parcel.PickupCode = newCode;
+                    string newCode = json.GetNamedString("pickupCode");
+                    if (!string.IsNullOrWhiteSpace(newCode)) parcel.PickupCode = newCode;
+                }
+                else if (json.ContainsKey("pickup_code"))
+                {
+                    string newCode = json.GetNamedString("pickup_code");
+                    if (!string.IsNullOrWhiteSpace(newCode)) parcel.PickupCode = newCode;
                 }
             }
 
@@ -475,35 +483,30 @@ namespace InPost_Mobile.Models
         }
         private static async Task<bool> RefreshSingleParcel(ParcelItem parcel)
         {
+            LastDebugLog = "Starting Refresh...";
             // 1. Try Authenticated Mobile API first (if logged in)
             if (IsLoggedIn())
             {
                 try
                 {
-                    if (!_localSettings.Values.ContainsKey("AuthToken")) return false;
+                    if (!_localSettings.Values.ContainsKey("AuthToken")) { LastDebugLog = "No Token"; return false; }
                     string token = _localSettings.Values["AuthToken"].ToString();
-                    string url = $"{AppSecrets.BaseUrl}v4/parcels/{parcel.TrackingNumber}";
+                    string url = $"{AppSecrets.BaseUrl}v1/tracking/{parcel.TrackingNumber}";
 
                     using (var client = CreateHttpClient())
                     {
                         client.DefaultRequestHeaders.Authorization = new Windows.Web.Http.Headers.HttpCredentialsHeaderValue("Bearer", token);
                         var response = await client.GetAsync(new Uri(url));
 
-                        // --- OBSŁUGA WYGAŚNIĘCIA TOKENA (401) ---
                         if (response.StatusCode == HttpStatusCode.Unauthorized)
                         {
+                            LastDebugLog = "401 Unauthorized, refreshing...";
                             bool refreshed = await RefreshAuthTokenAsync();
                             if (refreshed)
                             {
-                                // Pobierz nowy token i spróbuj jeszcze raz
                                 token = _localSettings.Values["AuthToken"].ToString();
                                 client.DefaultRequestHeaders.Authorization = new Windows.Web.Http.Headers.HttpCredentialsHeaderValue("Bearer", token);
                                 response = await client.GetAsync(new Uri(url));
-                            }
-                            else
-                            {
-                                // Token refresh failed, fall back to public API
-                                // (Proceed to step 2)
                             }
                         }
 
@@ -512,21 +515,35 @@ namespace InPost_Mobile.Models
                             IBuffer buffer = await response.Content.ReadAsBufferAsync();
                             string jsonString;
                             using (var dataReader = DataReader.FromBuffer(buffer)) { dataReader.UnicodeEncoding = Windows.Storage.Streams.UnicodeEncoding.Utf8; jsonString = dataReader.ReadString(buffer.Length); }
+                            
+                            LastDebugLog = "Auth OK. JSON: " + jsonString.Substring(0, Math.Min(jsonString.Length, 500)); // Log first 500 chars
+
                             JsonObject json = JsonObject.Parse(jsonString);
                             ParseApiObjectToParcel(parcel, json);
                             return true;
                         }
+                        else
+                        {
+                            string errorBody = "";
+                            try { errorBody = await response.Content.ReadAsStringAsync(); } catch { }
+                            LastDebugLog = "Auth Failed: " + response.StatusCode + " Body: " + errorBody;
+                        }
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
-                    // Fallback to public API on error
+                    LastDebugLog = "Auth Exception: " + ex.Message;
                 }
+            }
+            else
+            {
+                LastDebugLog = "Not Logged In";
             }
 
             // 2. Fallback to public ShipX (existing logic)
             try
             {
+                LastDebugLog += " -> Public Fallback";
                 using (var client = CreateHttpClient())
                 {
                     string url = $"{AppSecrets.ShipXUrl}v1/tracking/{parcel.TrackingNumber}";

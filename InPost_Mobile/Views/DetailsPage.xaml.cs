@@ -13,6 +13,7 @@ using Windows.Storage;
 using InPost_Mobile.Models;
 using ZXing;
 using ZXing.Common;
+using Windows.UI.ViewManagement;
 
 namespace InPost_Mobile.Views
 {
@@ -35,8 +36,12 @@ namespace InPost_Mobile.Views
                 if (!string.IsNullOrEmpty(trackingNumber))
                 {
                     _currentParcel = ParcelManager.AllParcels.FirstOrDefault(p => p.TrackingNumber == trackingNumber);
-                    this.DataContext = _currentParcel;
-                    UpdateInterface();
+                    if (_currentParcel != null)
+                    {
+                        this.DataContext = _currentParcel;
+                        _currentParcel.PropertyChanged += Parcel_PropertyChanged;
+                        UpdateInterface();
+                    }
                 }
             }
             catch (Exception ex)
@@ -46,7 +51,28 @@ namespace InPost_Mobile.Views
             }
         }
 
-        // --- ZDALNE OTWIERANIE ---
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            if (_currentParcel != null)
+            {
+                _currentParcel.PropertyChanged -= Parcel_PropertyChanged;
+            }
+            base.OnNavigatedFrom(e);
+        }
+
+        private async void Parcel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "PickupCode" || e.PropertyName == "Status" || e.PropertyName == "PickupPointName")
+            {
+                await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                {
+                    UpdateInterface();
+                });
+            }
+        }
+
+
+
         private async void OpenRemote_Click(object sender, RoutedEventArgs e)
         {
             var confirmDialog = new MessageDialog(_loader.GetString("Dialog_OpenConfirmContent"), _loader.GetString("Dialog_OpenConfirmTitle"));
@@ -60,25 +86,29 @@ namespace InPost_Mobile.Views
         private async Task ProcessRemoteOpening()
         {
             string sessionUuid = null;
+            var statusBar = StatusBar.GetForCurrentView();
 
             try
             {
-                // Jeśli LockerManager wyrzuci błąd
+                statusBar.ProgressIndicator.Text = "Skrytka zaniedługo się otworzy";
+                await statusBar.ProgressIndicator.ShowAsync();
                 sessionUuid = await LockerManager.ValidateAndOpenAsync(_currentParcel);
             }
             catch (Exception ex)
             {
-                // Wyświetlanie dokładnego powódu błędu zamiast zamykać aplikację
                 var failDialog = new MessageDialog("Nie udało się otworzyć skrytki:\n" + ex.Message, "Błąd otwierania");
                 await failDialog.ShowAsync();
-                return; // Przerwij działanie, nie idź do pętli sprawdzania
+                return; 
+            }
+            finally
+            {
+                await statusBar.ProgressIndicator.HideAsync();
             }
 
             if (string.IsNullOrEmpty(sessionUuid)) return;
 
-            // Pętla sprawdzania statusu 
             bool isClosed = false;
-            for (int i = 0; i < 24; i++) // 2 minuty czekania
+            for (int i = 0; i < 24; i++) 
             {
                 await Task.Delay(5000);
                 isClosed = await LockerManager.IsLockerClosedAsync(sessionUuid);
@@ -110,7 +140,6 @@ namespace InPost_Mobile.Views
             }
         }
 
-        // --- UI HELPERY ---
 
         private async void Rename_Click(object sender, RoutedEventArgs e)
         {
@@ -217,5 +246,7 @@ namespace InPost_Mobile.Views
             dialog.Commands.Add(new UICommand(_loader.GetString("BtnNo")));
             await dialog.ShowAsync();
         }
+
+
     }
 }
