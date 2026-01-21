@@ -44,7 +44,7 @@ The application was created for every Windows Phone, even with 512MB of RAM.
 
 ## 🔒 Security & Transparency
 
-This project is semi-open source. You can preview the code if you have any doubts about the app.
+This project is open source. You can preview the code ,edit or compile the code.
 
 1.  **Direct Connection:** The app connects **directly** to the official InPost API. No data is routed through third-party servers.
 2.  **No Tracking:** The app does not collect telemetry data or store your phone number externally.
@@ -73,13 +73,7 @@ This project is semi-open source. You can preview the code if you have any doubt
 
 ## ⚖️ License & Copyright
 
-**Copyright for writen code (c) 2026 HexRyu**
-
-The source code is provided solely for educational and verification purposes.
-
-* ❌ **Prohibited:** Compiling, modifying, redistributing, or publishing clones of this application without the author's consent.
-* ✅ **Allowed:** Viewing the code, learning from it, and using the provided `.appx` release for personal use.
-
+*✅You can modify or compile the code. But please be mindful of trademark laws.
 *All trademarks (InPost, Paczkomat) belong to their respective owners and are used for informational purposes only.*
 INPOST LIMITED LIABILITY COMPANY
 NIP: 6793108059

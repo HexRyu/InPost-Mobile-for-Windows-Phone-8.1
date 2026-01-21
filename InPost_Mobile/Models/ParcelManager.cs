@@ -192,6 +192,7 @@ namespace InPost_Mobile.Models
                         {
                             existing.ParcelType = enforcedType;
                             ParseApiObjectToParcel(existing, obj);
+
                         }
                     }
                     catch { }
@@ -213,11 +214,24 @@ namespace InPost_Mobile.Models
                 if (json.ContainsKey("sender")) { try { var s = json.GetNamedObject("sender"); if (s.ContainsKey("name")) parcel.Sender = s.GetNamedString("name"); } catch { } }
             }
 
-            if (json.ContainsKey("openCode")) parcel.PickupCode = json.GetNamedString("openCode");
+            if (json.ContainsKey("openCode"))
+            {
+                string newCode = json.GetNamedString("openCode");
+                // Fix: Only overwrite if new code is present, or if we don't have one yet.
+                // If we have a code and API returns empty/null, keep ours.
+                if (!string.IsNullOrWhiteSpace(newCode))
+                {
+                   parcel.PickupCode = newCode;
+                }
+            }
 
             if (json.ContainsKey("parcelSize"))
             {
-                parcel.Size = json.GetNamedString("parcelSize");
+                string newSize = json.GetNamedString("parcelSize");
+                if (!string.IsNullOrWhiteSpace(newSize))
+                {
+                    parcel.Size = newSize;
+                }
             }
 
             bool isCourier = false;
@@ -263,6 +277,11 @@ namespace InPost_Mobile.Models
                 }
             }
 
+            // Fix: If API returns no pickup point data (common in tracked endpoint updates), 
+            // do NOT overwrite our potentially good address with empty strings.
+            bool hasNewPointName = !string.IsNullOrWhiteSpace(newPointName);
+            bool hasNewPointAddress = !string.IsNullOrWhiteSpace(newPointAddress);
+
             if (string.IsNullOrEmpty(newPointName) && json.ContainsKey("custom_attributes"))
             {
                 try { var ca = json.GetNamedObject("custom_attributes"); if (ca.ContainsKey("target_machine_id")) newPointName = ca.GetNamedString("target_machine_id"); } catch { }
@@ -275,11 +294,17 @@ namespace InPost_Mobile.Models
             }
             else
             {
-                if (!string.IsNullOrEmpty(newPointName)) parcel.PickupPointName = newPointName;
+                // Logic updated to preserve existing data
+                if (hasNewPointName) parcel.PickupPointName = newPointName;
                 else if (string.IsNullOrEmpty(parcel.PickupPointName)) parcel.PickupPointName = "Paczkomat";
 
-                if (!string.IsNullOrWhiteSpace(newPointAddress)) parcel.PickupPointAddress = newPointAddress.Trim();
-                else if (string.IsNullOrWhiteSpace(parcel.PickupPointAddress) || parcel.PickupPointAddress == _loader.GetString("Txt_CheckSms")) parcel.PickupPointAddress = _loader.GetString("Txt_CheckSms");
+                if (hasNewPointAddress) parcel.PickupPointAddress = newPointAddress.Trim();
+                else if (string.IsNullOrWhiteSpace(parcel.PickupPointAddress) || parcel.PickupPointAddress == _loader.GetString("Txt_CheckSms"))
+                {
+                    // Only set to "Check SMS" if we really don't have anything better
+                    if (string.IsNullOrWhiteSpace(parcel.PickupPointAddress))
+                        parcel.PickupPointAddress = _loader.GetString("Txt_CheckSms");
+                }
 
                 if (lat != 0 && lon != 0)
                 {
@@ -446,6 +471,56 @@ namespace InPost_Mobile.Models
         }
         private static async Task<bool> RefreshSingleParcel(ParcelItem parcel)
         {
+            // 1. Try Authenticated Mobile API first (if logged in)
+            if (IsLoggedIn())
+            {
+                try
+                {
+                    if (!_localSettings.Values.ContainsKey("AuthToken")) return false;
+                    string token = _localSettings.Values["AuthToken"].ToString();
+                    string url = $"{AppSecrets.BaseUrl}v4/parcels/{parcel.TrackingNumber}";
+
+                    using (var client = CreateHttpClient())
+                    {
+                        client.DefaultRequestHeaders.Authorization = new Windows.Web.Http.Headers.HttpCredentialsHeaderValue("Bearer", token);
+                        var response = await client.GetAsync(new Uri(url));
+
+                        // --- OBSŁUGA WYGAŚNIĘCIA TOKENA (401) ---
+                        if (response.StatusCode == HttpStatusCode.Unauthorized)
+                        {
+                            bool refreshed = await RefreshAuthTokenAsync();
+                            if (refreshed)
+                            {
+                                // Pobierz nowy token i spróbuj jeszcze raz
+                                token = _localSettings.Values["AuthToken"].ToString();
+                                client.DefaultRequestHeaders.Authorization = new Windows.Web.Http.Headers.HttpCredentialsHeaderValue("Bearer", token);
+                                response = await client.GetAsync(new Uri(url));
+                            }
+                            else
+                            {
+                                // Token refresh failed, fall back to public API
+                                // (Proceed to step 2)
+                            }
+                        }
+
+                        if (response.IsSuccessStatusCode)
+                        {
+                            IBuffer buffer = await response.Content.ReadAsBufferAsync();
+                            string jsonString;
+                            using (var dataReader = DataReader.FromBuffer(buffer)) { dataReader.UnicodeEncoding = Windows.Storage.Streams.UnicodeEncoding.Utf8; jsonString = dataReader.ReadString(buffer.Length); }
+                            JsonObject json = JsonObject.Parse(jsonString);
+                            ParseApiObjectToParcel(parcel, json);
+                            return true;
+                        }
+                    }
+                }
+                catch
+                {
+                    // Fallback to public API on error
+                }
+            }
+
+            // 2. Fallback to public ShipX (existing logic)
             try
             {
                 using (var client = CreateHttpClient())
