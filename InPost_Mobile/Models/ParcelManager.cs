@@ -100,10 +100,14 @@ namespace InPost_Mobile.Models
                 if (r1 || r2 || r3) wasUpdated = true;
             }
             var manualParcels = AllParcels.Where(p => !p.IsArchived && !IsDeliveredStatus(p.Status) && string.IsNullOrEmpty(p.PickupCode)).ToList();
-            foreach (var parcel in manualParcels)
+
+            // Parallelize updates for faster background refresh
+            var tasks = manualParcels.Select(async parcel =>
             {
-                if (await RefreshSingleParcel(parcel)) wasUpdated = true;
-            }
+                 if (await RefreshSingleParcel(parcel)) wasUpdated = true;
+            });
+            await Task.WhenAll(tasks);
+
             if (wasUpdated) await SaveDataAsync();
         }
 

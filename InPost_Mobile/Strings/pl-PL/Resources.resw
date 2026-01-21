@@ -257,7 +257,7 @@
   <data name="Lbl_PickupCode.Text" xml:space="preserve">
     <value>Kod odbioru:</value>
   </data>
-  <data name="Lbl_NameHeader" xml:space="preserve">
+  <data name="Lbl_NameHeader.Text" xml:space="preserve">
     <value>NAZWA PRZESYŁKI</value>
   </data>
   <data name="Lbl_OnlyPl" xml:space="preserve">

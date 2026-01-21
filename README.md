@@ -28,6 +28,7 @@ The aim of the project is to create a working application for receiving or track
 The application was created for every Windows Phone, even with 512MB of RAM.
 
 ### ✨ Key Features (Current Status)
+* ✅ **Two languages ​​supported (English and Polish)
 * ✅ **Parcel Tracking** (Statuses: Sent, Ready for pickup, Delivered).
 * ✅ **Logging in via phone number and adding packages assigned to it to the application.
 * ✅ **Archiving packages.
