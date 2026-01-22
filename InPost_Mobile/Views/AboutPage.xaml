@@ -9,7 +9,7 @@
     Background="Black">
 
     <ScrollViewer>
-        <StackPanel Margin="24,20,0,40">
+        <StackPanel Margin="24,20,24,40">
 
             <TextBlock x:Uid="TxtAppName" 
                        Text="INPOST MOBILE" 
@@ -62,7 +62,7 @@
                        FontSize="18" 
                        Foreground="White" 
                        TextWrapping="Wrap" 
-                       Margin="0,10,24,30"
+                       Margin="0,10,0,30"
                        Opacity="0.9"/>
 
             <Button x:Uid="BtnCredits" 
@@ -76,7 +76,7 @@
                     Padding="30,10"
                     FontSize="18"
                     FontWeight="SemiBold"
-                    Margin="0,10,0,0"/>
+                    Margin="0,20,0,0"/>
 
         </StackPanel>
     </ScrollViewer>

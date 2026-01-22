@@ -11,7 +11,7 @@
     <Grid>
         <StackPanel VerticalAlignment="Center" Margin="24">
 
-            <Image Source="ms-appx:///Assets/header_logo.jpg" Height="50" Margin="0,0,0,0" HorizontalAlignment="Center"/>
+            <Image Source="ms-appx:///Assets/header_logo.jpg" Height="90" Margin="0,0,0,0" HorizontalAlignment="Center"/>
 
             <ProgressBar x:Name="LoginProgress" IsIndeterminate="True" Visibility="Collapsed" Margin="0,0,0,20"/>
             <TextBlock x:Name="StatusText" Foreground="#FF5555" HorizontalAlignment="Center" Margin="0,0,0,10" TextWrapping="Wrap" FontSize="16" FontWeight="SemiBold"/>
@@ -76,6 +76,6 @@
 
         <Button x:Name="BtnSkip" Content="POMIŃ LOGOWANIE" Click="Skip_Click" 
                 VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Margin="24,0,24,20"
-                Background="Transparent" Foreground="#666666" FontSize="12"/>
+                Background="Transparent" Foreground="#DDDDDD" FontSize="12"/>
     </Grid>
 </Page>
