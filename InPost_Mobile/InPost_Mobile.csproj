@@ -133,6 +133,7 @@
     <Content Include="Assets\avatar.png" />
     <Content Include="Assets\avatar_api.png" />
     <Content Include="Assets\avatar_tester.png" />
+    <Content Include="Assets\shrepard.png" />
     <Content Include="Assets\header_logo.jpg" />
     <Content Include="Assets\Logo.scale-100.png" />
     <Content Include="Assets\Logo.scale-140.png" />

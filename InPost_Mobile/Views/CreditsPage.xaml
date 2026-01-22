@@ -76,6 +76,28 @@
                            TextWrapping="Wrap"/>
             </Grid>
 
+            <Grid Margin="0,0,0,30">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Image Source="ms-appx:///Assets/shrepard.png" 
+                       Width="100" 
+                       Height="100" 
+                       Stretch="UniformToFill" 
+                       VerticalAlignment="Top"/>
+
+                <TextBlock Text="Shrepard" 
+                           Grid.Column="1" 
+                           FontSize="32" 
+                           Foreground="#3399FF" 
+                           VerticalAlignment="Center" 
+                           Margin="15,0,0,0" 
+                           FontWeight="Normal"
+                           TextWrapping="Wrap"/>
+            </Grid>
+
         </StackPanel>
     </ScrollViewer>
 </Page>

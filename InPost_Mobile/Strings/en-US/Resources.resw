@@ -58,7 +58,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-
   <data name="Status_created" xml:space="preserve">
     <value>Label created</value>
   </data>
@@ -125,10 +124,15 @@
   <data name="Status_not_found" xml:space="preserve">
     <value>Parcel not found</value>
   </data>
-   <data name="Status_stack_in_box_machine" xml:space="preserve">
-    <value>Placed in Parcel Locker (Stack)</value>
+  <data name="Status_stack_in_box_machine" xml:space="preserve">
+    <value>Parcel redirected to temporary locker</value>
   </data>
-
+  <data name="Status_pickup_reminder_set" xml:space="preserve">
+    <value>Reminder about waiting parcel</value>
+  </data>
+  <data name="Status_storage_period_expired" xml:space="preserve">
+    <value>Storage period expired</value>
+  </data>
   <data name="Status_Doręczona" xml:space="preserve">
     <value>Delivered</value>
   </data>
@@ -168,7 +172,6 @@
   <data name="Status_Awizowana" xml:space="preserve">
     <value>Delivery attempted</value>
   </data>
-
   <data name="Desc_out_for_delivery" xml:space="preserve">
     <value>Courier is on the way</value>
   </data>
@@ -184,7 +187,6 @@
   <data name="Txt_CourierDelivery" xml:space="preserve">
     <value>Courier delivery</value>
   </data>
-
   <data name="Lbl_Size_Small" xml:space="preserve">
     <value>Small</value>
   </data>
@@ -207,7 +209,7 @@
   <data name="HubSectionReturn.Header" xml:space="preserve">
     <value>Return</value>
   </data>
-  
+
   <data name="Hub_Receive.Header" xml:space="preserve">
     <value>Receive</value>
   </data>
@@ -217,7 +219,6 @@
   <data name="Hub_Return.Header" xml:space="preserve">
     <value>Return</value>
   </data>
-
   <data name="LblSender.Text" xml:space="preserve">
     <value>Sender</value>
   </data>
@@ -263,7 +264,6 @@
   <data name="Lbl_OnlyPl" xml:space="preserve">
     <value>(Only Polish numbers +48 supported)</value>
   </data>
-
   <data name="BtnNewParcel.Label" xml:space="preserve">
     <value>Add parcel</value>
   </data>
@@ -318,7 +318,6 @@
   <data name="BtnNo" xml:space="preserve">
     <value>No</value>
   </data>
-
   <data name="PageTitleDetails.Text" xml:space="preserve">
     <value>Parcel details</value>
   </data>
@@ -355,7 +354,6 @@
   <data name="Txt_CheckSms" xml:space="preserve">
     <value>Check SMS</value>
   </data>
-
   <data name="DialogArchiveTitle" xml:space="preserve">
     <value>Archive parcel</value>
   </data>
@@ -416,7 +414,6 @@
   <data name="Dialog_TermsRequiredContent" xml:space="preserve">
     <value>To log in with a phone number, you need to accept the legal information and terms of use.</value>
   </data>
-
   <data name="TxtLegalTitle.Text" xml:space="preserve">
     <value>LEGAL INFORMATION</value>
   </data>

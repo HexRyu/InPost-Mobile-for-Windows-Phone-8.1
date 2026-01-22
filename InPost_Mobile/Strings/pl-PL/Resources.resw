@@ -58,7 +58,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-
   <data name="Status_created" xml:space="preserve">
     <value>Wygenerowano etykietę</value>
   </data>
@@ -125,10 +124,12 @@
   <data name="Status_not_found" xml:space="preserve">
     <value>Nie znaleziono przesyłki</value>
   </data>
-   <data name="Status_stack_in_box_machine" xml:space="preserve">
-    <value>Umieszczona w Paczkomacie (Stack)</value>
+  <data name="Status_stack_in_box_machine" xml:space="preserve">
+    <value>Paczka przekierowana do paczkomatu tymczasowego</value>
   </data>
-
+  <data name="Status_pickup_reminder_set" xml:space="preserve">
+    <value>Przypomnienie o czekającej paczce</value>
+  </data>
   <data name="Status_Doręczona" xml:space="preserve">
     <value>Doręczona</value>
   </data>
@@ -168,7 +169,6 @@
   <data name="Status_Awizowana" xml:space="preserve">
     <value>Awizowana</value>
   </data>
-
   <data name="Desc_out_for_delivery" xml:space="preserve">
     <value>Kurier jedzie z paczką</value>
   </data>
@@ -184,7 +184,6 @@
   <data name="Txt_CourierDelivery" xml:space="preserve">
     <value>Doręczenie kurierem</value>
   </data>
-
   <data name="Lbl_Size_Small" xml:space="preserve">
     <value>Mała</value>
   </data>
@@ -197,7 +196,6 @@
   <data name="Lbl_Size_Mini" xml:space="preserve">
     <value>Mini</value>
   </data>
-
   <data name="HubSectionReceive.Header" xml:space="preserve">
     <value>Odbieram</value>
   </data>
@@ -207,7 +205,6 @@
   <data name="HubSectionReturn.Header" xml:space="preserve">
     <value>Zwracam</value>
   </data>
-  
   <data name="Hub_Receive.Header" xml:space="preserve">
     <value>Odbieram</value>
   </data>
@@ -217,7 +214,6 @@
   <data name="Hub_Return.Header" xml:space="preserve">
     <value>Zwracam</value>
   </data>
-
   <data name="LblSender.Text" xml:space="preserve">
     <value>Nadawca</value>
   </data>
@@ -263,7 +259,6 @@
   <data name="Lbl_OnlyPl" xml:space="preserve">
     <value>(Obsługiwane tylko polskie numery +48)</value>
   </data>
-
   <data name="BtnNewParcel.Label" xml:space="preserve">
     <value>Dodaj paczkę</value>
   </data>
@@ -318,7 +313,6 @@
   <data name="BtnNo" xml:space="preserve">
     <value>Nie</value>
   </data>
-
   <data name="PageTitleDetails.Text" xml:space="preserve">
     <value>Szczegóły przesyłki</value>
   </data>
@@ -355,7 +349,6 @@
   <data name="Txt_CheckSms" xml:space="preserve">
     <value>Sprawdź w SMS</value>
   </data>
-
   <data name="DialogArchiveTitle" xml:space="preserve">
     <value>Archiwizacja</value>
   </data>

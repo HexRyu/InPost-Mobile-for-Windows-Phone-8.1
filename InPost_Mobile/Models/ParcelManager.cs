@@ -294,10 +294,50 @@ namespace InPost_Mobile.Models
             bool hasNewPointName = !string.IsNullOrWhiteSpace(newPointName);
             bool hasNewPointAddress = !string.IsNullOrWhiteSpace(newPointAddress);
 
-            if (string.IsNullOrEmpty(newPointName) && json.ContainsKey("custom_attributes"))
+            // Handle Redirects (Temporary Lockers)
+            if (json.ContainsKey("custom_attributes"))
             {
-                try { var ca = json.GetNamedObject("custom_attributes"); if (ca.ContainsKey("target_machine_id")) newPointName = ca.GetNamedString("target_machine_id"); } catch { }
+                try
+                {
+                    var ca = json.GetNamedObject("custom_attributes");
+                    if (ca.ContainsKey("target_machine_id"))
+                    {
+                        string tId = ca.GetNamedString("target_machine_id");
+                        if (!string.IsNullOrWhiteSpace(tId))
+                        {
+                            newPointName = tId; // Override with actual machine ID (Critical for Remote Open)
+
+                            // Try to get address for target machine
+                            if (ca.ContainsKey("target_machine_detail"))
+                            {
+                                var tDetail = ca.GetNamedObject("target_machine_detail");
+                                if (tDetail.ContainsKey("location_description"))
+                                {
+                                    newPointAddress = tDetail.GetNamedString("location_description");
+                                }
+                                
+                                // Parse specific address fields if available (snake_case common in this part of API)
+                                JsonObject tAddr = null;
+                                if (tDetail.ContainsKey("address")) tAddr = tDetail.GetNamedObject("address");
+                                else if (tDetail.ContainsKey("address_details")) tAddr = tDetail.GetNamedObject("address_details");
+
+                                if (tAddr != null)
+                                {
+                                    string s = tAddr.ContainsKey("street") ? tAddr.GetNamedString("street") : "";
+                                    string b = tAddr.ContainsKey("building_no") ? tAddr.GetNamedString("building_no") : "";
+                                    string c = tAddr.ContainsKey("city") ? tAddr.GetNamedString("city") : "";
+                                    if (!string.IsNullOrEmpty(s)) newPointAddress = $"{s} {b}\n{c}";
+                                }
+                            }
+                        }
+                    }
+                }
+                catch { }
             }
+
+            // Re-evaluate flags in case they were updated by Redirect logic
+            hasNewPointName = !string.IsNullOrWhiteSpace(newPointName);
+            hasNewPointAddress = !string.IsNullOrWhiteSpace(newPointAddress);
 
             if (isCourier)
             {
@@ -342,7 +382,14 @@ namespace InPost_Mobile.Models
                 foreach (var item in eventsArr)
                 {
                     var evObj = item.GetObject();
-                    string name = evObj.ContainsKey("eventTitle") ? evObj.GetNamedString("eventTitle") : "Status";
+                    // Fix: Try to get machine-readable 'status' code first for proper translation
+                    string name = evObj.ContainsKey("status") ? evObj.GetNamedString("status") : "";
+                    
+                    if (string.IsNullOrEmpty(name))
+                    {
+                        name = evObj.ContainsKey("eventTitle") ? evObj.GetNamedString("eventTitle") : "Status";
+                    }
+
                     string dateStr = evObj.ContainsKey("date") ? evObj.GetNamedString("date") : DateTime.Now.ToString("o");
                     DateTimeOffset realDate; if (!DateTimeOffset.TryParse(dateStr, out realDate)) realDate = DateTimeOffset.MinValue;
                     tempList.Add(new TempEvent { Status = name, RealDate = realDate });
@@ -373,7 +420,7 @@ namespace InPost_Mobile.Models
                     {
                         Description = translatedDesc,
                         OriginalStatus = originalStatusName,
-                        Date = item.RealDate.ToString("dd.MM HH:mm"),
+                        Date = item.RealDate.ToLocalTime().ToString("dd.MM HH:mm"),
                         Color = GetColorForStatus(originalStatusName),
                         Opacity = (finalHistory.Count == 0) ? 1.0 : 0.6,
                         IsFirst = false

@@ -93,7 +93,7 @@ namespace InPost_Mobile.Views
             Frame.Navigate(typeof(LegalPage));
         }
 
-        private void LanguageComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void LanguageComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var combo = sender as ComboBox;
             var item = combo.SelectedItem as ComboBoxItem;
@@ -111,6 +111,9 @@ namespace InPost_Mobile.Views
 
                 settings.Values["AppLanguage"] = selectedLang;
                 ApplicationLanguages.PrimaryLanguageOverride = (selectedLang == "System") ? "" : selectedLang;
+
+                // Fix: Force immediate translation of cached parcels
+                await ParcelManager.ReloadAllParcelsTranslation();
             }
         }
     }

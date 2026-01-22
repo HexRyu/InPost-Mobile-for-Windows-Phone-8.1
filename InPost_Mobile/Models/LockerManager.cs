@@ -23,7 +23,7 @@ namespace InPost_Mobile.Models
 
             var client = new HttpClient(filter);
             client.DefaultRequestHeaders.UserAgent.ParseAdd(AppSecrets.UserAgent);
-            client.DefaultRequestHeaders.Accept.ParseAdd("application/json");
+            // client.DefaultRequestHeaders.Accept.ParseAdd("application/json"); // Removed to match C code
             return client;
         }
 
@@ -55,7 +55,7 @@ namespace InPost_Mobile.Models
             JsonObject phoneObj = new JsonObject();
             phoneObj.SetNamedValue("prefix", JsonValue.CreateStringValue("+48"));
             phoneObj.SetNamedValue("value", JsonValue.CreateStringValue(phone));
-            parcelObj.SetNamedValue("receiverPhoneNumber", phoneObj);
+            parcelObj.SetNamedValue("recieverPhoneNumber", phoneObj);
 
             JsonObject geoObj = new JsonObject();
             geoObj.SetNamedValue("latitude", JsonValue.CreateNumberValue(lat));
@@ -74,9 +74,13 @@ namespace InPost_Mobile.Models
                     client.DefaultRequestHeaders.Authorization = new Windows.Web.Http.Headers.HttpCredentialsHeaderValue("Bearer", token);
 
                     // A. VALIDATE
-                    var validateResp = await client.PostAsync(
-                        new Uri(AppSecrets.BaseUrl + "v2/collect/validate"),
-                        new HttpStringContent(json.ToString(), Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json"));
+                    // C Code uses strict "Content-Type: application/json" without charset
+                    var valContent = new HttpStringContent(json.ToString(), Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json");
+                    valContent.Headers.ContentType.CharSet = null; // Remove charset to match C code behavior
+
+                    var validateResp = await client.PostAsync(new Uri(AppSecrets.BaseUrl + "v2/collect/validate"), valContent);
+
+                    string valResponseStr = await validateResp.Content.ReadAsStringAsync();
 
                     if (validateResp.StatusCode == HttpStatusCode.Unauthorized && retry)
                     {
@@ -84,26 +88,25 @@ namespace InPost_Mobile.Models
                         if (await ParcelManager.RefreshAuthTokenAsync()) continue;
                     }
 
-                    string valResponseStr = await validateResp.Content.ReadAsStringAsync();
-
                     if (!validateResp.IsSuccessStatusCode)
                     {
-                        // Zwracamy dokładny błąd z API
+                        // Log full error for debugging (User sees InternalServerError, this helps reveal why)
                         throw new Exception($"Błąd walidacji ({validateResp.StatusCode}): {valResponseStr}");
                     }
 
                     JsonObject valObj = JsonObject.Parse(valResponseStr);
                     string sessionUuid = "";
                     if (valObj.ContainsKey("sessionUuid")) sessionUuid = valObj.GetNamedString("sessionUuid");
-                    else throw new Exception("Brak sessionUuid w odpowiedzi.");
+                    else throw new Exception($"Brak sessionUuid. Resp: {valResponseStr}");
 
                     // B. OPEN
                     JsonObject openJson = new JsonObject();
                     openJson.SetNamedValue("sessionUuid", JsonValue.CreateStringValue(sessionUuid));
 
-                    var openResp = await client.PostAsync(
-                        new Uri(AppSecrets.BaseUrl + "v1/collect/compartment/open"),
-                        new HttpStringContent(openJson.ToString(), Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json"));
+                    var openContent = new HttpStringContent(openJson.ToString(), Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json");
+                    openContent.Headers.ContentType.CharSet = null; // Remove charset
+
+                    var openResp = await client.PostAsync(new Uri(AppSecrets.BaseUrl + "v1/collect/compartment/open"), openContent);
 
                     if (openResp.IsSuccessStatusCode) return sessionUuid;
 
