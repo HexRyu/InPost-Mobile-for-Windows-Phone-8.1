@@ -29,7 +29,7 @@ The application was created for every Windows Phone, even with 512MB of RAM.
 
 ### ✨ Key Features (Current Status)
 * ✅ **Two languages ​​supported (English and Polish)
-* ✅ **Parcel Tracking**
+* ✅ **Parcel Tracking
 * ✅ **Logging in via phone number and adding packages assigned to it to the application.
 * ✅ **Archiving packages.
 * ✅ **Opening lockers using a QR code.
