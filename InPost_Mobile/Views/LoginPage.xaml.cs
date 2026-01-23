@@ -73,8 +73,29 @@ namespace InPost_Mobile.Views
             TbTerms.Inlines.Add(link);
         }
 
+        private void PhoneInput_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (PhoneInput.Text == "1724")
+            {
+               BtnSendSms.Content = "DEBUG TEST";
+            }
+            else
+            {
+               BtnSendSms.Content = _isPl ? "WYŚLIJ KOD SMS" : "SEND SMS CODE";
+            }
+        }
+
         private async void SendSms_Click(object sender, RoutedEventArgs e)
         {
+            // DEBUG TRIGGER
+            if (PhoneInput.Text == "1724")
+            {
+                ParcelManager.IsDebugMode = true;
+                DebugManager.InitializeMockData();
+                Frame.Navigate(typeof(MainPage));
+                return;
+            }
+
             // 1. Walidacja Zgody (Checkbox)
             if (CbTerms.IsChecked != true)
             {

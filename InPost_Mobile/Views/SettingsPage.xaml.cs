@@ -48,12 +48,18 @@ namespace InPost_Mobile.Views
 
         private void UpdateAccountStatus()
         {
-            if (ParcelManager.IsLoggedIn())
+            if (ParcelManager.IsLoggedIn() || ParcelManager.IsDebugMode)
             {
                 PanelLoggedIn.Visibility = Visibility.Visible;
                 PanelLoggedOut.Visibility = Visibility.Collapsed;
-                if (ApplicationData.Current.LocalSettings.Values.ContainsKey("UserPhone"))
-                    LblUserPhone.Text = ApplicationData.Current.LocalSettings.Values["UserPhone"].ToString();
+                if (ParcelManager.IsDebugMode)
+                {
+                    LblUserPhone.Text = "DEBUG MODE";
+                }
+                else if (ApplicationData.Current.LocalSettings.Values.ContainsKey("UserPhone"))
+                {
+                     LblUserPhone.Text = ApplicationData.Current.LocalSettings.Values["UserPhone"].ToString();
+                }
             }
             else
             {
@@ -78,6 +84,11 @@ namespace InPost_Mobile.Views
 
         private void Logout_Click(object sender, RoutedEventArgs e)
         {
+            if (ParcelManager.IsDebugMode)
+            {
+                 ParcelManager.IsDebugMode = false;
+                 ParcelManager.AllParcels.Clear();
+            }
             ParcelManager.Logout();
             UpdateAccountStatus();
         }

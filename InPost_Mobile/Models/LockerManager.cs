@@ -29,6 +29,13 @@ namespace InPost_Mobile.Models
 
         public static async Task<string> ValidateAndOpenAsync(ParcelItem parcel)
         {
+            if (ParcelManager.IsDebugMode)
+            {
+                // MOCK OPENING
+                await Task.Delay(2000); // Simulate network
+                return "DEBUG-SESSION-UUID";
+            }
+
             // 1. Sprawdzenie współrzędnych
             double lat = parcel.Latitude;
             double lon = parcel.Longitude;
@@ -55,7 +62,7 @@ namespace InPost_Mobile.Models
             JsonObject phoneObj = new JsonObject();
             phoneObj.SetNamedValue("prefix", JsonValue.CreateStringValue("+48"));
             phoneObj.SetNamedValue("value", JsonValue.CreateStringValue(phone));
-            parcelObj.SetNamedValue("recieverPhoneNumber", phoneObj);
+            parcelObj.SetNamedValue("receiverPhoneNumber", phoneObj);
 
             JsonObject geoObj = new JsonObject();
             geoObj.SetNamedValue("latitude", JsonValue.CreateNumberValue(lat));
@@ -119,6 +126,16 @@ namespace InPost_Mobile.Models
 
         public static async Task<bool> IsLockerClosedAsync(string sessionUuid)
         {
+            if (ParcelManager.IsDebugMode)
+            {
+               // Mock: 50/50 chance of being closed or simply wait a bit and return true? 
+               // Let's assume after a few calls it closes.
+               // For simplicity, let's just return true (closed) after a delay to simulate quick pickup, 
+               // or false effectively if we want to simulate waiting. 
+               // Let's return Random bool or just true for "test success".
+               await Task.Delay(1000);
+               return true; 
+            }
             try
             {
                 string token = _localSettings.Values["AuthToken"].ToString();
@@ -142,6 +159,11 @@ namespace InPost_Mobile.Models
 
         public static async Task TerminateSessionAsync(string sessionUuid)
         {
+            if (ParcelManager.IsDebugMode)
+            {
+                await Task.Delay(500);
+                return;
+            }
             try
             {
                 string token = _localSettings.Values["AuthToken"].ToString();

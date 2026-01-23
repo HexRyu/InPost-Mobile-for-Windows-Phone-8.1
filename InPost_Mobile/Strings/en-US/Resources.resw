@@ -172,6 +172,39 @@
   <data name="Status_Awizowana" xml:space="preserve">
     <value>Delivery attempted</value>
   </data>
+  <data name="Status_stack_in_customer_service_point" xml:space="preserve">
+    <value>Parcel at Customer Service Point</value>
+  </data>
+  <data name="Status_courier_label_creation" xml:space="preserve">
+    <value>Label created</value>
+  </data>
+  <data name="Status_ready_to_pickup_from_pok" xml:space="preserve">
+    <value>Ready for pickup at POK</value>
+  </data>
+  <data name="Status_undelivered" xml:space="preserve">
+    <value>Undelivered</value>
+  </data>
+  <data name="Status_return_pickup_confirmation" xml:space="preserve">
+    <value>Return pickup confirmed</value>
+  </data>
+  <data name="Status_missed_delivery" xml:space="preserve">
+    <value>Missed delivery</value>
+  </data>
+  <data name="Status_delayed" xml:space="preserve">
+    <value>Delayed</value>
+  </data>
+  <data name="Status_unclear_address" xml:space="preserve">
+    <value>Unclear address</value>
+  </data>
+  <data name="Status_taken_by_courier_from_pok" xml:space="preserve">
+    <value>Taken by courier from POK</value>
+  </data>
+  <data name="Status_dispatched_by_sender_to_pok" xml:space="preserve">
+    <value>Dispatched at POK</value>
+  </data>
+  <data name="Msg_Copied" xml:space="preserve">
+    <value>Tracking number copied to clipboard</value>
+  </data>
   <data name="Desc_out_for_delivery" xml:space="preserve">
     <value>Courier is on the way</value>
   </data>
@@ -460,5 +493,17 @@ Legal form: Spółka z ograniczoną odpowiedzialnością. All trademarks belong 
   </data>
   <data name="BtnLogout.Content" xml:space="preserve">
     <value>LOG OUT</value>
+  </data>
+  <data name="Section_ReadyForPickup" xml:space="preserve">
+    <value>Ready for pickup</value>
+  </data>
+  <data name="Section_OutForDelivery" xml:space="preserve">
+    <value>Out for delivery</value>
+  </data>
+  <data name="Section_InTransit" xml:space="preserve">
+    <value>In transit</value>
+  </data>
+  <data name="Section_Delivered" xml:space="preserve">
+    <value>Delivered</value>
   </data>
 </root>

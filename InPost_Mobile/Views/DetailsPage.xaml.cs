@@ -90,7 +90,7 @@ namespace InPost_Mobile.Views
 
             try
             {
-                statusBar.ProgressIndicator.Text = "Skrytka zaniedługo się otworzy";
+                statusBar.ProgressIndicator.Text = "Skrytka otworzy się za chwilę";
                 await statusBar.ProgressIndicator.ShowAsync();
                 sessionUuid = await LockerManager.ValidateAndOpenAsync(_currentParcel);
             }

@@ -169,6 +169,39 @@
   <data name="Status_Awizowana" xml:space="preserve">
     <value>Awizowana</value>
   </data>
+  <data name="Status_stack_in_customer_service_point" xml:space="preserve">
+    <value>Paczka w Punkcie Obsługi</value>
+  </data>
+  <data name="Status_courier_label_creation" xml:space="preserve">
+    <value>Etykieta utworzona</value>
+  </data>
+  <data name="Status_ready_to_pickup_from_pok" xml:space="preserve">
+    <value>Gotowa do odbioru w POK</value>
+  </data>
+  <data name="Status_undelivered" xml:space="preserve">
+    <value>Niedostarczona</value>
+  </data>
+  <data name="Status_return_pickup_confirmation" xml:space="preserve">
+    <value>Potwierdzenie odbioru zwrotu</value>
+  </data>
+  <data name="Status_missed_delivery" xml:space="preserve">
+    <value>Nieudane doręczenie</value>
+  </data>
+  <data name="Status_delayed" xml:space="preserve">
+    <value>Opóźniona</value>
+  </data>
+  <data name="Status_unclear_address" xml:space="preserve">
+    <value>Błędny adres</value>
+  </data>
+  <data name="Status_taken_by_courier_from_pok" xml:space="preserve">
+    <value>Odebrana przez kuriera z POK</value>
+  </data>
+  <data name="Status_dispatched_by_sender_to_pok" xml:space="preserve">
+    <value>Nadana w POK</value>
+  </data>
+  <data name="Msg_Copied" xml:space="preserve">
+    <value>Numer przesyłki został skopiowany do schowka</value>
+  </data>
   <data name="Desc_out_for_delivery" xml:space="preserve">
     <value>Kurier jedzie z paczką</value>
   </data>
@@ -456,5 +489,17 @@ Forma prawna: Spółka z ograniczoną odpowiedzialnością. Wszelkie znaki towar
   </data>
   <data name="BtnLogout.Content" xml:space="preserve">
     <value>WYLOGUJ SIĘ</value>
+  </data>
+  <data name="Section_ReadyForPickup" xml:space="preserve">
+    <value>Gotowe do odbioru</value>
+  </data>
+  <data name="Section_OutForDelivery" xml:space="preserve">
+    <value>Wydane do doręczenia</value>
+  </data>
+  <data name="Section_InTransit" xml:space="preserve">
+    <value>W trakcie dostawy</value>
+  </data>
+  <data name="Section_Delivered" xml:space="preserve">
+    <value>Odebrane</value>
   </data>
 </root>

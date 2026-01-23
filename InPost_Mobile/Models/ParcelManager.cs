@@ -25,6 +25,7 @@ namespace InPost_Mobile.Models
         private const string DATA_FILENAME = "parcels_data.json";
         private static ApplicationDataContainer _localSettings = ApplicationData.Current.LocalSettings;
         private static ResourceLoader _loader = new ResourceLoader();
+        public static bool IsDebugMode { get; set; } = false;
 
         private static HttpClient CreateHttpClient()
         {
@@ -91,9 +92,20 @@ namespace InPost_Mobile.Models
 
         public static async Task UpdateAllParcelsAsync()
         {
+            if (IsDebugMode)
+            {
+                // DEBUG MODE: Load from DebugManager
+                AllParcels.Clear();
+                AllParcels.AddRange(DebugManager.GetMockParcels("Receive"));
+                AllParcels.AddRange(DebugManager.GetMockParcels("Send"));
+                AllParcels.AddRange(DebugManager.GetMockParcels("Return"));
+                return;
+            }
+
             bool wasUpdated = false;
             if (IsLoggedIn())
             {
+                // ... real api calls ...
                 bool r1 = await DownloadFromEndpoint(AppSecrets.BaseUrl + "v4/parcels/tracked", "Receive");
                 bool r2 = await DownloadFromEndpoint(AppSecrets.BaseUrl + "v4/parcels/sent", "Send");
                 bool r3 = await DownloadFromEndpoint(AppSecrets.BaseUrl + "v1/returns/tickets", "Return");
@@ -111,7 +123,7 @@ namespace InPost_Mobile.Models
 
         public static string LastDebugLog = ""; // Debug field
 
-        private static bool IsDeliveredStatus(string status)
+        public static bool IsDeliveredStatus(string status)
         {
             if (string.IsNullOrEmpty(status)) return false;
             string s = status.ToLower();
@@ -365,10 +377,56 @@ namespace InPost_Mobile.Models
                 }
             }
 
-            if (isCourier) parcel.Icon = "\uE139"; else parcel.Icon = "\uE18B";
-            if (IsDeliveredStatus(parcel.Status)) parcel.Icon = "\uE10B";
-            else if (apiStatus.ToLower().Contains("return") || apiStatus.ToLower().Contains("zwrócona")) parcel.Icon = "\uE19F";
-            else if (apiStatus.ToLower().Contains("canceled") || apiStatus.ToLower().Contains("anulowana")) parcel.Icon = "\uE10A";
+            if (isCourier) parcel.Icon = "\uE139"; // Bus/Truck
+            else parcel.Icon = "\uE8B7"; // Paczkomat (Box)
+
+            // Override for Delivered/Returned?
+            // User: "For courier parcels, no matter the status let there be a bus icon"
+            // User: "and to all locker parcels package icon... but only change this for section Odbieram (Receive) and Nadaję (Send)"
+            // This implies:
+            // 1. Courier: ALWAYS Bus (\uE139) unless maybe Archived? stick to user request: "no matter what status"
+            // 2. Locker: Box (\uE8B7) in Receive/Send. Delivered/Returns can have specific status icons (Home, Arrow).
+
+            if (isCourier)
+            {
+                 parcel.Icon = "\uE139";
+                 parcel.IconImage = "ms-appx:///Assets/icon_kurier.png";
+            }
+            else
+            {
+                 // Locker
+                 string s = apiStatus.ToLower();
+                 if (parcel.ParcelType == "Receive" || parcel.ParcelType == "Send")
+                 {
+                     // Check specific exceptions
+                     if (s.Contains("return") || s.Contains("zwrócona"))
+                     {
+                         parcel.Icon = "\uE117"; // Keep Return (Arrow) - User likes this
+                         parcel.IconImage = null;
+                     }
+                     else if (IsDeliveredStatus(parcel.Status))
+                     {
+                         parcel.Icon = "\uE10B"; // Checkmark (Ptaszek)
+                         parcel.IconImage = null;
+                     }
+                     else
+                     {
+                         // Default Locker: Use PNG (covers Ready to Pickup, Out for Delivery, In Transit)
+                         parcel.Icon = "\uE8B7"; 
+                         parcel.IconImage = "ms-appx:///Assets/icon_paczkopunkt.PNG";
+                     }
+                 }
+                 else
+                 {
+                     // Archive / Returns ?
+                     parcel.IconImage = null; // Use Font Icons for Archive/History
+                     
+                     if (IsDeliveredStatus(parcel.Status)) parcel.Icon = "\uE10B"; // Checkmark
+                     else if (s.Contains("return")) parcel.Icon = "\uE117";
+                     else if (s.Contains("canceled")) parcel.Icon = "\uE10A";
+                     else parcel.Icon = "\uE8B7";
+                 }
+            }
 
             if (IsDeliveredStatus(parcel.Status) || apiStatus.ToLower() == "canceled")
             {
@@ -433,7 +491,7 @@ namespace InPost_Mobile.Models
 
         private class TempEvent { public string Status; public DateTimeOffset RealDate; }
 
-        private static string GetTranslatedStatus(string apiStatus)
+        public static string GetTranslatedStatus(string apiStatus)
         {
             if (string.IsNullOrEmpty(apiStatus)) return "";
 
@@ -490,10 +548,48 @@ namespace InPost_Mobile.Models
         }
 
 
-        private static string GetIconForStatus(string s)
+        public static string GetIconForStatus(string s)
         {
-            s = s.ToLower(); if (s.Contains("delivered") || s.Contains("odebrana") || s.Contains("dostarczona")) return "\uE10B";
-            if (s.Contains("return") || s.Contains("zwrócona")) return "\uE19F"; if (s.Contains("canceled") || s.Contains("anulowana")) return "\uE10A"; return "\uE18B";
+            s = s.ToLower(); 
+            if (s.Contains("return") || s.Contains("zwrócona") || s.Contains("zwrot")) return "\uE117"; // Undo (Return arrow)
+            if (s.Contains("taken_by_courier") || s.Contains("odebrana_przez_kuriera") || s.Contains("collected_from_sender")) return "\uE112"; // Arrow (In Transit)
+            if (s.Contains("delivered") || s.Contains("odebrana") || s.Contains("dostarczona")) return "\uE10F"; // Home (House)
+            if (s.Contains("canceled") || s.Contains("anulowana")) return "\uE10A"; // Cancel (X)
+            if (s.Contains("out_for_delivery") || s.Contains("wydana_do_doręczenia")) return "\uE112"; // Right Arrow (In Transit/Motion)
+            if (s.Contains("ready_to_pickup")) return "\uE102"; // Map Pin (Locker location)
+            return "\uE119"; // Mail Envelope (Default for Parcel)
+        }
+
+        public static string GetParcelSectionName(string statusRaw)
+        {
+             if (string.IsNullOrEmpty(statusRaw)) return _loader.GetString("Section_OutForDelivery");
+             string s = statusRaw.ToLower();
+
+             // Ready for pickup
+             if (s.Contains("ready_to_pickup") || s.Contains("stack_in_box_machine") || s.Contains("pickup_reminder") || s.Contains("awizo"))
+                return _loader.GetString("Section_ReadyForPickup");
+
+             // Delivered
+             if (s.Contains("delivered") || s.Contains("picked_up") || s.Contains("returned_to_sender") || s.Contains("canceled") || s.Contains("dostarczona") || s.Contains("odebrana"))
+                return _loader.GetString("Section_Delivered");
+
+             // Default (In Transit / Out for Delivery)
+             // Refined logic:
+             // 1. Out for delivery (courier last mile)
+             if (s.Contains("out_for_delivery") || s.Contains("courier_delivery") || s.Contains("wydana_do_doręczenia"))
+                 return _loader.GetString("Section_OutForDelivery");
+
+             // 2. In Transit (Middle mile)
+             string[] transitStatuses = { 
+                 "created", "confirmed", "collected_from_sender", "adopted_at_source_branch", 
+                 "sent_from_source_branch", "adopted_at_sorting_center", "sent_from_sorting_center", 
+                 "adopted_at_target_branch", "courier_label_creation", "w_trasie", "przyjęta_w_oddziale", "wysłana_z"
+             };
+
+             if (transitStatuses.Any(ts => s.Contains(ts)))
+                 return _loader.GetString("Section_InTransit");
+
+             return _loader.GetString("Section_InTransit"); // Default fallback to In Transit instead of OutForDelivery
         }
         private static string GetColorForStatus(string s)
         {
@@ -530,6 +626,7 @@ namespace InPost_Mobile.Models
         }
         private static async Task<bool> RefreshSingleParcel(ParcelItem parcel)
         {
+            if (IsDebugMode) return true; // Fake success in debug
             LastDebugLog = "Starting Refresh...";
             // 1. Try Authenticated Mobile API first (if logged in)
             if (IsLoggedIn())
@@ -607,9 +704,49 @@ namespace InPost_Mobile.Models
             return false;
         }
         public static async Task<bool> RequestSmsCode(string p) { try { using (var c = CreateHttpClient()) { string j = "{\"phoneNumber\":{\"prefix\":\"+48\",\"value\":\"" + p + "\"}}"; var ct = new HttpStringContent(j, Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json"); var r = await c.PostAsync(new Uri(AppSecrets.BaseUrl + "v1/account"), ct); return r.IsSuccessStatusCode; } } catch { return false; } }
-        public static async Task<bool> VerifySmsCode(string p, string s) { try { using (var c = CreateHttpClient()) { string j = "{\"phoneNumber\":{\"prefix\":\"+48\",\"value\":\"" + p + "\"},\"smsCode\":\"" + s + "\",\"devicePlatform\":\"Android\"}"; var ct = new HttpStringContent(j, Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json"); var r = await c.PostAsync(new Uri(AppSecrets.BaseUrl + "v1/account/verification"), ct); if (r.IsSuccessStatusCode) { string t = await r.Content.ReadAsStringAsync(); JsonObject o = JsonObject.Parse(t); if (o.ContainsKey("authToken")) { _localSettings.Values["AuthToken"] = o.GetNamedString("authToken"); if (o.ContainsKey("refreshToken")) _localSettings.Values["RefreshToken"] = o.GetNamedString("refreshToken"); _localSettings.Values["UserPhone"] = "+48 " + p; return true; } } return false; } } catch { return false; } }
+        public static async Task<bool> VerifySmsCode(string p, string s) 
+        { 
+            try 
+            { 
+                using (var c = CreateHttpClient()) 
+                { 
+                    string j = "{\"phoneNumber\":{\"prefix\":\"+48\",\"value\":\"" + p + "\"},\"smsCode\":\"" + s + "\",\"devicePlatform\":\"Android\"}"; 
+                    var ct = new HttpStringContent(j, Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json"); 
+                    var r = await c.PostAsync(new Uri(AppSecrets.BaseUrl + "v1/account/verification"), ct); 
+                    if (r.IsSuccessStatusCode) 
+                    { 
+                        string t = await r.Content.ReadAsStringAsync(); 
+                        JsonObject o = JsonObject.Parse(t); 
+                        if (o.ContainsKey("authToken")) 
+                        { 
+                            string newPhone = "+48 " + p;
+                            if (_localSettings.Values.ContainsKey("UserPhone"))
+                            {
+                                string oldPhone = _localSettings.Values["UserPhone"].ToString();
+                                if (oldPhone != newPhone)
+                                {
+                                    AllParcels.Clear();
+                                    await SaveDataAsync(); // Ensure empty list is saved
+                                }
+                            }
+                            
+                            _localSettings.Values["AuthToken"] = o.GetNamedString("authToken"); 
+                            if (o.ContainsKey("refreshToken")) _localSettings.Values["RefreshToken"] = o.GetNamedString("refreshToken"); 
+                            _localSettings.Values["UserPhone"] = newPhone; 
+                            return true; 
+                        } 
+                    } 
+                    return false; 
+                } 
+            } 
+            catch { return false; } 
+        }
         public static async Task LoadDataAsync() { try { StorageFile f = await ApplicationData.Current.LocalFolder.GetFileAsync(DATA_FILENAME); using (var s = await f.OpenStreamForReadAsync()) { var ser = new DataContractJsonSerializer(typeof(List<ParcelItem>)); AllParcels = (List<ParcelItem>)ser.ReadObject(s); } } catch { AllParcels = new List<ParcelItem>(); } }
-        public static async Task SaveDataAsync() { try { StorageFile f = await ApplicationData.Current.LocalFolder.CreateFileAsync(DATA_FILENAME, CreationCollisionOption.ReplaceExisting); using (var s = await f.OpenStreamForWriteAsync()) { var ser = new DataContractJsonSerializer(typeof(List<ParcelItem>)); ser.WriteObject(s, AllParcels); } } catch { } }
+        public static async Task SaveDataAsync() 
+        { 
+            if (IsDebugMode) return;
+            try { StorageFile f = await ApplicationData.Current.LocalFolder.CreateFileAsync(DATA_FILENAME, CreationCollisionOption.ReplaceExisting); using (var s = await f.OpenStreamForWriteAsync()) { var ser = new DataContractJsonSerializer(typeof(List<ParcelItem>)); ser.WriteObject(s, AllParcels); } } catch { } 
+        }
         public static async Task ForceSave() { await SaveDataAsync(); }
         public static async void RemoveParcel(ParcelItem p) { if (AllParcels.Contains(p)) { AllParcels.Remove(p); await SaveDataAsync(); } }
         public static async Task RenameParcel(string t, string n) { var p = AllParcels.FirstOrDefault(x => x.TrackingNumber == t); if (p != null) { p.CustomName = n; await SaveDataAsync(); } }

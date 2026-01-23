@@ -1,0 +1,71 @@
+<Page
+    x:Class="InPost_Mobile.Views.DebugPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid Background="#121212">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <TextBlock Text="DEBUG MODE - ADD PARCEL" FontSize="20" Foreground="Yellow" Margin="20,20,0,20" FontWeight="Bold"/>
+
+        <ScrollViewer Grid.Row="1" Padding="20">
+            <StackPanel>
+                <TextBlock Text="Tracking Number (min 10 chars):" Foreground="White" Margin="0,0,0,5"/>
+                <TextBox x:Name="TbTracking" PlaceholderText="1234567890" InputScope="Number" Margin="0,0,0,15"/>
+
+                <TextBlock Text="Sender:" Foreground="White" Margin="0,0,0,5"/>
+                <TextBox x:Name="TbSender" PlaceholderText="Amazon / Allegro / Private" Margin="0,0,0,15"/>
+
+                <TextBlock Text="Status:" Foreground="White" Margin="0,0,0,5"/>
+                <ComboBox x:Name="CbStatus" SelectedIndex="0" HorizontalAlignment="Stretch" Margin="0,0,0,15">
+                    <ComboBoxItem Content="created" Tag="created"/>
+                    <ComboBoxItem Content="confirmed" Tag="confirmed"/>
+                    <ComboBoxItem Content="collected_from_sender" Tag="collected_from_sender"/>
+                    <ComboBoxItem Content="adopted_at_source_branch" Tag="adopted_at_source_branch"/>
+                    <ComboBoxItem Content="sent_from_source_branch" Tag="sent_from_source_branch"/>
+                    <ComboBoxItem Content="adopted_at_sorting_center" Tag="adopted_at_sorting_center"/>
+                    <ComboBoxItem Content="sent_from_sorting_center" Tag="sent_from_sorting_center"/>
+                    <ComboBoxItem Content="adopted_at_target_branch" Tag="adopted_at_target_branch"/>
+                    <ComboBoxItem Content="out_for_delivery" Tag="out_for_delivery"/>
+                    <ComboBoxItem Content="ready_to_pickup" Tag="ready_to_pickup"/>
+                    <ComboBoxItem Content="pickup_reminder_set" Tag="pickup_reminder_set"/>
+                    <ComboBoxItem Content="delivered" Tag="delivered"/>
+                    <ComboBoxItem Content="not_found" Tag="not_found"/>
+                    <ComboBoxItem Content="avizo" Tag="avizo"/>
+                    <ComboBoxItem Content="returned_to_sender" Tag="returned_to_sender"/>
+                    <ComboBoxItem Content="return_pickup_confirmation" Tag="return_pickup_confirmation"/>
+                    <ComboBoxItem Content="stack_in_box_machine" Tag="stack_in_box_machine"/>
+                    <ComboBoxItem Content="stack_in_customer_service_point" Tag="stack_in_customer_service_point"/>
+                </ComboBox>
+
+                <TextBlock Text="Pickup Code (Receive only):" Foreground="White" Margin="0,0,0,5"/>
+                <TextBox x:Name="TbCode" PlaceholderText="123456" Margin="0,0,0,15"/>
+
+                <TextBlock Text="Type:" Foreground="White" Margin="0,0,0,5"/>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                    <RadioButton x:Name="RbReceive" Content="Receive" GroupName="Type" IsChecked="True" Foreground="White" Margin="0,0,10,0"/>
+                    <RadioButton x:Name="RbSend" Content="Send" GroupName="Type" Foreground="White" Margin="0,0,10,0"/>
+                    <RadioButton x:Name="RbReturn" Content="Return" GroupName="Type" Foreground="White"/>
+                </StackPanel>
+
+                <TextBlock Text="Target:" Foreground="White" Margin="0,0,0,5"/>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                     <RadioButton x:Name="RbLocker" Content="Locker" GroupName="Target" IsChecked="True" Foreground="White" Margin="0,0,10,0"/>
+                     <RadioButton x:Name="RbCourier" Content="Courier" GroupName="Target" Foreground="White"/>
+                </StackPanel>
+
+                <Button Content="ADD MOCK PARCEL" Click="AddMock_Click" HorizontalAlignment="Stretch" Margin="0,20,0,0" Background="Yellow" Foreground="Black"/>
+                
+                <TextBlock x:Name="TxtStatus" Foreground="Green" Margin="0,10,0,0" HorizontalAlignment="Center"/>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>

@@ -83,6 +83,35 @@ namespace InPost_Mobile.Models
             set { if (_icon != value) { _icon = value; OnPropertyChanged(); } }
         }
 
+        private string _iconImage;
+        [DataMember]
+        public string IconImage
+        {
+            get { return _iconImage; }
+            set 
+            { 
+                if (_iconImage != value) 
+                { 
+                    _iconImage = value; 
+                    OnPropertyChanged(); 
+                    OnPropertyChanged("IsBitmapIcon");
+                    OnPropertyChanged("IsFontIcon");
+                } 
+            }
+        }
+
+        [IgnoreDataMember]
+        public Visibility IsBitmapIcon
+        {
+            get { return !string.IsNullOrEmpty(IconImage) ? Visibility.Visible : Visibility.Collapsed; }
+        }
+
+        [IgnoreDataMember]
+        public Visibility IsFontIcon
+        {
+            get { return string.IsNullOrEmpty(IconImage) ? Visibility.Visible : Visibility.Collapsed; }
+        }
+
         private bool _isArchived;
         [DataMember]
         public bool IsArchived
@@ -168,6 +197,7 @@ namespace InPost_Mobile.Models
                     OnPropertyChanged(); 
                     OnPropertyChanged("NameButtonText");
                     OnPropertyChanged("NameButtonColor");
+                    OnPropertyChanged("SenderDisplay");
                 } 
             }
         }
@@ -203,6 +233,7 @@ namespace InPost_Mobile.Models
         {
             get
             {
+                if (!string.IsNullOrWhiteSpace(CustomName)) return CustomName;
                 if (string.IsNullOrEmpty(Sender) || Sender == "Nadawca") return "InPost";
                 return Sender;
             }

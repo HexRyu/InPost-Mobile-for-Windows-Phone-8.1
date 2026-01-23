@@ -29,7 +29,7 @@
                         <TextBlock Text="+48" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="18" Foreground="Gray"/>
                     </Border>
 
-                    <TextBox Grid.Column="1" x:Name="PhoneInput" InputScope="Number" PlaceholderText="500000000" Height="45" FontSize="20" MaxLength="9"/>
+                    <TextBox Grid.Column="1" x:Name="PhoneInput" InputScope="Number" PlaceholderText="500000000" Height="45" FontSize="20" MaxLength="9" TextChanged="PhoneInput_TextChanged"/>
                 </Grid>
 
                 <Grid Margin="0,20,0,5">

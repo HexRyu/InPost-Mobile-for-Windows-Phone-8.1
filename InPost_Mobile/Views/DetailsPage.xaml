@@ -25,26 +25,41 @@
                                 <Border Background="#3D3D3D" Height="1" Margin="0,15,0,15"/>
 
                                 <StackPanel Visibility="{Binding DetailsSenderVisibility}">
-                                    <TextBlock x:Uid="Lbl_Sender" Text="Nadawca" FontSize="12" Foreground="#AAAAAA" Opacity="0.7"/>
-                                    <TextBlock Text="{Binding Sender}" FontSize="16" Foreground="#DDDDDD" Margin="0,0,0,10"/>
+                                    <TextBlock x:Uid="Lbl_Sender" Text="Nadawca" FontSize="15" Foreground="#AAAAAA" Opacity="0.7"/>
+                                    <TextBlock Text="{Binding Sender}" FontSize="22" FontWeight="SemiBold" Foreground="#DDDDDD" Margin="0,5,0,15" HorizontalAlignment="Left" TextAlignment="Left"/>
                                 </StackPanel>
 
-                                <TextBlock x:Uid="Lbl_TrackingNum" Text="Numer przesyłki" FontSize="12" Foreground="#AAAAAA" Opacity="0.7"/>
-                                <TextBlock Text="{Binding TrackingNumber}" FontSize="16" Foreground="#DDDDDD" Margin="0,0,0,15"/>
+                                <!-- Tracking Number Section -->
+                                <TextBlock x:Uid="Lbl_TrackingNum" Text="Numer przesyłki" FontSize="15" Foreground="#AAAAAA" Opacity="0.7" Margin="0,5,0,0"/>
+                                <TextBox Text="{Binding TrackingNumber}" IsReadOnly="True" Background="Transparent" BorderThickness="0" 
+                                         FontSize="22" FontWeight="SemiBold" Foreground="#DDDDDD" Margin="0,5,0,15" Padding="0" HorizontalAlignment="Left" TextAlignment="Left">
+                                    <TextBox.Resources>
+                                        <SolidColorBrush x:Key="PhoneTextBoxBrush" Color="Transparent"/>
+                                        <SolidColorBrush x:Key="PhoneTextBoxEditBackgroundBrush" Color="Transparent"/>
+                                        <SolidColorBrush x:Key="PhoneTextBoxReadOnlyBrush" Color="Transparent"/>
+                                        <SolidColorBrush x:Key="PhoneTextBoxForegroundBrush" Color="#DDDDDD"/>
+                                        <SolidColorBrush x:Key="PhoneTextBoxEditBorderBrush" Color="Transparent"/>
+                                        <SolidColorBrush x:Key="PhoneTextBoxReadOnlyBorderBrush" Color="Transparent"/>
+                                    </TextBox.Resources>
+                                </TextBox>
 
-                                <TextBlock x:Uid="Lbl_NameHeader" Text="NAZWA PRZESYŁKI" FontSize="12" Foreground="#AAAAAA" Opacity="0.7"/>
-                                <Button x:Name="BtnRename" Click="Rename_Click" HorizontalAlignment="Left" Background="Transparent" Padding="0" BorderThickness="0" Margin="-2,0,0,0">
+                                <!-- Name Section -->
+                                <TextBlock x:Uid="Lbl_NameHeader" Text="NAZWA PRZESYŁKI" FontSize="15" Foreground="#AAAAAA" Opacity="0.7" Margin="0,5,0,0"/>
+                                <Button x:Name="BtnRename" Click="Rename_Click" HorizontalAlignment="Left" Background="Transparent" Padding="0" BorderThickness="0" Margin="-2,-8,0,0">
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="{Binding NameButtonText}" Foreground="{Binding NameButtonColor}" FontSize="18" FontWeight="SemiBold" Margin="0,0,10,0"/>
-                                        <TextBlock Text="&#xE104;" FontFamily="Segoe UI Symbol" Foreground="White" FontSize="16" VerticalAlignment="Center" Opacity="0.7"/>
+                                        <TextBlock Text="{Binding NameButtonText}" Foreground="{Binding NameButtonColor}" FontSize="19" FontWeight="SemiBold" Margin="0,0,10,0"/>
+                                        <TextBlock Text="&#xE104;" FontFamily="Segoe UI Symbol" Foreground="White" FontSize="18" VerticalAlignment="Center" Opacity="0.7"/>
                                     </StackPanel>
                                 </Button>
                             </StackPanel>
 
                             <StackPanel Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Right">
                                 <Border BorderBrush="White" BorderThickness="2" Width="50" Height="50">
-                                    <TextBlock Text="{Binding Icon}" FontFamily="Segoe UI Symbol" FontSize="24" Foreground="White" 
-                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    <Grid>
+                                        <TextBlock Text="{Binding Icon}" FontFamily="Segoe UI Symbol" FontSize="24" Foreground="White" 
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding IsFontIcon}"/>
+                                        <Image Source="{Binding IconImage}" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding IsBitmapIcon}" Margin="5"/>
+                                    </Grid>
                                 </Border>
                                 <TextBlock x:Uid="LblSize" Text="Rozmiar" FontSize="12" Foreground="#AAAAAA" HorizontalAlignment="Center" Margin="0,5,0,0"/>
                                 <TextBlock Text="{Binding SizeName}" FontSize="16" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>

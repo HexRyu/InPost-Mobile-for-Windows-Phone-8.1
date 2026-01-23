@@ -14,7 +14,7 @@
     <MinimumVisualStudioVersion>12</MinimumVisualStudioVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{76F1466A-8B6D-4E39-A767-685A06062A39};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
+    <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <AppxBundle>Never</AppxBundle>
     <AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
   </PropertyGroup>
@@ -92,8 +92,10 @@
     </Compile>
     <Compile Include="Helpers\LanguageManager.cs" />
     <Compile Include="Models\AppSecrets.cs" />
+    <Compile Include="Models\DebugManager.cs" />
     <Compile Include="Models\LockerManager.cs" />
     <Compile Include="Models\ParcelEvent.cs" />
+    <Compile Include="Models\ParcelGroup.cs" />
     <Compile Include="Models\ParcelItem.cs" />
     <Compile Include="Models\ParcelManager.cs" />
     <Compile Include="Models\User.cs" />
@@ -105,6 +107,9 @@
     </Compile>
     <Compile Include="Views\CreditsPage.xaml.cs">
       <DependentUpon>CreditsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\DebugPage.xaml.cs">
+      <DependentUpon>DebugPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\DetailsPage.xaml.cs">
       <DependentUpon>DetailsPage.xaml</DependentUpon>
@@ -133,6 +138,8 @@
     <Content Include="Assets\avatar.png" />
     <Content Include="Assets\avatar_api.png" />
     <Content Include="Assets\avatar_tester.png" />
+    <Content Include="Assets\icon_kurier.png" />
+    <Content Include="Assets\icon_paczkopunkt.PNG" />
     <Content Include="Assets\shrepard.png" />
     <Content Include="Assets\header_logo.jpg" />
     <Content Include="Assets\Logo.scale-100.png" />
@@ -170,6 +177,10 @@
     <Page Include="Views\CreditsPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\DebugPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\DetailsPage.xaml">
       <SubType>Designer</SubType>

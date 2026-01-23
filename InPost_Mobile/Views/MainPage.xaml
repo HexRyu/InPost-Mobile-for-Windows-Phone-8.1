@@ -8,14 +8,24 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
+    <Page.Resources>
+        <CollectionViewSource x:Name="ReceivedParcelsCVS" IsSourceGrouped="True" />
+    </Page.Resources>
+
     <Grid>
-        <ProgressBar x:Name="LoadingBar" IsIndeterminate="True" VerticalAlignment="Top" Visibility="Collapsed" Canvas.ZIndex="99"/>
-        <Hub>
-            <Hub.Header>
-                <Border HorizontalAlignment="Left" Margin="0,20,0,10">
-                    <Image Source="ms-appx:///Assets/header_logo.jpg" Height="80" Stretch="Uniform" Width="205" RenderTransformOrigin="1,0.557"/>
-                </Border>
-            </Hub.Header>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <ProgressBar x:Name="LoadingBar" IsIndeterminate="True" VerticalAlignment="Top" Visibility="Collapsed" Canvas.ZIndex="99" Grid.RowSpan="2"/>
+        
+        <Border Grid.Row="0" HorizontalAlignment="Left" Margin="0,20,0,20">
+             <Image Source="ms-appx:///Assets/header_logo.jpg" Height="80" Stretch="Uniform" Width="205" RenderTransformOrigin="1,0.557"/>
+        </Border>
+
+        <Hub Grid.Row="1">
+            <!-- Header removed to prevent jumping -->
 
             <HubSection x:Uid="HubSectionReceive">
                 <HubSection.HeaderTemplate>
@@ -25,7 +35,26 @@
                 </HubSection.HeaderTemplate>
 
                 <DataTemplate>
-                    <ListView x:Name="ParcelsList" Loaded="ParcelsList_Loaded" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Parcel_ItemClick">
+                    <ListView x:Name="ParcelsList" Loaded="ParcelsList_Loaded" SelectionMode="None" IsItemClickEnabled="True" ItemClick="Parcel_ItemClick"
+                              ItemsSource="{Binding Source={StaticResource ReceivedParcelsCVS}}">
+                        <ListView.GroupStyle>
+                            <GroupStyle>
+                                <GroupStyle.HeaderTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="0,10,0,10">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Border Grid.Column="0" Height="1" Background="Gray" Margin="0,0,10,0" Opacity="0.5"/>
+                                            <TextBlock Grid.Column="1" Text="{Binding Key}" Foreground="Gray" FontSize="14" HorizontalAlignment="Center"/>
+                                            <Border Grid.Column="2" Height="1" Background="Gray" Margin="10,0,0,0" Opacity="0.5"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </GroupStyle.HeaderTemplate>
+                            </GroupStyle>
+                        </ListView.GroupStyle>
                         <ListView.ItemContainerStyle>
                             <Style TargetType="ListViewItem">
                                 <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
@@ -55,7 +84,10 @@
 
                                         <StackPanel Grid.Column="1" VerticalAlignment="Top" Margin="10,0,0,0">
                                             <Border BorderBrush="White" BorderThickness="2" Width="46" Height="36" Margin="0,0,0,5">
-                                                <TextBlock Text="{Binding Icon}" FontFamily="Segoe UI Symbol" FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
+                                                <Grid>
+                                                    <TextBlock Text="{Binding Icon}" FontFamily="Segoe UI Symbol" FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" Visibility="{Binding IsFontIcon}"/>
+                                                    <Image Source="{Binding IconImage}" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding IsBitmapIcon}" Margin="3"/>
+                                                </Grid>
                                             </Border>
                                             <TextBlock x:Uid="LblSize" FontSize="10" Foreground="Gray" HorizontalAlignment="Center"/>
                                             <TextBlock Text="{Binding SizeName}" FontSize="15" Foreground="White" HorizontalAlignment="Center" FontWeight="Bold"/>
@@ -105,7 +137,10 @@
                                         </StackPanel>
                                         <StackPanel Grid.Column="1" VerticalAlignment="Top" Margin="10,0,0,0">
                                             <Border BorderBrush="White" BorderThickness="2" Width="46" Height="36" Margin="0,0,0,5">
-                                                <TextBlock Text="{Binding Icon}" FontFamily="Segoe UI Symbol" FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
+                                                <Grid>
+                                                    <TextBlock Text="{Binding Icon}" FontFamily="Segoe UI Symbol" FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" Visibility="{Binding IsFontIcon}"/>
+                                                    <Image Source="{Binding IconImage}" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding IsBitmapIcon}" Margin="3"/>
+                                                </Grid>
                                             </Border>
                                             <TextBlock x:Uid="LblSize" FontSize="10" Foreground="Gray" HorizontalAlignment="Center"/>
                                             <TextBlock Text="{Binding SizeName}" FontSize="15" Foreground="White" HorizontalAlignment="Center" FontWeight="Bold"/>
@@ -155,7 +190,10 @@
                                         </StackPanel>
                                         <StackPanel Grid.Column="1" VerticalAlignment="Top" Margin="10,0,0,0">
                                             <Border BorderBrush="White" BorderThickness="2" Width="46" Height="36" Margin="0,0,0,5">
-                                                <TextBlock Text="{Binding Icon}" FontFamily="Segoe UI Symbol" FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
+                                                <Grid>
+                                                    <TextBlock Text="{Binding Icon}" FontFamily="Segoe UI Symbol" FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" Visibility="{Binding IsFontIcon}"/>
+                                                    <Image Source="{Binding IconImage}" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding IsBitmapIcon}" Margin="3"/>
+                                                </Grid>
                                             </Border>
                                             <TextBlock x:Uid="LblSize" FontSize="10" Foreground="Gray" HorizontalAlignment="Center"/>
                                             <TextBlock Text="{Binding SizeName}" FontSize="15" Foreground="White" HorizontalAlignment="Center" FontWeight="Bold"/>
@@ -170,12 +208,14 @@
         </Hub>
     </Grid>
 
+
     <Page.BottomAppBar>
-        <CommandBar Background="#1F1F1F" Foreground="White">
-            <AppBarButton x:Uid="BtnNewParcel" Icon="Add" Label="nowa paczka" Click="AddParcel_Click"/>
-            <AppBarButton x:Uid="BtnRefresh" Icon="Refresh" Label="odśwież" Click="Refresh_Click"/>
-            <AppBarButton x:Uid="BtnArchive" Icon="Folder" Label="archiwum" Click="Archive_Click"/>
-            <AppBarButton x:Uid="BtnSettings" Icon="Setting" Label="ustawienia" Click="Settings_Click"/>
+        <CommandBar x:Name="MainCommandBar" Background="#1F1F1F" Foreground="White" ClosedDisplayMode="Compact">
+            <AppBarButton x:Name="BtnDebug" Icon="Repair" Label="Debug" Click="Debug_Click" Visibility="Collapsed"/>
+            <AppBarButton x:Uid="BtnNewParcel" Icon="Add" Label="Add Parcel" Click="AddParcel_Click"/>
+            <AppBarButton x:Uid="BtnRefresh" Icon="Refresh" Label="Refresh" Click="Refresh_Click"/>
+            <AppBarButton x:Uid="BtnArchive" Icon="Folder" Label="Archive" Click="Archive_Click"/>
+            <AppBarButton x:Name="BtnSettings" x:Uid="BtnSettings" Icon="Setting" Label="Settings" Click="Settings_Click"/>
         </CommandBar>
     </Page.BottomAppBar>
 </Page>
