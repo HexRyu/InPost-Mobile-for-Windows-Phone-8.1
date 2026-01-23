@@ -10,7 +10,7 @@
 
 ## ⚠️ PROJECT IN BETA
 **Please Note:** This application is currently under active development. Some features may be incomplete, and you might experience bugs. Stability is not guaranteed yet.
- UPDATED VERSION 0.8.9.5 IS NOW AVAILABLE!!
+ UPDATED VERSION 0.9.1.2 IS NOW AVAILABLE!!
 ---
 
 ## 📸 Gallery
