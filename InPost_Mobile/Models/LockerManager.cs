@@ -22,18 +22,20 @@ namespace InPost_Mobile.Models
             filter.IgnorableServerCertificateErrors.Add(Windows.Security.Cryptography.Certificates.ChainValidationResult.IncompleteChain);
 
             var client = new HttpClient(filter);
-            client.DefaultRequestHeaders.UserAgent.ParseAdd(AppSecrets.UserAgent);
-            // client.DefaultRequestHeaders.Accept.ParseAdd("application/json"); // Removed to match C code
+            // Zmiana User-Agent na zgodny z działającym kodem 3DS
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("InPost-Mobile/3.46.0(34600200) (Horizon 11.17.0-50U; AW715988204; Nintendo 3DS; pl)");
+            client.DefaultRequestHeaders.Accept.ParseAdd("application/json");
             return client;
         }
 
         public static async Task<string> ValidateAndOpenAsync(ParcelItem parcel)
         {
+            if (parcel == null) throw new Exception("Błąd wewnętrzny: Pusty obiekt paczki.");
+
             if (ParcelManager.IsDebugMode)
             {
-                // MOCK OPENING
                 await Task.Delay(2000); // Simulate network
-                return "DEBUG-SESSION-UUID";
+                return "debug-session-uuid";
             }
 
             // 1. Sprawdzenie współrzędnych
@@ -46,96 +48,50 @@ namespace InPost_Mobile.Models
             }
 
             // 2. Przygotowanie numeru telefonu 
-            string rawPhone = _localSettings.Values["UserPhone"].ToString().Replace(" ", "").Replace("-", "").Trim();
+            string rawPhone = "";
+            if (_localSettings.Values.ContainsKey("UserPhone"))
+            {
+                rawPhone = _localSettings.Values["UserPhone"]?.ToString() ?? "";
+            }
+            
+            if (string.IsNullOrEmpty(rawPhone))
+            {
+                 // Fallback - spróbuj pobrać z tokena lub wymuś ponowne logowanie?
+                 throw new Exception("Błąd: Brak numeru telefonu w ustawieniach. Zaloguj się ponownie.");
+            }
+
+            rawPhone = rawPhone.Replace(" ", "").Replace("-", "").Trim();
             string phone = rawPhone;
             if (phone.Length > 9) phone = phone.Substring(phone.Length - 9);
 
-            string token = _localSettings.Values["AuthToken"].ToString();
+             string token = _localSettings.Values["AuthToken"].ToString();
 
-            // 3. Budowanie JSON
-            JsonObject json = new JsonObject();
-
-            JsonObject parcelObj = new JsonObject();
-            parcelObj.SetNamedValue("shipmentNumber", JsonValue.CreateStringValue(parcel.TrackingNumber));
-            parcelObj.SetNamedValue("openCode", JsonValue.CreateStringValue(parcel.PickupCode));
-
-            JsonObject phoneObj = new JsonObject();
-            phoneObj.SetNamedValue("prefix", JsonValue.CreateStringValue("+48"));
-            phoneObj.SetNamedValue("value", JsonValue.CreateStringValue(phone));
-            parcelObj.SetNamedValue("receiverPhoneNumber", phoneObj);
-
-            JsonObject geoObj = new JsonObject();
-            geoObj.SetNamedValue("latitude", JsonValue.CreateNumberValue(lat));
-            geoObj.SetNamedValue("longitude", JsonValue.CreateNumberValue(lon));
-            geoObj.SetNamedValue("accuracy", JsonValue.CreateNumberValue(13.365));
-
-            json.SetNamedValue("parcel", parcelObj);
-            json.SetNamedValue("geoPoint", geoObj);
-
-            using (var client = CreateHttpClient())
+            // --- STRATEGIA: Metoda 1 (V2), jak błąd to Metoda 2 (V1) ---
+            
+            try
             {
-                bool retry = true;
-                while (true)
-                { 
-                    token = _localSettings.Values["AuthToken"].ToString();
-                    client.DefaultRequestHeaders.Authorization = new Windows.Web.Http.Headers.HttpCredentialsHeaderValue("Bearer", token);
-
-                    // A. VALIDATE
-                    // C Code uses strict "Content-Type: application/json" without charset
-                    var valContent = new HttpStringContent(json.ToString(), Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json");
-                    valContent.Headers.ContentType.CharSet = null; // Remove charset to match C code behavior
-
-                    var validateResp = await client.PostAsync(new Uri(AppSecrets.BaseUrl + "v2/collect/validate"), valContent);
-
-                    string valResponseStr = await validateResp.Content.ReadAsStringAsync();
-
-                    if (validateResp.StatusCode == HttpStatusCode.Unauthorized && retry)
-                    {
-                        retry = false;
-                        if (await ParcelManager.RefreshAuthTokenAsync()) continue;
-                    }
-
-                    if (!validateResp.IsSuccessStatusCode)
-                    {
-                        // Log full error for debugging (User sees InternalServerError, this helps reveal why)
-                        throw new Exception($"Błąd walidacji ({validateResp.StatusCode}): {valResponseStr}");
-                    }
-
-                    JsonObject valObj = JsonObject.Parse(valResponseStr);
-                    string sessionUuid = "";
-                    if (valObj.ContainsKey("sessionUuid")) sessionUuid = valObj.GetNamedString("sessionUuid");
-                    else throw new Exception($"Brak sessionUuid. Resp: {valResponseStr}");
-
-                    // B. OPEN
-                    JsonObject openJson = new JsonObject();
-                    openJson.SetNamedValue("sessionUuid", JsonValue.CreateStringValue(sessionUuid));
-
-                    var openContent = new HttpStringContent(openJson.ToString(), Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json");
-                    openContent.Headers.ContentType.CharSet = null; // Remove charset
-
-                    var openResp = await client.PostAsync(new Uri(AppSecrets.BaseUrl + "v1/collect/compartment/open"), openContent);
-
-                    if (openResp.IsSuccessStatusCode) return sessionUuid;
-
-                    // Obsługa błędu otwarcia
-                     string openErr = await openResp.Content.ReadAsStringAsync();
-                     throw new Exception($"Błąd otwarcia ({openResp.StatusCode}): {openErr}");
+                // METODA 1: Standardowa (v2/collect/validate -> v1 open)
+                return await OpenMethod_ValidateV2(parcel, lat, lon, phone, token, retryCount: 1);
+            }
+            catch (Exception ex1)
+            {
+                // METODA 2: Fallback (v1/collect/validate -> v1 open)
+                try
+                {
+                    return await OpenMethod_ValidateV1(parcel, lat, lon, phone, token);
+                }
+                catch (Exception ex2)
+                {
+                    // Jeśli obie zawiodą, pokazujemy błędy obu
+                    throw new Exception($"Metoda 1: {ex1.Message}\n\nMetoda 2: {ex2.Message}");
                 }
             }
         }
 
         public static async Task<bool> IsLockerClosedAsync(string sessionUuid)
         {
-            if (ParcelManager.IsDebugMode)
-            {
-               // Mock: 50/50 chance of being closed or simply wait a bit and return true? 
-               // Let's assume after a few calls it closes.
-               // For simplicity, let's just return true (closed) after a delay to simulate quick pickup, 
-               // or false effectively if we want to simulate waiting. 
-               // Let's return Random bool or just true for "test success".
-               await Task.Delay(1000);
-               return true; 
-            }
+            if (ParcelManager.IsDebugMode) return true;
+
             try
             {
                 string token = _localSettings.Values["AuthToken"].ToString();
@@ -180,5 +136,112 @@ namespace InPost_Mobile.Models
             }
             catch { }
         }
+            // METODA 1: V2 Validate (Bieżąca produkcyjna)
+        private static async Task<string> OpenMethod_ValidateV2(ParcelItem parcel, double lat, double lon, string phone, string token, int retryCount)
+        {
+            JsonObject json = new JsonObject();
+            JsonObject parcelObj = new JsonObject();
+            parcelObj.SetNamedValue("shipmentNumber", JsonValue.CreateStringValue(parcel.TrackingNumber ?? ""));
+            parcelObj.SetNamedValue("openCode", JsonValue.CreateStringValue(parcel.PickupCode ?? ""));
+            
+            JsonObject phoneObj = new JsonObject();
+            phoneObj.SetNamedValue("prefix", JsonValue.CreateStringValue("+48"));
+            phoneObj.SetNamedValue("value", JsonValue.CreateStringValue(phone ?? ""));
+            parcelObj.SetNamedValue("receiverPhoneNumber", phoneObj); // Poprawna nazwa pola w V2
+
+            JsonObject geoObj = new JsonObject();
+            geoObj.SetNamedValue("latitude", JsonValue.CreateNumberValue(lat));
+            geoObj.SetNamedValue("longitude", JsonValue.CreateNumberValue(lon));
+            geoObj.SetNamedValue("accuracy", JsonValue.CreateNumberValue(10));
+
+            json.SetNamedValue("parcel", parcelObj);
+            json.SetNamedValue("geoPoint", geoObj);
+
+            using (var client = CreateHttpClient())
+            {
+                client.DefaultRequestHeaders.Authorization = new Windows.Web.Http.Headers.HttpCredentialsHeaderValue("Bearer", token);
+                var valContent = new HttpStringContent(json.ToString(), Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json");
+                valContent.Headers.ContentType.CharSet = null;
+
+                var validateResp = await client.PostAsync(new Uri(AppSecrets.BaseUrl + "v2/collect/validate"), valContent);
+
+                if (validateResp.StatusCode == HttpStatusCode.Unauthorized && retryCount > 0)
+                {
+                    if (await ParcelManager.RefreshAuthTokenAsync())
+                        return await OpenMethod_ValidateV2(parcel, lat, lon, phone, _localSettings.Values["AuthToken"].ToString(), retryCount - 1);
+                }
+
+                if (!validateResp.IsSuccessStatusCode)
+                {
+                    string err = await validateResp.Content.ReadAsStringAsync();
+                    throw new Exception($"Błąd walidacji V2 ({validateResp.StatusCode}): {err}");
+                }
+
+                string valResponseStr = await validateResp.Content.ReadAsStringAsync();
+                JsonObject valObj = JsonObject.Parse(valResponseStr);
+                string sessionUuid = valObj.GetNamedString("sessionUuid");
+
+                return await OpenCompartment(client, sessionUuid);
+            }
+        }
+
+        // METODA 2: V1 Validate (Starsza / Alternatywna)
+        private static async Task<string> OpenMethod_ValidateV1(ParcelItem parcel, double lat, double lon, string phone, string token)
+        {
+            JsonObject json = new JsonObject();
+            JsonObject parcelObj = new JsonObject();
+            parcelObj.SetNamedValue("shipmentNumber", JsonValue.CreateStringValue(parcel.TrackingNumber ?? ""));
+            parcelObj.SetNamedValue("openCode", JsonValue.CreateStringValue(parcel.PickupCode ?? ""));
+            
+            JsonObject phoneObj = new JsonObject();
+            phoneObj.SetNamedValue("prefix", JsonValue.CreateStringValue("+48"));
+            phoneObj.SetNamedValue("value", JsonValue.CreateStringValue(phone ?? ""));
+            parcelObj.SetNamedValue("recieverPhoneNumber", phoneObj); // Stara literówka (możliwa w V1)
+
+            JsonObject geoObj = new JsonObject();
+            geoObj.SetNamedValue("latitude", JsonValue.CreateNumberValue(lat));
+            geoObj.SetNamedValue("longitude", JsonValue.CreateNumberValue(lon));
+            geoObj.SetNamedValue("accuracy", JsonValue.CreateNumberValue(10));
+
+            json.SetNamedValue("parcel", parcelObj);
+            json.SetNamedValue("geoPoint", geoObj);
+
+            using (var client = CreateHttpClient())
+            {
+                client.DefaultRequestHeaders.Authorization = new Windows.Web.Http.Headers.HttpCredentialsHeaderValue("Bearer", token);
+                var valContent = new HttpStringContent(json.ToString(), Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json");
+                valContent.Headers.ContentType.CharSet = null;
+
+                var validateResp = await client.PostAsync(new Uri(AppSecrets.BaseUrl + "v1/collect/validate"), valContent);
+
+                if (!validateResp.IsSuccessStatusCode)
+                {
+                    string err = await validateResp.Content.ReadAsStringAsync();
+                    throw new Exception($"Błąd walidacji V1 ({validateResp.StatusCode}): {err}");
+                }
+
+                string valResponseStr = await validateResp.Content.ReadAsStringAsync();
+                JsonObject valObj = JsonObject.Parse(valResponseStr);
+                string sessionUuid = valObj.GetNamedString("sessionUuid");
+
+                return await OpenCompartment(client, sessionUuid);
+            }
+        }
+
+        private static async Task<string> OpenCompartment(HttpClient client, string sessionUuid)
+        {
+            JsonObject openJson = new JsonObject();
+            openJson.SetNamedValue("sessionUuid", JsonValue.CreateStringValue(sessionUuid));
+            var openContent = new HttpStringContent(openJson.ToString(), Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json");
+            openContent.Headers.ContentType.CharSet = null;
+
+            var openResp = await client.PostAsync(new Uri(AppSecrets.BaseUrl + "v1/collect/compartment/open"), openContent);
+            
+            if (openResp.IsSuccessStatusCode) return sessionUuid;
+
+            string err = await openResp.Content.ReadAsStringAsync();
+            throw new Exception($"Błąd otwarcia skrytki ({openResp.StatusCode}): {err}");
+        }
     }
+
 }

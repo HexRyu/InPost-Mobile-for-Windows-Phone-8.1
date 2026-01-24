@@ -56,7 +56,7 @@ namespace InPost_Mobile.Models
             await SaveDataAsync();
         }
 
-        // REFRESH TOKEN
+        // --- ZMIANA: PUBLIC (żeby LockerManager mógł tego użyć) ---
         public static async Task<bool> RefreshAuthTokenAsync()
         {
             if (!_localSettings.Values.ContainsKey("RefreshToken")) return false;
@@ -90,38 +90,24 @@ namespace InPost_Mobile.Models
             return false;
         }
 
+        // ... RESZTA KODU BEZ ZMIAN (UpdateAllParcelsAsync itd.) ...
         public static async Task UpdateAllParcelsAsync()
         {
-            if (IsDebugMode)
-            {
-                // DEBUG MODE: Load from DebugManager
-                AllParcels.Clear();
-                AllParcels.AddRange(DebugManager.GetMockParcels("Receive"));
-                AllParcels.AddRange(DebugManager.GetMockParcels("Send"));
-                AllParcels.AddRange(DebugManager.GetMockParcels("Return"));
-                return;
-            }
-
             bool wasUpdated = false;
             if (IsLoggedIn())
             {
-                // ... real api calls ...
                 bool r1 = await DownloadFromEndpoint(AppSecrets.BaseUrl + "v4/parcels/tracked", "Receive");
                 bool r2 = await DownloadFromEndpoint(AppSecrets.BaseUrl + "v4/parcels/sent", "Send");
                 bool r3 = await DownloadFromEndpoint(AppSecrets.BaseUrl + "v1/returns/tickets", "Return");
                 if (r1 || r2 || r3) wasUpdated = true;
             }
             var manualParcels = AllParcels.Where(p => !p.IsArchived && !IsDeliveredStatus(p.Status) && string.IsNullOrEmpty(p.PickupCode)).ToList();
-
             foreach (var parcel in manualParcels)
             {
-                 if (await RefreshSingleParcel(parcel)) wasUpdated = true;
+                if (await RefreshSingleParcel(parcel)) wasUpdated = true;
             }
-
             if (wasUpdated) await SaveDataAsync();
         }
-
-        public static string LastDebugLog = ""; // Debug field
 
         public static bool IsDeliveredStatus(string status)
         {
@@ -145,21 +131,16 @@ namespace InPost_Mobile.Models
                     client.DefaultRequestHeaders.Authorization = new Windows.Web.Http.Headers.HttpCredentialsHeaderValue("Bearer", token);
                     var response = await client.GetAsync(new Uri(url));
 
-                    // --- OBSŁUGA WYGAŚNIĘCIA TOKENA (401) ---
                     if (response.StatusCode == HttpStatusCode.Unauthorized)
                     {
                         bool refreshed = await RefreshAuthTokenAsync();
                         if (refreshed)
                         {
-                            // Pobierz nowy token i spróbuj jeszcze raz
                             token = _localSettings.Values["AuthToken"].ToString();
                             client.DefaultRequestHeaders.Authorization = new Windows.Web.Http.Headers.HttpCredentialsHeaderValue("Bearer", token);
                             response = await client.GetAsync(new Uri(url));
                         }
-                        else
-                        {
-                            return false; // Nie udało się odświeżyć
-                        }
+                        else return false;
                     }
 
                     if (response.IsSuccessStatusCode)
@@ -208,7 +189,6 @@ namespace InPost_Mobile.Models
                         {
                             existing.ParcelType = enforcedType;
                             ParseApiObjectToParcel(existing, obj);
-
                         }
                     }
                     catch { }
@@ -220,7 +200,6 @@ namespace InPost_Mobile.Models
         {
             string apiStatus = "unknown";
             if (json.ContainsKey("status")) apiStatus = json.GetNamedString("status");
-
             parcel.OriginalStatus = apiStatus;
             parcel.Status = GetTranslatedStatus(apiStatus);
 
@@ -230,32 +209,11 @@ namespace InPost_Mobile.Models
                 if (json.ContainsKey("sender")) { try { var s = json.GetNamedObject("sender"); if (s.ContainsKey("name")) parcel.Sender = s.GetNamedString("name"); } catch { } }
             }
 
-            if (json.ContainsKey("openCode"))
-            {
-                string newCode = json.GetNamedString("openCode");
-                if (!string.IsNullOrWhiteSpace(newCode)) parcel.PickupCode = newCode;
-            }
-            if (string.IsNullOrEmpty(parcel.PickupCode) || parcel.PickupCode == "---")
-            {
-                if (json.ContainsKey("pickupCode"))
-                {
-                    string newCode = json.GetNamedString("pickupCode");
-                    if (!string.IsNullOrWhiteSpace(newCode)) parcel.PickupCode = newCode;
-                }
-                else if (json.ContainsKey("pickup_code"))
-                {
-                    string newCode = json.GetNamedString("pickup_code");
-                    if (!string.IsNullOrWhiteSpace(newCode)) parcel.PickupCode = newCode;
-                }
-            }
+            if (json.ContainsKey("openCode")) parcel.PickupCode = json.GetNamedString("openCode");
 
             if (json.ContainsKey("parcelSize"))
             {
-                string newSize = json.GetNamedString("parcelSize");
-                if (!string.IsNullOrWhiteSpace(newSize))
-                {
-                    parcel.Size = newSize;
-                }
+                parcel.Size = json.GetNamedString("parcelSize");
             }
 
             bool isCourier = false;
@@ -301,55 +259,10 @@ namespace InPost_Mobile.Models
                 }
             }
 
-            // Fix: If API returns no pickup point data (common in tracked endpoint updates), 
-            // do NOT overwrite our potentially good address with empty strings.
-            bool hasNewPointName = !string.IsNullOrWhiteSpace(newPointName);
-            bool hasNewPointAddress = !string.IsNullOrWhiteSpace(newPointAddress);
-
-            // Handle Redirects (Temporary Lockers)
-            if (json.ContainsKey("custom_attributes"))
+            if (string.IsNullOrEmpty(newPointName) && json.ContainsKey("custom_attributes"))
             {
-                try
-                {
-                    var ca = json.GetNamedObject("custom_attributes");
-                    if (ca.ContainsKey("target_machine_id"))
-                    {
-                        string tId = ca.GetNamedString("target_machine_id");
-                        if (!string.IsNullOrWhiteSpace(tId))
-                        {
-                            newPointName = tId; // Override with actual machine ID (Critical for Remote Open)
-
-                            // Try to get address for target machine
-                            if (ca.ContainsKey("target_machine_detail"))
-                            {
-                                var tDetail = ca.GetNamedObject("target_machine_detail");
-                                if (tDetail.ContainsKey("location_description"))
-                                {
-                                    newPointAddress = tDetail.GetNamedString("location_description");
-                                }
-                                
-                                // Parse specific address fields if available (snake_case common in this part of API)
-                                JsonObject tAddr = null;
-                                if (tDetail.ContainsKey("address")) tAddr = tDetail.GetNamedObject("address");
-                                else if (tDetail.ContainsKey("address_details")) tAddr = tDetail.GetNamedObject("address_details");
-
-                                if (tAddr != null)
-                                {
-                                    string s = tAddr.ContainsKey("street") ? tAddr.GetNamedString("street") : "";
-                                    string b = tAddr.ContainsKey("building_no") ? tAddr.GetNamedString("building_no") : "";
-                                    string c = tAddr.ContainsKey("city") ? tAddr.GetNamedString("city") : "";
-                                    if (!string.IsNullOrEmpty(s)) newPointAddress = $"{s} {b}\n{c}";
-                                }
-                            }
-                        }
-                    }
-                }
-                catch { }
+                try { var ca = json.GetNamedObject("custom_attributes"); if (ca.ContainsKey("target_machine_id")) newPointName = ca.GetNamedString("target_machine_id"); } catch { }
             }
-
-            // Re-evaluate flags in case they were updated by Redirect logic
-            hasNewPointName = !string.IsNullOrWhiteSpace(newPointName);
-            hasNewPointAddress = !string.IsNullOrWhiteSpace(newPointAddress);
 
             if (isCourier)
             {
@@ -358,17 +271,11 @@ namespace InPost_Mobile.Models
             }
             else
             {
-                // Logic updated to preserve existing data
-                if (hasNewPointName) parcel.PickupPointName = newPointName;
+                if (!string.IsNullOrEmpty(newPointName)) parcel.PickupPointName = newPointName;
                 else if (string.IsNullOrEmpty(parcel.PickupPointName)) parcel.PickupPointName = "Paczkomat";
 
-                if (hasNewPointAddress) parcel.PickupPointAddress = newPointAddress.Trim();
-                else if (string.IsNullOrWhiteSpace(parcel.PickupPointAddress) || parcel.PickupPointAddress == _loader.GetString("Txt_CheckSms"))
-                {
-                    // Only set to "Check SMS" if we really don't have anything better
-                    if (string.IsNullOrWhiteSpace(parcel.PickupPointAddress))
-                        parcel.PickupPointAddress = _loader.GetString("Txt_CheckSms");
-                }
+                if (!string.IsNullOrWhiteSpace(newPointAddress)) parcel.PickupPointAddress = newPointAddress.Trim();
+                else if (string.IsNullOrWhiteSpace(parcel.PickupPointAddress) || parcel.PickupPointAddress == _loader.GetString("Txt_CheckSms")) parcel.PickupPointAddress = _loader.GetString("Txt_CheckSms");
 
                 if (lat != 0 && lon != 0)
                 {
@@ -377,56 +284,10 @@ namespace InPost_Mobile.Models
                 }
             }
 
-            if (isCourier) parcel.Icon = "\uE139"; // Bus/Truck
-            else parcel.Icon = "\uE8B7"; // Paczkomat (Box)
-
-            // Override for Delivered/Returned?
-            // User: "For courier parcels, no matter the status let there be a bus icon"
-            // User: "and to all locker parcels package icon... but only change this for section Odbieram (Receive) and Nadaję (Send)"
-            // This implies:
-            // 1. Courier: ALWAYS Bus (\uE139) unless maybe Archived? stick to user request: "no matter what status"
-            // 2. Locker: Box (\uE8B7) in Receive/Send. Delivered/Returns can have specific status icons (Home, Arrow).
-
-            if (isCourier)
-            {
-                 parcel.Icon = "\uE139";
-                 parcel.IconImage = "ms-appx:///Assets/icon_kurier.png";
-            }
-            else
-            {
-                 // Locker
-                 string s = apiStatus.ToLower();
-                 if (parcel.ParcelType == "Receive" || parcel.ParcelType == "Send")
-                 {
-                     // Check specific exceptions
-                     if (s.Contains("return") || s.Contains("zwrócona"))
-                     {
-                         parcel.Icon = "\uE117"; // Keep Return (Arrow) - User likes this
-                         parcel.IconImage = null;
-                     }
-                     else if (IsDeliveredStatus(parcel.Status))
-                     {
-                         parcel.Icon = "\uE10B"; // Checkmark (Ptaszek)
-                         parcel.IconImage = null;
-                     }
-                     else
-                     {
-                         // Default Locker: Use PNG (covers Ready to Pickup, Out for Delivery, In Transit)
-                         parcel.Icon = "\uE8B7"; 
-                         parcel.IconImage = "ms-appx:///Assets/icon_paczkopunkt.PNG";
-                     }
-                 }
-                 else
-                 {
-                     // Archive / Returns ?
-                     parcel.IconImage = null; // Use Font Icons for Archive/History
-                     
-                     if (IsDeliveredStatus(parcel.Status)) parcel.Icon = "\uE10B"; // Checkmark
-                     else if (s.Contains("return")) parcel.Icon = "\uE117";
-                     else if (s.Contains("canceled")) parcel.Icon = "\uE10A";
-                     else parcel.Icon = "\uE8B7";
-                 }
-            }
+            if (isCourier) parcel.Icon = "\uE139"; else parcel.Icon = "\uE18B";
+            if (IsDeliveredStatus(parcel.Status)) parcel.Icon = "\uE10B";
+            else if (apiStatus.ToLower().Contains("return") || apiStatus.ToLower().Contains("zwrócona")) parcel.Icon = "\uE19F";
+            else if (apiStatus.ToLower().Contains("canceled") || apiStatus.ToLower().Contains("anulowana")) parcel.Icon = "\uE10A";
 
             if (IsDeliveredStatus(parcel.Status) || apiStatus.ToLower() == "canceled")
             {
@@ -440,14 +301,7 @@ namespace InPost_Mobile.Models
                 foreach (var item in eventsArr)
                 {
                     var evObj = item.GetObject();
-                    // Fix: Try to get machine-readable 'status' code first for proper translation
-                    string name = evObj.ContainsKey("status") ? evObj.GetNamedString("status") : "";
-                    
-                    if (string.IsNullOrEmpty(name))
-                    {
-                        name = evObj.ContainsKey("eventTitle") ? evObj.GetNamedString("eventTitle") : "Status";
-                    }
-
+                    string name = evObj.ContainsKey("eventTitle") ? evObj.GetNamedString("eventTitle") : "Status";
                     string dateStr = evObj.ContainsKey("date") ? evObj.GetNamedString("date") : DateTime.Now.ToString("o");
                     DateTimeOffset realDate; if (!DateTimeOffset.TryParse(dateStr, out realDate)) realDate = DateTimeOffset.MinValue;
                     tempList.Add(new TempEvent { Status = name, RealDate = realDate });
@@ -474,14 +328,13 @@ namespace InPost_Mobile.Models
                 {
                     string originalStatusName = item.Status;
                     string translatedDesc = GetTranslatedStatus(originalStatusName);
-                    finalHistory.Add(new ParcelEvent
-                    {
-                        Description = translatedDesc,
+                    finalHistory.Add(new ParcelEvent { 
+                        Description = translatedDesc, 
                         OriginalStatus = originalStatusName,
-                        Date = item.RealDate.ToLocalTime().ToString("dd.MM HH:mm"),
-                        Color = GetColorForStatus(originalStatusName),
-                        Opacity = (finalHistory.Count == 0) ? 1.0 : 0.6,
-                        IsFirst = false
+                        Date = item.RealDate.ToString("dd.MM HH:mm"), 
+                        Color = GetColorForStatus(originalStatusName), 
+                        Opacity = (finalHistory.Count == 0) ? 1.0 : 0.6, 
+                        IsFirst = false 
                     });
                 }
                 if (finalHistory.Count > 0) { finalHistory[0].IsFirst = true; parcel.LastUpdateDate = finalHistory[0].Date; parcel.Status = finalHistory[0].Description; }
@@ -494,104 +347,41 @@ namespace InPost_Mobile.Models
         public static string GetTranslatedStatus(string apiStatus)
         {
             if (string.IsNullOrEmpty(apiStatus)) return "";
-
-            string cleanStatus = apiStatus.Replace(" ", "_")
-                                          .Replace("/", "_")
-                                          .Replace("(", "")
-                                          .Replace(")", "")
-                                          .Trim();
-
+            string cleanStatus = apiStatus.Replace(" ", "_").Replace("/", "_").Replace("(", "").Replace(")", "").Trim();
             string key = "Status_" + cleanStatus;
             string translated = _loader.GetString(key);
-
             if (!string.IsNullOrEmpty(translated)) return translated;
-
             return apiStatus;
         }
 
-        // Wywołaj to po zmianie języka w SettingsPage
         public static async Task ReloadAllParcelsTranslation()
         {
             _loader = new ResourceLoader();
-
             foreach (var parcel in AllParcels)
             {
-                // 1. Przetłumacz główny 
                 if (!string.IsNullOrEmpty(parcel.OriginalStatus))
-                {
                     parcel.Status = GetTranslatedStatus(parcel.OriginalStatus);
-                }
 
-                // 2. Przetłumacz historię 
                 if (parcel.History != null)
                 {
                     foreach (var ev in parcel.History)
-                    {
                         if (!string.IsNullOrEmpty(ev.OriginalStatus))
-                        {
                             ev.Description = GetTranslatedStatus(ev.OriginalStatus);
-                        }
-                    }
-                    // Zaktualizuj status główny na podstawie najnowszego zdarzenia
                     if (parcel.History.Count > 0)
-                    {
                         parcel.Status = parcel.History[0].Description;
-                    }
                 }
-
                 if (parcel.PickupPointName == "Kurier" || parcel.PickupPointAddress == "Doręczenie kurierem" || parcel.PickupPointAddress == "Courier delivery")
-                {
                     parcel.PickupPointAddress = _loader.GetString("Txt_CourierDelivery");
-                }
             }
             await SaveDataAsync();
         }
 
-
         public static string GetIconForStatus(string s)
         {
-            s = s.ToLower(); 
-            if (s.Contains("return") || s.Contains("zwrócona") || s.Contains("zwrot")) return "\uE117"; // Undo (Return arrow)
-            if (s.Contains("taken_by_courier") || s.Contains("odebrana_przez_kuriera") || s.Contains("collected_from_sender")) return "\uE112"; // Arrow (In Transit)
-            if (s.Contains("delivered") || s.Contains("odebrana") || s.Contains("dostarczona")) return "\uE10F"; // Home (House)
-            if (s.Contains("canceled") || s.Contains("anulowana")) return "\uE10A"; // Cancel (X)
-            if (s.Contains("out_for_delivery") || s.Contains("wydana_do_doręczenia")) return "\uE112"; // Right Arrow (In Transit/Motion)
-            if (s.Contains("ready_to_pickup")) return "\uE102"; // Map Pin (Locker location)
-            return "\uE119"; // Mail Envelope (Default for Parcel)
+            s = s.ToLower(); if (s.Contains("delivered") || s.Contains("odebrana") || s.Contains("dostarczona")) return "\uE10B";
+            if (s.Contains("return") || s.Contains("zwrócona")) return "\uE19F"; if (s.Contains("canceled") || s.Contains("anulowana")) return "\uE10A"; return "\uE18B";
         }
-
-        public static string GetParcelSectionName(string statusRaw)
-        {
-             if (string.IsNullOrEmpty(statusRaw)) return _loader.GetString("Section_OutForDelivery");
-             string s = statusRaw.ToLower();
-
-             // Ready for pickup
-             if (s.Contains("ready_to_pickup") || s.Contains("stack_in_box_machine") || s.Contains("pickup_reminder") || s.Contains("awizo"))
-                return _loader.GetString("Section_ReadyForPickup");
-
-             // Delivered
-             if (s.Contains("delivered") || s.Contains("picked_up") || s.Contains("returned_to_sender") || s.Contains("canceled") || s.Contains("dostarczona") || s.Contains("odebrana"))
-                return _loader.GetString("Section_Delivered");
-
-             // Default (In Transit / Out for Delivery)
-             // Refined logic:
-             // 1. Out for delivery (courier last mile)
-             if (s.Contains("out_for_delivery") || s.Contains("courier_delivery") || s.Contains("wydana_do_doręczenia"))
-                 return _loader.GetString("Section_OutForDelivery");
-
-             // 2. In Transit (Middle mile)
-             string[] transitStatuses = { 
-                 "created", "confirmed", "collected_from_sender", "adopted_at_source_branch", 
-                 "sent_from_source_branch", "adopted_at_sorting_center", "sent_from_sorting_center", 
-                 "adopted_at_target_branch", "courier_label_creation", "w_trasie", "przyjęta_w_oddziale", "wysłana_z"
-             };
-
-             if (transitStatuses.Any(ts => s.Contains(ts)))
-                 return _loader.GetString("Section_InTransit");
-
-             return _loader.GetString("Section_InTransit"); // Default fallback to In Transit instead of OutForDelivery
-        }
-        private static string GetColorForStatus(string s)
+        public static string GetColorForStatus(string s)
         {
             s = s.ToLower(); if (s.Contains("delivered") || s.Contains("odebrana") || s.Contains("dostarczona")) return "#00CC00";
             if (s.Contains("return") || s.Contains("zwrócona") || s.Contains("canceled") || s.Contains("anulowana")) return "#FF4444";
@@ -626,68 +416,8 @@ namespace InPost_Mobile.Models
         }
         private static async Task<bool> RefreshSingleParcel(ParcelItem parcel)
         {
-            if (IsDebugMode) return true; // Fake success in debug
-            LastDebugLog = "Starting Refresh...";
-            // 1. Try Authenticated Mobile API first (if logged in)
-            if (IsLoggedIn())
-            {
-                try
-                {
-                    if (!_localSettings.Values.ContainsKey("AuthToken")) { LastDebugLog = "No Token"; return false; }
-                    string token = _localSettings.Values["AuthToken"].ToString();
-                    string url = $"{AppSecrets.BaseUrl}v1/tracking/{parcel.TrackingNumber}";
-
-                    using (var client = CreateHttpClient())
-                    {
-                        client.DefaultRequestHeaders.Authorization = new Windows.Web.Http.Headers.HttpCredentialsHeaderValue("Bearer", token);
-                        var response = await client.GetAsync(new Uri(url));
-
-                        if (response.StatusCode == HttpStatusCode.Unauthorized)
-                        {
-                            LastDebugLog = "401 Unauthorized, refreshing...";
-                            bool refreshed = await RefreshAuthTokenAsync();
-                            if (refreshed)
-                            {
-                                token = _localSettings.Values["AuthToken"].ToString();
-                                client.DefaultRequestHeaders.Authorization = new Windows.Web.Http.Headers.HttpCredentialsHeaderValue("Bearer", token);
-                                response = await client.GetAsync(new Uri(url));
-                            }
-                        }
-
-                        if (response.IsSuccessStatusCode)
-                        {
-                            IBuffer buffer = await response.Content.ReadAsBufferAsync();
-                            string jsonString;
-                            using (var dataReader = DataReader.FromBuffer(buffer)) { dataReader.UnicodeEncoding = Windows.Storage.Streams.UnicodeEncoding.Utf8; jsonString = dataReader.ReadString(buffer.Length); }
-                            
-                            LastDebugLog = "Auth OK. JSON: " + jsonString.Substring(0, Math.Min(jsonString.Length, 500)); // Log first 500 chars
-
-                            JsonObject json = JsonObject.Parse(jsonString);
-                            ParseApiObjectToParcel(parcel, json);
-                            return true;
-                        }
-                        else
-                        {
-                            string errorBody = "";
-                            try { errorBody = await response.Content.ReadAsStringAsync(); } catch { }
-                            LastDebugLog = "Auth Failed: " + response.StatusCode + " Body: " + errorBody;
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    LastDebugLog = "Auth Exception: " + ex.Message;
-                }
-            }
-            else
-            {
-                LastDebugLog = "Not Logged In";
-            }
-
-            // 2. Fallback to public ShipX (existing logic)
             try
             {
-                LastDebugLog += " -> Public Fallback";
                 using (var client = CreateHttpClient())
                 {
                     string url = $"{AppSecrets.ShipXUrl}v1/tracking/{parcel.TrackingNumber}";
@@ -704,43 +434,7 @@ namespace InPost_Mobile.Models
             return false;
         }
         public static async Task<bool> RequestSmsCode(string p) { try { using (var c = CreateHttpClient()) { string j = "{\"phoneNumber\":{\"prefix\":\"+48\",\"value\":\"" + p + "\"}}"; var ct = new HttpStringContent(j, Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json"); var r = await c.PostAsync(new Uri(AppSecrets.BaseUrl + "v1/account"), ct); return r.IsSuccessStatusCode; } } catch { return false; } }
-        public static async Task<bool> VerifySmsCode(string p, string s) 
-        { 
-            try 
-            { 
-                using (var c = CreateHttpClient()) 
-                { 
-                    string j = "{\"phoneNumber\":{\"prefix\":\"+48\",\"value\":\"" + p + "\"},\"smsCode\":\"" + s + "\",\"devicePlatform\":\"Android\"}"; 
-                    var ct = new HttpStringContent(j, Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json"); 
-                    var r = await c.PostAsync(new Uri(AppSecrets.BaseUrl + "v1/account/verification"), ct); 
-                    if (r.IsSuccessStatusCode) 
-                    { 
-                        string t = await r.Content.ReadAsStringAsync(); 
-                        JsonObject o = JsonObject.Parse(t); 
-                        if (o.ContainsKey("authToken")) 
-                        { 
-                            string newPhone = "+48 " + p;
-                            if (_localSettings.Values.ContainsKey("UserPhone"))
-                            {
-                                string oldPhone = _localSettings.Values["UserPhone"].ToString();
-                                if (oldPhone != newPhone)
-                                {
-                                    AllParcels.Clear();
-                                    await SaveDataAsync(); // Ensure empty list is saved
-                                }
-                            }
-                            
-                            _localSettings.Values["AuthToken"] = o.GetNamedString("authToken"); 
-                            if (o.ContainsKey("refreshToken")) _localSettings.Values["RefreshToken"] = o.GetNamedString("refreshToken"); 
-                            _localSettings.Values["UserPhone"] = newPhone; 
-                            return true; 
-                        } 
-                    } 
-                    return false; 
-                } 
-            } 
-            catch { return false; } 
-        }
+        public static async Task<bool> VerifySmsCode(string p, string s) { try { using (var c = CreateHttpClient()) { string j = "{\"phoneNumber\":{\"prefix\":\"+48\",\"value\":\"" + p + "\"},\"smsCode\":\"" + s + "\",\"devicePlatform\":\"Android\"}"; var ct = new HttpStringContent(j, Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json"); var r = await c.PostAsync(new Uri(AppSecrets.BaseUrl + "v1/account/verification"), ct); if (r.IsSuccessStatusCode) { string t = await r.Content.ReadAsStringAsync(); JsonObject o = JsonObject.Parse(t); if (o.ContainsKey("authToken")) { _localSettings.Values["AuthToken"] = o.GetNamedString("authToken"); if (o.ContainsKey("refreshToken")) _localSettings.Values["RefreshToken"] = o.GetNamedString("refreshToken"); _localSettings.Values["UserPhone"] = "+48 " + p; return true; } } return false; } } catch { return false; } }
         public static async Task LoadDataAsync() { try { StorageFile f = await ApplicationData.Current.LocalFolder.GetFileAsync(DATA_FILENAME); using (var s = await f.OpenStreamForReadAsync()) { var ser = new DataContractJsonSerializer(typeof(List<ParcelItem>)); AllParcels = (List<ParcelItem>)ser.ReadObject(s); } } catch { AllParcels = new List<ParcelItem>(); } }
         public static async Task SaveDataAsync() 
         { 
@@ -753,5 +447,15 @@ namespace InPost_Mobile.Models
         public static void InitializeData() { }
         public static ObservableCollection<ParcelItem> GetActiveParcels(string t) => new ObservableCollection<ParcelItem>(AllParcels.Where(p => !p.IsArchived && p.ParcelType == t).ToList());
         public static ObservableCollection<ParcelItem> GetArchivedParcels(string t) => new ObservableCollection<ParcelItem>(AllParcels.Where(p => p.IsArchived && p.ParcelType == t).ToList());
+        public static string GetParcelSectionName(string status)
+        {
+             if (string.IsNullOrEmpty(status)) return "Other";
+             string s = status.ToLower();
+             if (s == _loader.GetString("Status_ready_to_pickup").ToLower() || s.Contains("pickup_ready")) return _loader.GetString("Section_ReadyForPickup"); 
+             if (s == _loader.GetString("Status_out_for_delivery").ToLower() || s.Contains("out_for_delivery")) return _loader.GetString("Section_OutForDelivery");
+             if (s == _loader.GetString("Status_delivered").ToLower() || s == _loader.GetString("Status_picked_up").ToLower() || s.Contains("delivered")) return _loader.GetString("Section_Delivered");
+             if (s.Contains("in_transit") || s.Contains("sent") || s.Contains("prepared")) return _loader.GetString("Section_InTransit");
+             return _loader.GetString("Section_InTransit"); 
+        }
     }
 }
