@@ -181,6 +181,18 @@
   <data name="Status_ready_to_pickup_from_pok" xml:space="preserve">
     <value>Ready for pickup at POK</value>
   </data>
+  <data name="Status_unstack_from_box_machine" xml:space="preserve">
+    <value>Parcel storage finished</value>
+  </data>
+  <data name="Status_stack_parcel_in_box_machine_pickup_time_expired" xml:space="preserve">
+    <value>Storage period expired</value>
+  </data>
+  <data name="Status_pickup_reminder_sent" xml:space="preserve">
+    <value>Reminder about waiting parcel</value>
+  </data>
+  <data name="Status_W_oddziale_nadawczym" xml:space="preserve">
+    <value>At source branch</value>
+  </data>
   <data name="Status_undelivered" xml:space="preserve">
     <value>Undelivered</value>
   </data>
@@ -382,7 +394,9 @@
     <value>App created by:</value>
   </data>
   <data name="TxtAboutDescription.Text" xml:space="preserve">
-    <value>Unofficial InPost Mobile client for Windows Phone. The app allows parcel tracking and remote locker opening.</value>
+    <value>Unofficial InPost Mobile app for Windows Phone. Created by independent developer Hexryu.
+    More information about me can be found on my website: hexryu.net 
+    </value>
   </data>
   <data name="Txt_CheckSms" xml:space="preserve">
     <value>Check SMS</value>
@@ -505,5 +519,26 @@ Legal form: Spółka z ograniczoną odpowiedzialnością. All trademarks belong 
   </data>
   <data name="Section_Delivered" xml:space="preserve">
     <value>Delivered</value>
+  </data>
+  <data name="Notif_Out_Sender" xml:space="preserve">
+    <value>Parcel from {0} is out for delivery</value>
+  </data>
+  <data name="Notif_Out_Number" xml:space="preserve">
+    <value>Parcel {0} is out for delivery</value>
+  </data>
+  <data name="Notif_Out_Name" xml:space="preserve">
+    <value>Parcel {0} is out for delivery</value>
+  </data>
+  <data name="Notif_Ready_Sender" xml:space="preserve">
+    <value>Parcel from {0} is ready for pickup</value>
+  </data>
+  <data name="Notif_Ready_Number" xml:space="preserve">
+    <value>Parcel {0} is ready for pickup</value>
+  </data>
+  <data name="Notif_Ready_Name" xml:space="preserve">
+    <value>Parcel {0} is ready for pickup</value>
+  </data>
+  <data name="Notif_ParcelCount" xml:space="preserve">
+    <value>Parcel count</value>
   </data>
 </root>

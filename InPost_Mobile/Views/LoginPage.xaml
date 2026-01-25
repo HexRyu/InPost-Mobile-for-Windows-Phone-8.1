@@ -9,73 +9,75 @@
     Background="Black">
 
     <Grid>
-        <StackPanel VerticalAlignment="Center" Margin="24">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel VerticalAlignment="Center" Margin="24,40,24,24">
 
-            <Image Source="ms-appx:///Assets/header_logo.jpg" Height="90" Margin="0,0,0,0" HorizontalAlignment="Center"/>
+                <Image Source="ms-appx:///Assets/header_logo.jpg" Height="90" Margin="0,0,0,0" HorizontalAlignment="Center"/>
 
-            <ProgressBar x:Name="LoginProgress" IsIndeterminate="True" Visibility="Collapsed" Margin="0,0,0,20"/>
-            <TextBlock x:Name="StatusText" Foreground="#FF5555" HorizontalAlignment="Center" Margin="0,0,0,10" TextWrapping="Wrap" FontSize="16" FontWeight="SemiBold"/>
+                <ProgressBar x:Name="LoginProgress" IsIndeterminate="True" Visibility="Collapsed" Margin="0,0,0,20"/>
+                <TextBlock x:Name="StatusText" Foreground="#FF5555" HorizontalAlignment="Center" Margin="0,0,0,10" TextWrapping="Wrap" FontSize="16" FontWeight="SemiBold"/>
 
-            <StackPanel x:Name="StepPhone" Visibility="Visible">
-                <TextBlock x:Name="LblPhone" Text="Numer telefonu" Foreground="#BBBBBB" FontSize="14" Margin="0,0,0,5"/>
+                <StackPanel x:Name="StepPhone" Visibility="Visible">
+                    <TextBlock x:Name="LblPhone" Text="Numer telefonu" Foreground="#BBBBBB" FontSize="14" Margin="0,0,0,5"/>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
 
-                    <Border Grid.Column="0" Background="#222222" BorderBrush="#444444" BorderThickness="1" Height="45" Width="55" Margin="0,0,10,0">
-                        <TextBlock Text="+48" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="18" Foreground="Gray"/>
-                    </Border>
+                        <Border Grid.Column="0" Background="#222222" BorderBrush="#444444" BorderThickness="1" Height="45" Width="55" Margin="0,0,10,0">
+                            <TextBlock Text="+48" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="18" Foreground="Gray"/>
+                        </Border>
 
-                    <TextBox Grid.Column="1" x:Name="PhoneInput" InputScope="Number" PlaceholderText="500000000" Height="45" FontSize="20" MaxLength="9" TextChanged="PhoneInput_TextChanged"/>
-                </Grid>
+                        <TextBox Grid.Column="1" x:Name="PhoneInput" InputScope="Number" PlaceholderText="500000000" Height="45" FontSize="20" MaxLength="9" TextChanged="PhoneInput_TextChanged"/>
+                    </Grid>
 
-                <Grid Margin="0,20,0,5">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
+                    <Grid Margin="0,20,0,5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
 
-                    <CheckBox x:Name="CbTerms" 
-                              Grid.Column="0" 
-                              VerticalAlignment="Top" 
-                              Margin="0,-6,5,0" 
-                              MinWidth="32"
-                              MinHeight="32"/>
+                        <CheckBox x:Name="CbTerms" 
+                                  Grid.Column="0" 
+                                  VerticalAlignment="Top" 
+                                  Margin="0,-6,5,0" 
+                                  MinWidth="32"
+                                  MinHeight="32"/>
 
-                    <TextBlock x:Name="TbTerms" 
-                               Grid.Column="1"
-                               FontSize="13" 
-                               Foreground="#AAAAAA" 
-                               TextWrapping="Wrap" 
-                               VerticalAlignment="Top"
-                               LineHeight="18"
-                               Padding="0,2,0,0"/>
-                </Grid>
+                        <TextBlock x:Name="TbTerms" 
+                                   Grid.Column="1"
+                                   FontSize="13" 
+                                   Foreground="#AAAAAA" 
+                                   TextWrapping="Wrap" 
+                                   VerticalAlignment="Top"
+                                   LineHeight="18"
+                                   Padding="0,2,0,0"/>
+                    </Grid>
 
-                <Button x:Name="BtnSendSms" Content="WYŚLIJ KOD SMS" Click="SendSms_Click" 
-                        Background="#FFCC00" Foreground="Black" FontWeight="Bold" BorderThickness="0"
-                        HorizontalAlignment="Stretch" Height="60" Margin="0,15,0,0"/>
+                    <Button x:Name="BtnSendSms" Content="WYŚLIJ KOD SMS" Click="SendSms_Click" 
+                            Background="#FFCC00" Foreground="Black" FontWeight="Bold" BorderThickness="0"
+                            HorizontalAlignment="Stretch" Height="60" Margin="0,15,0,0"/>
+                </StackPanel>
+
+                <StackPanel x:Name="StepSms" Visibility="Collapsed">
+                    <TextBlock x:Name="LblSms" Text="Kod weryfikacyjny SMS" Foreground="#BBBBBB" FontSize="14" Margin="0,0,0,5"/>
+                    <TextBox x:Name="SmsInput" InputScope="Number" PlaceholderText="XXXXXX" Height="45" FontSize="20" MaxLength="6"/>
+
+                    <Button x:Name="BtnVerify" Content="ZALOGUJ SIĘ" Click="VerifySms_Click" 
+                            Background="#FFCC00" Foreground="Black" FontWeight="Bold" BorderThickness="0"
+                            HorizontalAlignment="Stretch" Height="60" Margin="0,20,0,0"/>
+
+                    <Button x:Name="BtnBack" Content="POPRAW NUMER" Click="BackToPhone_Click" 
+                            Background="Transparent" Foreground="White" BorderBrush="White" BorderThickness="2"
+                            HorizontalAlignment="Stretch" Height="60" Margin="0,15,0,0"/>
+                </StackPanel>
+                
+                <Button x:Name="BtnSkip" Content="POMIŃ LOGOWANIE" Click="Skip_Click" 
+                        HorizontalAlignment="Stretch" Margin="0,40,0,0"
+                        Background="Transparent" Foreground="#DDDDDD" FontSize="12"/>
             </StackPanel>
-
-            <StackPanel x:Name="StepSms" Visibility="Collapsed">
-                <TextBlock x:Name="LblSms" Text="Kod weryfikacyjny SMS" Foreground="#BBBBBB" FontSize="14" Margin="0,0,0,5"/>
-                <TextBox x:Name="SmsInput" InputScope="Number" PlaceholderText="XXXXXX" Height="45" FontSize="20" MaxLength="6"/>
-
-                <Button x:Name="BtnVerify" Content="ZALOGUJ SIĘ" Click="VerifySms_Click" 
-                        Background="#FFCC00" Foreground="Black" FontWeight="Bold" BorderThickness="0"
-                        HorizontalAlignment="Stretch" Height="60" Margin="0,20,0,0"/>
-
-                <Button x:Name="BtnBack" Content="POPRAW NUMER" Click="BackToPhone_Click" 
-                        Background="Transparent" Foreground="White" BorderBrush="White" BorderThickness="2"
-                        HorizontalAlignment="Stretch" Height="60" Margin="0,15,0,0"/>
-            </StackPanel>
-        </StackPanel>
-
-        <Button x:Name="BtnSkip" Content="POMIŃ LOGOWANIE" Click="Skip_Click" 
-                VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Margin="24,0,24,20"
-                Background="Transparent" Foreground="#DDDDDD" FontSize="12"/>
+        </ScrollViewer>
     </Grid>
 </Page>

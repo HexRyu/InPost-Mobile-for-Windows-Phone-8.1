@@ -16,6 +16,8 @@ using Windows.UI.Popups;
 using System.Text;
 using System.Globalization;
 using Windows.Storage.Streams;
+using Windows.UI.Notifications;
+using Windows.Data.Xml.Dom;
 
 namespace InPost_Mobile.Models
 {
@@ -23,9 +25,20 @@ namespace InPost_Mobile.Models
     {
         public static List<ParcelItem> AllParcels = new List<ParcelItem>();
         private const string DATA_FILENAME = "parcels_data.json";
+        private const string DEBUG_DATA_FILENAME = "parcels_debug.json";
         private static ApplicationDataContainer _localSettings = ApplicationData.Current.LocalSettings;
         private static ResourceLoader _loader = new ResourceLoader();
-        public static bool IsDebugMode { get; set; } = false;
+        private static System.Threading.SemaphoreSlim _fileLock = new System.Threading.SemaphoreSlim(1);
+
+        public static bool IsDebugMode 
+        { 
+            get 
+            { 
+               if (_localSettings.Values.ContainsKey("IsDebugMode")) return (bool)_localSettings.Values["IsDebugMode"];
+               return false;
+            }
+            set { _localSettings.Values["IsDebugMode"] = value; }
+        }
 
         private static HttpClient CreateHttpClient()
         {
@@ -41,13 +54,14 @@ namespace InPost_Mobile.Models
             return client;
         }
 
-        public static bool IsLoggedIn() => _localSettings.Values.ContainsKey("AuthToken");
+        public static bool IsLoggedIn() => _localSettings.Values.ContainsKey("AuthToken") || IsDebugMode;
 
         public static async void Logout()
         {
             _localSettings.Values.Remove("AuthToken");
             _localSettings.Values.Remove("RefreshToken");
             _localSettings.Values.Remove("UserPhone");
+            _localSettings.Values.Remove("IsDebugMode");
             foreach (var p in AllParcels)
             {
                 p.PickupCode = "";
@@ -284,10 +298,32 @@ namespace InPost_Mobile.Models
                 }
             }
 
-            if (isCourier) parcel.Icon = "\uE139"; else parcel.Icon = "\uE18B";
-            if (IsDeliveredStatus(parcel.Status)) parcel.Icon = "\uE10B";
-            else if (apiStatus.ToLower().Contains("return") || apiStatus.ToLower().Contains("zwrócona")) parcel.Icon = "\uE19F";
-            else if (apiStatus.ToLower().Contains("canceled") || apiStatus.ToLower().Contains("anulowana")) parcel.Icon = "\uE10A";
+            if (isCourier) 
+            {
+                parcel.Icon = "\uE139";
+                parcel.IconImage = "ms-appx:///Assets/icon_kurier.png";
+            } 
+            else 
+            {
+                parcel.Icon = "\uE18B";
+                parcel.IconImage = "ms-appx:///Assets/icon_paczkopunkt.PNG";
+            }
+
+            if (IsDeliveredStatus(parcel.Status)) 
+            {
+                parcel.Icon = "\uE10B";
+                parcel.IconImage = null;
+            }
+            else if (apiStatus.ToLower().Contains("return") || apiStatus.ToLower().Contains("zwrócona")) 
+            {
+                parcel.Icon = "\uE19F";
+                parcel.IconImage = null;
+            }
+            else if (apiStatus.ToLower().Contains("canceled") || apiStatus.ToLower().Contains("anulowana")) 
+            {
+                parcel.Icon = "\uE10A";
+                parcel.IconImage = null;
+            }
 
             if (IsDeliveredStatus(parcel.Status) || apiStatus.ToLower() == "canceled")
             {
@@ -414,7 +450,7 @@ namespace InPost_Mobile.Models
             var parcel = AllParcels.FirstOrDefault(p => p.TrackingNumber == trackingNumber);
             if (parcel != null && await RefreshSingleParcel(parcel)) await SaveDataAsync();
         }
-        private static async Task<bool> RefreshSingleParcel(ParcelItem parcel)
+        public static async Task<bool> RefreshSingleParcel(ParcelItem parcel)
         {
             try
             {
@@ -435,12 +471,41 @@ namespace InPost_Mobile.Models
         }
         public static async Task<bool> RequestSmsCode(string p) { try { using (var c = CreateHttpClient()) { string j = "{\"phoneNumber\":{\"prefix\":\"+48\",\"value\":\"" + p + "\"}}"; var ct = new HttpStringContent(j, Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json"); var r = await c.PostAsync(new Uri(AppSecrets.BaseUrl + "v1/account"), ct); return r.IsSuccessStatusCode; } } catch { return false; } }
         public static async Task<bool> VerifySmsCode(string p, string s) { try { using (var c = CreateHttpClient()) { string j = "{\"phoneNumber\":{\"prefix\":\"+48\",\"value\":\"" + p + "\"},\"smsCode\":\"" + s + "\",\"devicePlatform\":\"Android\"}"; var ct = new HttpStringContent(j, Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json"); var r = await c.PostAsync(new Uri(AppSecrets.BaseUrl + "v1/account/verification"), ct); if (r.IsSuccessStatusCode) { string t = await r.Content.ReadAsStringAsync(); JsonObject o = JsonObject.Parse(t); if (o.ContainsKey("authToken")) { _localSettings.Values["AuthToken"] = o.GetNamedString("authToken"); if (o.ContainsKey("refreshToken")) _localSettings.Values["RefreshToken"] = o.GetNamedString("refreshToken"); _localSettings.Values["UserPhone"] = "+48 " + p; return true; } } return false; } } catch { return false; } }
-        public static async Task LoadDataAsync() { try { StorageFile f = await ApplicationData.Current.LocalFolder.GetFileAsync(DATA_FILENAME); using (var s = await f.OpenStreamForReadAsync()) { var ser = new DataContractJsonSerializer(typeof(List<ParcelItem>)); AllParcels = (List<ParcelItem>)ser.ReadObject(s); } } catch { AllParcels = new List<ParcelItem>(); } }
+        
+        public static async Task LoadDataAsync() 
+        { 
+            string fileName = IsDebugMode ? DEBUG_DATA_FILENAME : DATA_FILENAME;
+            await _fileLock.WaitAsync();
+            try 
+            { 
+                StorageFile f = await ApplicationData.Current.LocalFolder.GetFileAsync(fileName); 
+                using (var s = await f.OpenStreamForReadAsync()) 
+                { 
+                    var ser = new DataContractJsonSerializer(typeof(List<ParcelItem>)); 
+                    AllParcels = (List<ParcelItem>)ser.ReadObject(s); 
+                } 
+            } 
+            catch { AllParcels = new List<ParcelItem>(); }
+            finally { _fileLock.Release(); }
+        }
+
         public static async Task SaveDataAsync() 
         { 
-            if (IsDebugMode) return;
-            try { StorageFile f = await ApplicationData.Current.LocalFolder.CreateFileAsync(DATA_FILENAME, CreationCollisionOption.ReplaceExisting); using (var s = await f.OpenStreamForWriteAsync()) { var ser = new DataContractJsonSerializer(typeof(List<ParcelItem>)); ser.WriteObject(s, AllParcels); } } catch { } 
+            string fileName = IsDebugMode ? DEBUG_DATA_FILENAME : DATA_FILENAME;
+            await _fileLock.WaitAsync();
+            try 
+            { 
+                StorageFile f = await ApplicationData.Current.LocalFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting); 
+                using (var s = await f.OpenStreamForWriteAsync()) 
+                { 
+                    var ser = new DataContractJsonSerializer(typeof(List<ParcelItem>)); 
+                    ser.WriteObject(s, AllParcels); 
+                } 
+            } 
+            catch { }
+            finally { _fileLock.Release(); }
         }
+
         public static async Task ForceSave() { await SaveDataAsync(); }
         public static async void RemoveParcel(ParcelItem p) { if (AllParcels.Contains(p)) { AllParcels.Remove(p); await SaveDataAsync(); } }
         public static async Task RenameParcel(string t, string n) { var p = AllParcels.FirstOrDefault(x => x.TrackingNumber == t); if (p != null) { p.CustomName = n; await SaveDataAsync(); } }
@@ -451,11 +516,97 @@ namespace InPost_Mobile.Models
         {
              if (string.IsNullOrEmpty(status)) return "Other";
              string s = status.ToLower();
-             if (s == _loader.GetString("Status_ready_to_pickup").ToLower() || s.Contains("pickup_ready")) return _loader.GetString("Section_ReadyForPickup"); 
+             if (s == _loader.GetString("Status_ready_to_pickup").ToLower() || s.Contains("pickup_ready") || s.Contains("ready_to_pickup")) return _loader.GetString("Section_ReadyForPickup"); 
              if (s == _loader.GetString("Status_out_for_delivery").ToLower() || s.Contains("out_for_delivery")) return _loader.GetString("Section_OutForDelivery");
              if (s == _loader.GetString("Status_delivered").ToLower() || s == _loader.GetString("Status_picked_up").ToLower() || s.Contains("delivered")) return _loader.GetString("Section_Delivered");
              if (s.Contains("in_transit") || s.Contains("sent") || s.Contains("prepared")) return _loader.GetString("Section_InTransit");
              return _loader.GetString("Section_InTransit"); 
+        }
+        public static void UpdateLiveTile()
+        {
+            try
+            {
+                var liveParcels = AllParcels.Where(p => 
+                    !p.IsArchived && 
+                    p.ParcelType == "Receive" && 
+                    !string.IsNullOrEmpty(p.OriginalStatus) &&
+                    (p.OriginalStatus.ToLower().Contains("ready") || 
+                     p.OriginalStatus.ToLower().Contains("pickup_ready") || 
+                     p.OriginalStatus.ToLower().Contains("out_for_delivery"))
+                ).ToList();
+
+                int count = liveParcels.Count;
+
+                BadgeUpdateManager.CreateBadgeUpdaterForApplication().Clear();
+
+                var updater = TileUpdateManager.CreateTileUpdaterForApplication();
+                updater.EnableNotificationQueue(true);
+                updater.Clear();
+
+                if (count == 0) return;
+
+                foreach (var p in liveParcels.Take(5))
+                {
+                    try
+                    {
+                        string displayName = !string.IsNullOrEmpty(p.CustomName) ? p.CustomName : p.Sender;
+                        if (string.IsNullOrEmpty(displayName) || displayName == "Nadawca") displayName = p.TrackingNumber;
+                        
+                        bool isOut = !string.IsNullOrEmpty(p.OriginalStatus) && p.OriginalStatus.ToLower().Contains("out_for_delivery");
+                        string fullMessage = "";
+                        
+                        if (isOut)
+                        {
+                            if (!string.IsNullOrEmpty(p.CustomName)) fullMessage = string.Format(_loader.GetString("Notif_Out_Name"), p.CustomName);
+                            else if (!string.IsNullOrEmpty(p.Sender) && p.Sender != "Nadawca") fullMessage = string.Format(_loader.GetString("Notif_Out_Sender"), p.Sender);
+                            else fullMessage = string.Format(_loader.GetString("Notif_Out_Number"), p.TrackingNumber);
+                        }
+                        else
+                        {
+                            if (!string.IsNullOrEmpty(p.CustomName)) fullMessage = string.Format(_loader.GetString("Notif_Ready_Name"), p.CustomName);
+                            else if (!string.IsNullOrEmpty(p.Sender) && p.Sender != "Nadawca") fullMessage = string.Format(_loader.GetString("Notif_Ready_Sender"), p.Sender);
+                            else fullMessage = string.Format(_loader.GetString("Notif_Ready_Number"), p.TrackingNumber);
+                        }
+                        
+                        fullMessage += $"\n{_loader.GetString("Notif_ParcelCount")}: {count}";
+
+                        var tileXml = TileUpdateManager.GetTemplateContent(TileTemplateType.TileWide310x150Text03);
+                        var textNodes = tileXml.GetElementsByTagName("text");
+                        textNodes[0].InnerText = displayName; 
+                        textNodes[1].InnerText = fullMessage; 
+
+                        var binding = tileXml.GetElementsByTagName("binding").Item(0) as XmlElement;
+                        if (binding != null)
+                        {
+                            binding.SetAttribute("branding", "name"); // Changed from nameAndLogo to name
+                        }
+
+                        var squareXml = TileUpdateManager.GetTemplateContent(TileTemplateType.TileSquare150x150Text04);
+                        var sqNodes = squareXml.GetElementsByTagName("text");
+                        sqNodes[0].InnerText = displayName;
+                        sqNodes[0].InnerText += $"\n({count})"; 
+                        
+                        var sqBinding = squareXml.GetElementsByTagName("binding").Item(0) as XmlElement;
+                        if (sqBinding != null)
+                        {
+                             sqBinding.SetAttribute("branding", "name"); // Standardize branding
+                        }
+
+                        var node = tileXml.ImportNode(squareXml.GetElementsByTagName("binding").Item(0), true);
+                        tileXml.GetElementsByTagName("visual").Item(0).AppendChild(node);
+                        
+                        var notification = new TileNotification(tileXml);
+                        
+                        string cleanTag = p.TrackingNumber;
+                        if (cleanTag.Length > 15) cleanTag = cleanTag.Substring(cleanTag.Length - 15);
+                        notification.Tag = cleanTag; 
+                        
+                        updater.Update(notification);
+                    }
+                    catch { }
+                }
+            }
+            catch { }
         }
     }
 }

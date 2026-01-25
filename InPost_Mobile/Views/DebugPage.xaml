@@ -20,12 +20,15 @@
             <StackPanel>
                 <TextBlock Text="Tracking Number (min 10 chars):" Foreground="White" Margin="0,0,0,5"/>
                 <TextBox x:Name="TbTracking" PlaceholderText="1234567890" InputScope="Number" Margin="0,0,0,15"/>
+                
+                <TextBlock Text="Custom Name (Optional):" Foreground="White" Margin="0,0,0,5"/>
+                <TextBox x:Name="TbCustomName" PlaceholderText="E.g. New Shoes" Margin="0,0,0,15"/>
 
                 <TextBlock Text="Sender:" Foreground="White" Margin="0,0,0,5"/>
                 <TextBox x:Name="TbSender" PlaceholderText="Amazon / Allegro / Private" Margin="0,0,0,15"/>
 
                 <TextBlock Text="Status:" Foreground="White" Margin="0,0,0,5"/>
-                <ComboBox x:Name="CbStatus" SelectedIndex="0" HorizontalAlignment="Stretch" Margin="0,0,0,15">
+                <ComboBox x:Name="CbStatus" SelectionChanged="CbStatus_SelectionChanged" SelectedIndex="0" HorizontalAlignment="Stretch" Margin="0,0,0,15">
                     <ComboBoxItem Content="created" Tag="created"/>
                     <ComboBoxItem Content="confirmed" Tag="confirmed"/>
                     <ComboBoxItem Content="collected_from_sender" Tag="collected_from_sender"/>
@@ -61,6 +64,14 @@
                      <RadioButton x:Name="RbLocker" Content="Locker" GroupName="Target" IsChecked="True" Foreground="White" Margin="0,0,10,0"/>
                      <RadioButton x:Name="RbCourier" Content="Courier" GroupName="Target" Foreground="White"/>
                 </StackPanel>
+
+                <ComboBox x:Name="CbSize" Header="Size:" SelectedIndex="0" HorizontalAlignment="Stretch" Margin="0,0,0,15">
+                    <ComboBoxItem Content="A (Small)" Tag="A"/>
+                    <ComboBoxItem Content="B (Medium)" Tag="B"/>
+                    <ComboBoxItem Content="C (Large)" Tag="C"/>
+                </ComboBox>
+
+                <ComboBox x:Name="CbNotifDelay" Header="Notification Delay" Visibility="Collapsed" Margin="0,0,0,15"/>
 
                 <Button Content="ADD MOCK PARCEL" Click="AddMock_Click" HorizontalAlignment="Stretch" Margin="0,20,0,0" Background="Yellow" Foreground="Black"/>
                 

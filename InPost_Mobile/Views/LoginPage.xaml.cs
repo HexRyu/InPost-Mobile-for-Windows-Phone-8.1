@@ -91,7 +91,6 @@ namespace InPost_Mobile.Views
             if (PhoneInput.Text == "1724")
             {
                 ParcelManager.IsDebugMode = true;
-                DebugManager.InitializeMockData();
                 Frame.Navigate(typeof(MainPage));
                 return;
             }

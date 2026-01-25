@@ -178,6 +178,18 @@
   <data name="Status_ready_to_pickup_from_pok" xml:space="preserve">
     <value>Gotowa do odbioru w POK</value>
   </data>
+  <data name="Status_unstack_from_box_machine" xml:space="preserve">
+    <value>Magazynowanie paczki zakończone</value>
+  </data>
+  <data name="Status_stack_parcel_in_box_machine_pickup_time_expired" xml:space="preserve">
+    <value>Upłynął termin magazynowania paczki</value>
+  </data>
+  <data name="Status_pickup_reminder_sent" xml:space="preserve">
+    <value>Przypomnienie o oczekującej paczce</value>
+  </data>
+  <data name="Status_W_oddziale_nadawczym" xml:space="preserve">
+    <value>W oddziale nadawczym</value>
+  </data>
   <data name="Status_undelivered" xml:space="preserve">
     <value>Niedostarczona</value>
   </data>
@@ -377,7 +389,9 @@
     <value>Aplikacja stworzona przez:</value>
   </data>
   <data name="TxtAboutDescription.Text" xml:space="preserve">
-    <value>Nieoficjalny klient InPost Mobile na Windows Phone. Aplikacja pozwala na śledzenie paczek i zdalne otwieranie skrytek.</value>
+    <value>Nieoficjalna aplikacja InPost Mobile na Windows Phone. Stworona przez niezależnego dewelopera Hexryu. 
+    Więcej informacji o mnie na mojej stronie www: hexryu.net
+  </value>
   </data>
   <data name="Txt_CheckSms" xml:space="preserve">
     <value>Sprawdź w SMS</value>
@@ -501,5 +515,26 @@ Forma prawna: Spółka z ograniczoną odpowiedzialnością. Wszelkie znaki towar
   </data>
   <data name="Section_Delivered" xml:space="preserve">
     <value>Odebrane</value>
+  </data>
+  <data name="Notif_Out_Sender" xml:space="preserve">
+    <value>Paczka od {0} została wydana do doręczenia</value>
+  </data>
+  <data name="Notif_Out_Number" xml:space="preserve">
+    <value>Paczka o numerze {0} została wydana do doręczenia</value>
+  </data>
+  <data name="Notif_Out_Name" xml:space="preserve">
+    <value>Paczka {0} została wydana do doręczenia</value>
+  </data>
+  <data name="Notif_Ready_Sender" xml:space="preserve">
+    <value>Paczka od {0} jest gotowa do odbioru</value>
+  </data>
+  <data name="Notif_Ready_Number" xml:space="preserve">
+    <value>Paczka o numerze {0} jest gotowa do odbioru</value>
+  </data>
+  <data name="Notif_Ready_Name" xml:space="preserve">
+    <value>Paczka {0} jest gotowa do odbioru</value>
+  </data>
+  <data name="Notif_ParcelCount" xml:space="preserve">
+    <value>Liczba paczek</value>
   </data>
 </root>

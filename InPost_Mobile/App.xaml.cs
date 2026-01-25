@@ -1,5 +1,6 @@
 ﻿using System;
 using Windows.ApplicationModel;
+using Windows.ApplicationModel.Background;
 using Windows.ApplicationModel.Activation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -96,6 +97,34 @@ namespace InPost_Mobile
             }
 
             Window.Current.Activate();
+            RegisterBackgroundTask();
+        }
+
+        private async void RegisterBackgroundTask()
+        {
+            var taskName = "BackgroundSyncTask";
+            var taskEntryPoint = "InPost_Mobile.Tasks.BackgroundSyncTask";
+
+            foreach (var task in Windows.ApplicationModel.Background.BackgroundTaskRegistration.AllTasks)
+            {
+                if (task.Value.Name == taskName) return; // Already registered
+            }
+
+            try
+            {
+                var access = await Windows.ApplicationModel.Background.BackgroundExecutionManager.RequestAccessAsync();
+                
+                if (access == BackgroundAccessStatus.AllowedMayUseActiveRealTimeConnectivity || 
+                    access == BackgroundAccessStatus.AllowedWithAlwaysOnRealTimeConnectivity)
+                {
+                    var builder = new BackgroundTaskBuilder();
+                    builder.Name = taskName;
+                    builder.TaskEntryPoint = taskEntryPoint;
+                    builder.SetTrigger(new TimeTrigger(30, false)); // Run every 30 minutes
+                    builder.Register();
+                }
+            }
+            catch { }
         }
 
         private void RootFrame_FirstNavigated(object sender, NavigationEventArgs e)

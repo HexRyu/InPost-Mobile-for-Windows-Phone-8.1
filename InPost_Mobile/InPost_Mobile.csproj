@@ -14,7 +14,7 @@
     <MinimumVisualStudioVersion>12</MinimumVisualStudioVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{76F1466A-8B6D-4E39-A767-685A06062A39};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
+    <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
     <AppxBundle>Never</AppxBundle>
     <AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
   </PropertyGroup>
@@ -99,6 +99,7 @@
     <Compile Include="Models\ParcelItem.cs" />
     <Compile Include="Models\ParcelManager.cs" />
     <Compile Include="Models\User.cs" />
+    <Compile Include="Tasks\BackgroundSyncTask.cs" />
     <Compile Include="Views\AboutPage.xaml.cs">
       <DependentUpon>AboutPage.xaml</DependentUpon>
     </Compile>
@@ -138,6 +139,9 @@
     <Content Include="Assets\avatar.png" />
     <Content Include="Assets\avatar_api.png" />
     <Content Include="Assets\avatar_tester.png" />
+    <Content Include="Assets\BadgeLogo.scale-100.png" />
+    <Content Include="Assets\BadgeLogo.scale-140.png" />
+    <Content Include="Assets\BadgeLogo.scale-240.png" />
     <Content Include="Assets\icon_kurier.png" />
     <Content Include="Assets\icon_paczkopunkt.PNG" />
     <Content Include="Assets\shrepard.png" />

@@ -69,14 +69,14 @@ namespace InPost_Mobile.Views
                 if (ParcelManager.IsDebugMode && ParcelManager.AllParcels.Count == 0)
                 {
                     // Ensure mocks are loaded if empty (e.g. first nav)
-                     await ParcelManager.UpdateAllParcelsAsync();
+                     await DebugManager.InitializeMockData();
                 } 
                 else if (!_isFirstLoad) 
                 {
                     // ... standard refresh ...
                 }
                 
-                if (!ParcelManager.IsDebugMode) await ParcelManager.LoadDataAsync();
+                await ParcelManager.LoadDataAsync();
                 RefreshLists();
                 _isFirstLoad = false;
 
@@ -113,6 +113,7 @@ namespace InPost_Mobile.Views
             RefreshReceiveList();
             if (_sendingList != null) _sendingList.ItemsSource = ParcelManager.GetActiveParcels("Send");
             if (_returnsList != null) _returnsList.ItemsSource = ParcelManager.GetActiveParcels("Return");
+            ParcelManager.UpdateLiveTile();
         }
 
         private void RefreshReceiveList()
@@ -148,6 +149,7 @@ namespace InPost_Mobile.Views
         private async void Refresh_Click(object sender, RoutedEventArgs e)
         {
             LoadingBar.Visibility = Visibility.Visible;
+            if (ParcelManager.IsDebugMode) await Task.Delay(1500); // Simulate network delay
             await ParcelManager.UpdateAllParcelsAsync();
             RefreshLists();
             LoadingBar.Visibility = Visibility.Collapsed;

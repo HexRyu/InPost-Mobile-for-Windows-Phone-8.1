@@ -223,8 +223,9 @@ namespace InPost_Mobile.Models
         {
             get
             {
+                bool hasCustomName = !string.IsNullOrWhiteSpace(CustomName);
                 bool hasRealSender = !string.IsNullOrEmpty(Sender) && Sender != "Nadawca";
-                return hasRealSender ? Visibility.Visible : Visibility.Collapsed;
+                return (hasCustomName || hasRealSender) ? Visibility.Visible : Visibility.Collapsed;
             }
         }
 
@@ -245,6 +246,12 @@ namespace InPost_Mobile.Models
             get
             {
                 var loader = new ResourceLoader();
+                // If we are displaying Custom Name, maybe we shouldn't label it "Sender"? 
+                // But for now keeping it simple or maybe return empty if CustomName is used?
+                // User requirement: "Name of parcel above tracking number". 
+                // If Custom Name is used, the label "Sender" might be confusing. 
+                // Let's hide label if it's a Custom Name?
+                // Ref previous behavior: The label text is "Nadawca" (LblSender.Text).
                 return loader.GetString("LblSender/Text");
             }
         }
@@ -254,8 +261,9 @@ namespace InPost_Mobile.Models
         {
             get
             {
+                bool hasCustomName = !string.IsNullOrWhiteSpace(CustomName);
                 bool hasRealSender = !string.IsNullOrEmpty(Sender) && Sender != "Nadawca";
-                return hasRealSender ? Visibility.Visible : Visibility.Collapsed;
+                return (hasCustomName || hasRealSender) ? Visibility.Visible : Visibility.Collapsed;
             }
         }
 
