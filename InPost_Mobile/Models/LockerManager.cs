@@ -49,7 +49,14 @@ namespace InPost_Mobile.Models
 
             // 2. Przygotowanie numeru telefonu 
             string rawPhone = "";
-            if (_localSettings.Values.ContainsKey("UserPhone"))
+            
+            // PRIORITY: Use phone number from the parcel itself (as per inpost_api.c)
+            if (!string.IsNullOrEmpty(parcel.PhoneNumber))
+            {
+                rawPhone = parcel.PhoneNumber;
+            }
+            // FALLBACK: Use global setting
+            else if (_localSettings.Values.ContainsKey("UserPhone"))
             {
                 rawPhone = _localSettings.Values["UserPhone"]?.ToString() ?? "";
             }
@@ -57,7 +64,7 @@ namespace InPost_Mobile.Models
             if (string.IsNullOrEmpty(rawPhone))
             {
                  // Fallback - spróbuj pobrać z tokena lub wymuś ponowne logowanie?
-                 throw new Exception("Błąd: Brak numeru telefonu w ustawieniach. Zaloguj się ponownie.");
+                 throw new Exception("Błąd: Brak numeru telefonu przypisanego do paczki lub konta.");
             }
 
             rawPhone = rawPhone.Replace(" ", "").Replace("-", "").Trim();
@@ -145,14 +152,14 @@ namespace InPost_Mobile.Models
             parcelObj.SetNamedValue("openCode", JsonValue.CreateStringValue(parcel.PickupCode ?? ""));
             
             JsonObject phoneObj = new JsonObject();
-            phoneObj.SetNamedValue("prefix", JsonValue.CreateStringValue("+48"));
+            phoneObj.SetNamedValue("prefix", JsonValue.CreateStringValue(parcel.PhoneNumberPrefix ?? "+48")); // Use parcel prefix if available
             phoneObj.SetNamedValue("value", JsonValue.CreateStringValue(phone ?? ""));
-            parcelObj.SetNamedValue("receiverPhoneNumber", phoneObj); // Poprawna nazwa pola w V2
+            parcelObj.SetNamedValue("recieverPhoneNumber", phoneObj); // Matches inpost_api.c (typo in API?)
 
             JsonObject geoObj = new JsonObject();
             geoObj.SetNamedValue("latitude", JsonValue.CreateNumberValue(lat));
             geoObj.SetNamedValue("longitude", JsonValue.CreateNumberValue(lon));
-            geoObj.SetNamedValue("accuracy", JsonValue.CreateNumberValue(10));
+            geoObj.SetNamedValue("accuracy", JsonValue.CreateNumberValue(13.365));
 
             json.SetNamedValue("parcel", parcelObj);
             json.SetNamedValue("geoPoint", geoObj);

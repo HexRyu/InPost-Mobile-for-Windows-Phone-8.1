@@ -36,28 +36,38 @@
                        Foreground="White" 
                        Margin="0,0,0,20"/>
 
-            <Grid Margin="0,0,0,30">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-
-                <Image Source="ms-appx:///Assets/avatar.png" 
-                       Width="100" 
-                       Height="100" 
-                       Stretch="UniformToFill" 
-                       VerticalAlignment="Top"/>
-
-                <HyperlinkButton Grid.Column="1" 
-                                 NavigateUri="https://github.com/HexRyu"
-                                 Margin="15,0,0,0" 
-                                 VerticalAlignment="Center">
-                    <TextBlock Text="HexRyu" 
-                               FontSize="32" 
-                               Foreground="#3399FF" 
-                               FontWeight="Normal"/>
-                </HyperlinkButton>
-            </Grid>
+            <!-- Author Profile Button -->
+            <Button Click="Website_Click"
+                    HorizontalAlignment="Stretch"
+                    BorderThickness="2"
+                    BorderBrush="White"
+                    Background="Transparent"
+                    Padding="10"
+                    Margin="0,0,0,30">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <!-- Avatar -->
+                    <Image Source="ms-appx:///Assets/avatar.png"
+                           Width="60" Height="60"
+                           Stretch="UniformToFill"
+                           Margin="0,0,15,0"/>
+                           
+                    <!-- Text -->
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock Text="HexRyu" 
+                                   FontSize="24" 
+                                   FontWeight="Bold" 
+                                   Foreground="#3399FF"/>
+                        <TextBlock Text="hexryu.net" 
+                                   FontSize="14" 
+                                   Foreground="Gray"/>
+                    </StackPanel>
+                </Grid>
+            </Button>
 
             <TextBlock x:Uid="TxtAboutDescription" 
                        Text="Opis..." 

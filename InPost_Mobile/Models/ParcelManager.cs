@@ -239,6 +239,21 @@ namespace InPost_Mobile.Models
             string shipmentType = json.ContainsKey("shipmentType") ? json.GetNamedString("shipmentType").ToLower() : "";
             if (shipmentType.Contains("courier")) isCourier = true;
 
+            if (json.ContainsKey("receiver"))
+            {
+                try
+                {
+                    var rec = json.GetNamedObject("receiver");
+                    if (rec.ContainsKey("phoneNumber"))
+                    {
+                        var ph = rec.GetNamedObject("phoneNumber");
+                        if (ph.ContainsKey("value")) parcel.PhoneNumber = ph.GetNamedString("value");
+                        if (ph.ContainsKey("prefix")) parcel.PhoneNumberPrefix = ph.GetNamedString("prefix");
+                    }
+                }
+                catch { }
+            }
+
             JsonObject pickupObj = null;
             if (json.ContainsKey("pickUpPoint") && json["pickUpPoint"].ValueType == JsonValueType.Object) pickupObj = json.GetNamedObject("pickUpPoint");
             else if (json.ContainsKey("pickup_point") && json["pickup_point"].ValueType == JsonValueType.Object) pickupObj = json.GetNamedObject("pickup_point");
@@ -522,91 +537,6 @@ namespace InPost_Mobile.Models
              if (s.Contains("in_transit") || s.Contains("sent") || s.Contains("prepared")) return _loader.GetString("Section_InTransit");
              return _loader.GetString("Section_InTransit"); 
         }
-        public static void UpdateLiveTile()
-        {
-            try
-            {
-                var liveParcels = AllParcels.Where(p => 
-                    !p.IsArchived && 
-                    p.ParcelType == "Receive" && 
-                    !string.IsNullOrEmpty(p.OriginalStatus) &&
-                    (p.OriginalStatus.ToLower().Contains("ready") || 
-                     p.OriginalStatus.ToLower().Contains("pickup_ready") || 
-                     p.OriginalStatus.ToLower().Contains("out_for_delivery"))
-                ).ToList();
 
-                int count = liveParcels.Count;
-
-                BadgeUpdateManager.CreateBadgeUpdaterForApplication().Clear();
-
-                var updater = TileUpdateManager.CreateTileUpdaterForApplication();
-                updater.EnableNotificationQueue(true);
-                updater.Clear();
-
-                if (count == 0) return;
-
-                foreach (var p in liveParcels.Take(5))
-                {
-                    try
-                    {
-                        string displayName = !string.IsNullOrEmpty(p.CustomName) ? p.CustomName : p.Sender;
-                        if (string.IsNullOrEmpty(displayName) || displayName == "Nadawca") displayName = p.TrackingNumber;
-                        
-                        bool isOut = !string.IsNullOrEmpty(p.OriginalStatus) && p.OriginalStatus.ToLower().Contains("out_for_delivery");
-                        string fullMessage = "";
-                        
-                        if (isOut)
-                        {
-                            if (!string.IsNullOrEmpty(p.CustomName)) fullMessage = string.Format(_loader.GetString("Notif_Out_Name"), p.CustomName);
-                            else if (!string.IsNullOrEmpty(p.Sender) && p.Sender != "Nadawca") fullMessage = string.Format(_loader.GetString("Notif_Out_Sender"), p.Sender);
-                            else fullMessage = string.Format(_loader.GetString("Notif_Out_Number"), p.TrackingNumber);
-                        }
-                        else
-                        {
-                            if (!string.IsNullOrEmpty(p.CustomName)) fullMessage = string.Format(_loader.GetString("Notif_Ready_Name"), p.CustomName);
-                            else if (!string.IsNullOrEmpty(p.Sender) && p.Sender != "Nadawca") fullMessage = string.Format(_loader.GetString("Notif_Ready_Sender"), p.Sender);
-                            else fullMessage = string.Format(_loader.GetString("Notif_Ready_Number"), p.TrackingNumber);
-                        }
-                        
-                        fullMessage += $"\n{_loader.GetString("Notif_ParcelCount")}: {count}";
-
-                        var tileXml = TileUpdateManager.GetTemplateContent(TileTemplateType.TileWide310x150Text03);
-                        var textNodes = tileXml.GetElementsByTagName("text");
-                        textNodes[0].InnerText = displayName; 
-                        textNodes[1].InnerText = fullMessage; 
-
-                        var binding = tileXml.GetElementsByTagName("binding").Item(0) as XmlElement;
-                        if (binding != null)
-                        {
-                            binding.SetAttribute("branding", "name"); // Changed from nameAndLogo to name
-                        }
-
-                        var squareXml = TileUpdateManager.GetTemplateContent(TileTemplateType.TileSquare150x150Text04);
-                        var sqNodes = squareXml.GetElementsByTagName("text");
-                        sqNodes[0].InnerText = displayName;
-                        sqNodes[0].InnerText += $"\n({count})"; 
-                        
-                        var sqBinding = squareXml.GetElementsByTagName("binding").Item(0) as XmlElement;
-                        if (sqBinding != null)
-                        {
-                             sqBinding.SetAttribute("branding", "name"); // Standardize branding
-                        }
-
-                        var node = tileXml.ImportNode(squareXml.GetElementsByTagName("binding").Item(0), true);
-                        tileXml.GetElementsByTagName("visual").Item(0).AppendChild(node);
-                        
-                        var notification = new TileNotification(tileXml);
-                        
-                        string cleanTag = p.TrackingNumber;
-                        if (cleanTag.Length > 15) cleanTag = cleanTag.Substring(cleanTag.Length - 15);
-                        notification.Tag = cleanTag; 
-                        
-                        updater.Update(notification);
-                    }
-                    catch { }
-                }
-            }
-            catch { }
-        }
     }
 }

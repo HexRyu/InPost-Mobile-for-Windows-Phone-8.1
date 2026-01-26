@@ -389,8 +389,7 @@
     <value>Aplikacja stworzona przez:</value>
   </data>
   <data name="TxtAboutDescription.Text" xml:space="preserve">
-    <value>Nieoficjalna aplikacja InPost Mobile na Windows Phone. Stworona przez niezależnego dewelopera Hexryu. 
-    Więcej informacji o mnie na mojej stronie www: hexryu.net
+    <value>Nieoficjalna aplikacja InPost Mobile na Windows Phone. Stworona przez niezależnego dewelopera Hexryu. Więcej informacji jest na mojej stronie internetowej ,po kliknięciu na mój awatar przejdziesz na moją stronę
   </value>
   </data>
   <data name="Txt_CheckSms" xml:space="preserve">

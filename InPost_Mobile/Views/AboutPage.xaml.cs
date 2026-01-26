@@ -30,5 +30,10 @@ namespace InPost_Mobile.Views
         {
             Frame.Navigate(typeof(CreditsPage));
         }
+
+        private async void Website_Click(object sender, RoutedEventArgs e)
+        {
+            await Windows.System.Launcher.LaunchUriAsync(new Uri("https://hexryu.net"));
+        }
     }
 }

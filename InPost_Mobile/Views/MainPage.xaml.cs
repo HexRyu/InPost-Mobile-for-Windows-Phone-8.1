@@ -6,7 +6,7 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 using Windows.ApplicationModel;
 using Windows.UI.Core;
-using InPost_Mobile.Models;
+using InPost_Mobile.Models; // Explicitly confirming usage
 
 namespace InPost_Mobile.Views
 {
@@ -113,7 +113,7 @@ namespace InPost_Mobile.Views
             RefreshReceiveList();
             if (_sendingList != null) _sendingList.ItemsSource = ParcelManager.GetActiveParcels("Send");
             if (_returnsList != null) _returnsList.ItemsSource = ParcelManager.GetActiveParcels("Return");
-            ParcelManager.UpdateLiveTile();
+            TileManager.Update(ParcelManager.AllParcels);
         }
 
         private void RefreshReceiveList()

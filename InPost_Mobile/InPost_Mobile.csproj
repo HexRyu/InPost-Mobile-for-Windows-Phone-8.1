@@ -98,6 +98,7 @@
     <Compile Include="Models\ParcelGroup.cs" />
     <Compile Include="Models\ParcelItem.cs" />
     <Compile Include="Models\ParcelManager.cs" />
+    <Compile Include="Models\TileManager.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Tasks\BackgroundSyncTask.cs" />
     <Compile Include="Views\AboutPage.xaml.cs">

@@ -394,8 +394,7 @@
     <value>App created by:</value>
   </data>
   <data name="TxtAboutDescription.Text" xml:space="preserve">
-    <value>Unofficial InPost Mobile app for Windows Phone. Created by independent developer Hexryu.
-    More information about me can be found on my website: hexryu.net 
+    <value>Unofficial InPost Mobile app for Windows Phone. Created by independent developer Hexryu. More information is available on my website, click on my avatar to go to my website. 
     </value>
   </data>
   <data name="Txt_CheckSms" xml:space="preserve">

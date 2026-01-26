@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel.Background;
 using Windows.Data.Xml.Dom;
 using Windows.UI.Notifications;
-using InPost_Mobile.Models;
+using InPost_Mobile.Models; // Explicitly confirming usage
 
 namespace InPost_Mobile.Tasks
 {
@@ -169,7 +169,7 @@ namespace InPost_Mobile.Tasks
 
         private void UpdateLiveTile()
         {
-            ParcelManager.UpdateLiveTile();
+            TileManager.Update(ParcelManager.AllParcels);
         }
     }
 }

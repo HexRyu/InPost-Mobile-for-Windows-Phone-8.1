@@ -1,12 +1,10 @@
-using System;
+using System; // Restored
+using InPost_Mobile.Models; // Ensure Models is included
 using System.Collections.Generic;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
-using InPost_Mobile.Models;
-
 using InPost_Mobile.Tasks;
-
 using Windows.UI.Notifications;
 using Windows.Data.Xml.Dom;
 using Windows.ApplicationModel.Resources;
@@ -113,7 +111,7 @@ namespace InPost_Mobile.Views
             string size = (CbSize.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "A";
 
             await DebugManager.AddMockParcel(tracking, status, senderName, type, code, target, size, customName);
-            ParcelManager.UpdateLiveTile(); // Update tile immediately
+            TileManager.Update(ParcelManager.AllParcels); // Update tile immediately
 
             TxtStatus.Foreground = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.Green);
             TxtStatus.Text = "Parcel Added!";

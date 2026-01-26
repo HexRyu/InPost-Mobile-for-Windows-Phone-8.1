@@ -218,6 +218,22 @@ namespace InPost_Mobile.Models
             set { if (_longitude != value) { _longitude = value; OnPropertyChanged(); } }
         }
 
+        private string _phoneNumber;
+        [DataMember]
+        public string PhoneNumber
+        {
+            get { return _phoneNumber; }
+            set { if (_phoneNumber != value) { _phoneNumber = value; OnPropertyChanged(); } }
+        }
+
+        private string _phoneNumberPrefix;
+        [DataMember]
+        public string PhoneNumberPrefix
+        {
+            get { return _phoneNumberPrefix; }
+            set { if (_phoneNumberPrefix != value) { _phoneNumberPrefix = value; OnPropertyChanged(); } }
+        }
+
         [IgnoreDataMember]
         public Visibility SenderSectionVisibility
         {
