@@ -15,8 +15,6 @@
 
 ## 📸 Gallery
 
-## 📸 Gallery
-
 | Parcel List | Parcel Details |
 |:---:|:---:|
 | <img src="images/parcel_list.png" width="250" alt="Main list of parcels" /> | <img src="images/parcel_details.png" width="250" alt="Parcel details with QR code" /> |
