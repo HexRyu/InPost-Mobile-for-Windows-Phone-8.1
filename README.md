@@ -10,14 +10,18 @@
 
 ## ⚠️ PROJECT IN BETA
 **Please Note:** This application is currently under active development. Some features may be incomplete, and you might experience bugs. Stability is not guaranteed yet.
- UPDATED VERSION 0.9.1.2 IS NOW AVAILABLE!!
+ UPDATED VERSION 0.9.3.0 IS NOW AVAILABLE!!
 ---
 
 ## 📸 Gallery
 
-| Home Screen | Parcel Details |
+## 📸 Gallery
+
+| Parcel List | Parcel Details |
 |:---:|:---:|
-| <img src="images/screen1.png" width="250" alt="Home Screen" /> | <img src="images/screen2.png" width="250" alt="Details" /> |
+| <img src="images/parcel_list.png" width="250" alt="Main list of parcels" /> | <img src="images/parcel_details.png" width="250" alt="Parcel details with QR code" /> |
+| **Live Tile** | **Push Notification** |
+| <img src="images/live_tile.png" width="250" alt="Live Tile on Start Screen" /> | <img src="images/push_notification.png" width="250" alt="Push notification toast" /> |
 
 ---
 
@@ -31,13 +35,14 @@ The application was created for every Windows Phone, even with 512MB of RAM.
 * ✅ **Two languages ​​supported (English and Polish)
 * ✅ **Parcel Tracking.
 * ✅ **Logging in via phone number and adding packages assigned to it to the application.
+* ✅ **Push notifications**
+* ✅ **Live title**
+* ✅ **Short status on lock screen
 * ✅ **Archiving packages.
 * ✅ **Opening lockers using a QR code.
 * ✅ **Displaying information about the parcel pickup location."
 * ⚠️ **Multilocker Support**. (May cause problems when receiving the parcel)
 * 🚧 **Remote Locker Opening** (I am in the process of fixing this error) 
-* 🚧 **Push notifications**
-* 🚧 **Live title**
 * 🚧 **Dark/Light Theme** (Follows system settings).
 * 🚧 *More features coming soon...*
 
