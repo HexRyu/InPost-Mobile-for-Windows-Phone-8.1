@@ -36,38 +36,28 @@
                        Foreground="White" 
                        Margin="0,0,0,20"/>
 
-            <!-- Author Profile Button -->
-            <Button Click="Website_Click"
-                    HorizontalAlignment="Stretch"
-                    BorderThickness="2"
-                    BorderBrush="White"
-                    Background="Transparent"
-                    Padding="10"
-                    Margin="0,0,0,30">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    
-                    <!-- Avatar -->
-                    <Image Source="ms-appx:///Assets/avatar.png"
-                           Width="60" Height="60"
-                           Stretch="UniformToFill"
-                           Margin="0,0,15,0"/>
-                           
-                    <!-- Text -->
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                        <TextBlock Text="HexRyu" 
-                                   FontSize="24" 
-                                   FontWeight="Bold" 
-                                   Foreground="#3399FF"/>
-                        <TextBlock Text="hexryu.net" 
-                                   FontSize="14" 
-                                   Foreground="Gray"/>
-                    </StackPanel>
-                </Grid>
-            </Button>
+            <!-- Author Profile (Grid layout like Credits) -->
+            <Grid Margin="0,0,0,30" Tapped="Website_Click" Background="Transparent">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                
+                <!-- Avatar -->
+                <Image Source="ms-appx:///Assets/avatar.png"
+                       Width="100" Height="100"
+                       Stretch="UniformToFill"
+                       VerticalAlignment="Top"/>
+                       
+                <!-- Name -->
+                <TextBlock Text="HexRyu" 
+                           Grid.Column="1" 
+                           FontSize="32" 
+                           Foreground="#3399FF" 
+                           VerticalAlignment="Center" 
+                           Margin="15,0,0,0" 
+                           FontWeight="Normal"/>
+            </Grid>
 
             <TextBlock x:Uid="TxtAboutDescription" 
                        Text="Opis..." 
@@ -77,8 +67,20 @@
                        Margin="0,10,0,30"
                        Opacity="0.9"/>
 
-            <Button x:Uid="BtnCredits" 
-                    Content="Podziękowania" 
+            <!-- Website Button -->
+            <Button x:Uid="BtnMyWebsite"
+                    Click="Website_Click" 
+                    HorizontalAlignment="Center" 
+                    Background="Transparent" 
+                    Foreground="White"
+                    BorderBrush="White" 
+                    BorderThickness="2"
+                    Padding="30,10"
+                    FontSize="18"
+                    FontWeight="SemiBold"
+                    Margin="0,0,0,20"/>
+
+            <Button x:Uid="BtnCredits"
                     Click="Credits_Click" 
                     HorizontalAlignment="Center" 
                     Background="Transparent" 

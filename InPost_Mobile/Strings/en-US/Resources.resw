@@ -68,19 +68,19 @@
     <value>Collected from sender</value>
   </data>
   <data name="Status_adopted_at_source_branch" xml:space="preserve">
-    <value>At source branch</value>
+    <value>Accepted at Logistics Center</value>
   </data>
   <data name="Status_sent_from_source_branch" xml:space="preserve">
-    <value>On the way (departed)</value>
+    <value>In transit</value>
   </data>
   <data name="Status_adopted_at_sorting_center" xml:space="preserve">
-    <value>At sorting center</value>
+    <value>Accepted at Logistics Center</value>
   </data>
   <data name="Status_sent_from_sorting_center" xml:space="preserve">
-    <value>On the way (from sorting)</value>
+    <value>In transit</value>
   </data>
   <data name="Status_adopted_at_destination_branch" xml:space="preserve">
-    <value>At destination branch</value>
+    <value>Accepted at Logistics Center</value>
   </data>
   <data name="Status_out_for_delivery" xml:space="preserve">
     <value>Out for delivery</value>
@@ -107,12 +107,9 @@
     <value>Out for delivery</value>
   </data>
   <data name="Status_adopted_at_target_branch" xml:space="preserve">
-    <value>At target branch</value>
+    <value>Accepted at Logistics Center</value>
   </data>
   <data name="Status_canceled" xml:space="preserve">
-    <value>Canceled</value>
-  </data>
-  <data name="Status_Canceled" xml:space="preserve">
     <value>Canceled</value>
   </data>
   <data name="Status_confirmed" xml:space="preserve">
@@ -133,43 +130,43 @@
   <data name="Status_storage_period_expired" xml:space="preserve">
     <value>Storage period expired</value>
   </data>
-  <data name="Status_Doręczona" xml:space="preserve">
+  <data name="Status_doręczona" xml:space="preserve">
     <value>Delivered</value>
   </data>
-  <data name="Status_Gotowa_do_odbioru" xml:space="preserve">
+  <data name="Status_gotowa_do_odbioru" xml:space="preserve">
     <value>Ready for pickup</value>
   </data>
-  <data name="Status_Wydana_do_doręczenia" xml:space="preserve">
+  <data name="Status_wydana_do_doręczenia" xml:space="preserve">
     <value>Out for delivery</value>
   </data>
-  <data name="Status_Przyjęta_w_Centrum_Logistycznym" xml:space="preserve">
+  <data name="Status_przyjęta_w_centrum_logistycznym" xml:space="preserve">
     <value>Accepted at Sorting Center</value>
   </data>
-  <data name="Status_W_trasie" xml:space="preserve">
+  <data name="Status_w_trasie" xml:space="preserve">
     <value>In transit</value>
   </data>
-  <data name="Status_Odebrana_przez_Kuriera" xml:space="preserve">
+  <data name="Status_odebrana_przez_kuriera" xml:space="preserve">
     <value>Picked up by courier</value>
   </data>
-  <data name="Status_Nadana_przez_Paczkomat_PaczkoPunkt" xml:space="preserve">
+  <data name="Status_nadana_przez_paczkomat_paczkopunkt" xml:space="preserve">
     <value>Dropped off at Parcel Locker/Point</value>
   </data>
-  <data name="Status_Przesyłka_utworzona" xml:space="preserve">
+  <data name="Status_przesyłka_utworzona" xml:space="preserve">
     <value>Shipment created</value>
   </data>
-  <data name="Status_Zwrot_dostarczony" xml:space="preserve">
+  <data name="Status_zwrot_dostarczony" xml:space="preserve">
     <value>Return delivered</value>
   </data>
-  <data name="Status_Zwrot_nadany" xml:space="preserve">
+  <data name="Status_zwrot_nadany" xml:space="preserve">
     <value>Return sent</value>
   </data>
-  <data name="Status_Zwrot_gotowy_do_nadania" xml:space="preserve">
+  <data name="Status_zwrot_gotowy_do_nadania" xml:space="preserve">
     <value>Return ready to be sent</value>
   </data>
-  <data name="Status_Umieszczona_w_Paczkomacie_Stack" xml:space="preserve">
+  <data name="Status_umieszczona_w_paczkomacie_stack" xml:space="preserve">
     <value>Placed in Locker (Stack)</value>
   </data>
-  <data name="Status_Awizowana" xml:space="preserve">
+  <data name="Status_awizowana" xml:space="preserve">
     <value>Delivery attempted</value>
   </data>
   <data name="Status_stack_in_customer_service_point" xml:space="preserve">
@@ -190,8 +187,8 @@
   <data name="Status_pickup_reminder_sent" xml:space="preserve">
     <value>Reminder about waiting parcel</value>
   </data>
-  <data name="Status_W_oddziale_nadawczym" xml:space="preserve">
-    <value>At source branch</value>
+  <data name="Status_w_oddziale_nadawczym" xml:space="preserve">
+    <value>In transit</value>
   </data>
   <data name="Status_undelivered" xml:space="preserve">
     <value>Undelivered</value>
@@ -339,6 +336,9 @@
   <data name="MenuDelete.Label" xml:space="preserve">
     <value>Delete</value>
   </data>
+  <data name="Btn_NotTaken" xml:space="preserve">
+    <value>No, open again</value>
+  </data>
   <data name="Btn_NamePlaceholder" xml:space="preserve">
     <value>Name your parcel</value>
   </data>
@@ -394,7 +394,7 @@
     <value>App created by:</value>
   </data>
   <data name="TxtAboutDescription.Text" xml:space="preserve">
-    <value>Unofficial InPost Mobile app for Windows Phone. Created by independent developer Hexryu. More information is available on my website, click on my avatar to go to my website. 
+    <value>Unofficial InPost Mobile app for Windows Phone. Created by independent developer Hexryu. More information is available on my website. 
     </value>
   </data>
   <data name="Txt_CheckSms" xml:space="preserve">
@@ -507,6 +507,9 @@ Legal form: Spółka z ograniczoną odpowiedzialnością. All trademarks belong 
   <data name="BtnLogout.Content" xml:space="preserve">
     <value>LOG OUT</value>
   </data>
+  <data name="BtnMyWebsite.Content" xml:space="preserve">
+    <value>My website</value>
+  </data>
   <data name="Section_ReadyForPickup" xml:space="preserve">
     <value>Ready for pickup</value>
   </data>
@@ -539,5 +542,11 @@ Legal form: Spółka z ograniczoną odpowiedzialnością. All trademarks belong 
   </data>
   <data name="Notif_ParcelCount" xml:space="preserve">
     <value>Parcel count</value>
+  </data>
+  <data name="Tile_ParcelsHeader" xml:space="preserve">
+    <value>Parcels: {0}</value>
+  </data>
+  <data name="Tile_SenderFormat" xml:space="preserve">
+    <value>Parcel from {0}</value>
   </data>
 </root>

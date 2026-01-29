@@ -24,7 +24,7 @@ namespace InPost_Mobile.Views
             this.InitializeComponent();
             this.NavigationCacheMode = NavigationCacheMode.Required;
             ParcelManager.InitializeData();
-            Application.Current.Resuming += App_Resuming;
+            // Application.Resuming subscription moved to OnNavigatedTo/OnNavigatedFrom
         }
 
         private async void App_Resuming(object sender, object e)
@@ -40,6 +40,9 @@ namespace InPost_Mobile.Views
 
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
+            // Subscribe to Resuming event (fixed memory leak)
+            Application.Current.Resuming += App_Resuming;
+
             // Handle Debug Button Visibility
             if (ParcelManager.IsDebugMode)
             {
@@ -98,9 +101,21 @@ namespace InPost_Mobile.Views
                      LoadingBar.Visibility = Visibility.Collapsed;
                 }
 
-                await ParcelManager.ReloadAllParcelsTranslation();
-                RefreshLists();
+                if (ParcelManager.ShouldUIUpdate)
+                {
+                    await ParcelManager.LoadDataAsync(); // Reload z pliku po background sync
+                    await ParcelManager.ReloadAllParcelsTranslation();
+                    RefreshLists();
+                    ParcelManager.ShouldUIUpdate = false;
+                }
             }
+        }
+
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            // Unsubscribe from Resuming event (prevent memory leak)
+            Application.Current.Resuming -= App_Resuming;
+            base.OnNavigatedFrom(e);
         }
         
         private void Debug_Click(object sender, RoutedEventArgs e)
@@ -152,6 +167,7 @@ namespace InPost_Mobile.Views
             if (ParcelManager.IsDebugMode) await Task.Delay(1500); // Simulate network delay
             await ParcelManager.UpdateAllParcelsAsync();
             RefreshLists();
+            ParcelManager.ShouldUIUpdate = false; // UI is now up-to-date
             LoadingBar.Visibility = Visibility.Collapsed;
         }
 
@@ -201,7 +217,11 @@ namespace InPost_Mobile.Views
             if (result == ContentDialogResult.Primary && !string.IsNullOrWhiteSpace(input.Text))
             {
                 bool success = await ParcelManager.AddParcelFromApi(input.Text);
-                if (success) RefreshLists();
+                if (success) 
+                {
+                    RefreshLists();
+                    ParcelManager.ShouldUIUpdate = false;
+                }
             }
         }
 

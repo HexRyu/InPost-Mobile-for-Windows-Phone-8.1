@@ -90,6 +90,7 @@ namespace InPost_Mobile.Views
             // DEBUG TRIGGER
             if (PhoneInput.Text == "1724")
             {
+                ParcelManager.AllParcels.Clear();
                 ParcelManager.IsDebugMode = true;
                 Frame.Navigate(typeof(MainPage));
                 return;

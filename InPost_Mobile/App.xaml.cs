@@ -120,7 +120,7 @@ namespace InPost_Mobile
                     var builder = new BackgroundTaskBuilder();
                     builder.Name = taskName;
                     builder.TaskEntryPoint = taskEntryPoint;
-                    builder.SetTrigger(new TimeTrigger(30, false)); // Run every 30 minutes
+                    builder.SetTrigger(new TimeTrigger(20, false)); // Co 20 minut (sync z najkrótszym interwałem)
                     builder.Register();
                 }
             }

@@ -22,8 +22,10 @@ namespace InPost_Mobile.Models
             filter.IgnorableServerCertificateErrors.Add(Windows.Security.Cryptography.Certificates.ChainValidationResult.IncompleteChain);
 
             var client = new HttpClient(filter);
-            // Zmiana User-Agent na zgodny z działającym kodem 3DS
-            client.DefaultRequestHeaders.UserAgent.ParseAdd("InPost-Mobile/3.46.0(34600200) (Horizon 11.17.0-50U; AW715988204; Nintendo 3DS; pl)");
+            // Ensure UserAgent is not null
+            string ua = AppSecrets.UserAgent;
+            if (string.IsNullOrEmpty(ua)) ua = "InPost Mobile/3.46.0 (Windows Phone 8.1; Android 6.0)";
+            client.DefaultRequestHeaders.UserAgent.ParseAdd(ua);
             client.DefaultRequestHeaders.Accept.ParseAdd("application/json");
             return client;
         }
@@ -63,7 +65,6 @@ namespace InPost_Mobile.Models
             
             if (string.IsNullOrEmpty(rawPhone))
             {
-                 // Fallback - spróbuj pobrać z tokena lub wymuś ponowne logowanie?
                  throw new Exception("Błąd: Brak numeru telefonu przypisanego do paczki lub konta.");
             }
 
@@ -71,7 +72,25 @@ namespace InPost_Mobile.Models
             string phone = rawPhone;
             if (phone.Length > 9) phone = phone.Substring(phone.Length - 9);
 
-             string token = _localSettings.Values["AuthToken"].ToString();
+            // SAFE TOKEN RETRIEVAL
+            string token = null;
+            if (_localSettings.Values.ContainsKey("AuthToken"))
+            {
+                token = _localSettings.Values["AuthToken"]?.ToString();
+            }
+            
+            if (string.IsNullOrEmpty(token))
+            {
+                // Attempt refresh before failing
+                if (await ParcelManager.RefreshAuthTokenAsync())
+                {
+                    if (_localSettings.Values.ContainsKey("AuthToken"))
+                        token = _localSettings.Values["AuthToken"]?.ToString();
+                }
+            }
+
+            if (string.IsNullOrEmpty(token)) 
+                throw new Exception("Błąd autoryzacji: Brak tokenu. Zaloguj się ponownie.");
 
             // --- STRATEGIA: Metoda 1 (V2), jak błąd to Metoda 2 (V1) ---
             
@@ -146,20 +165,28 @@ namespace InPost_Mobile.Models
             // METODA 1: V2 Validate (Bieżąca produkcyjna)
         private static async Task<string> OpenMethod_ValidateV2(ParcelItem parcel, double lat, double lon, string phone, string token, int retryCount)
         {
+            // Walidacja wymaganych parametrów przed tworzeniem JSON
+            if (string.IsNullOrEmpty(parcel.TrackingNumber))
+                throw new Exception("Błąd: Brak numeru śledzenia paczki.");
+            if (string.IsNullOrEmpty(parcel.PickupCode))
+                throw new Exception("Błąd: Brak kodu odbioru dla tej paczki.");
+            if (string.IsNullOrEmpty(phone))
+                throw new Exception("Błąd: Brak numeru telefonu.");
+
             JsonObject json = new JsonObject();
             JsonObject parcelObj = new JsonObject();
-            parcelObj.SetNamedValue("shipmentNumber", JsonValue.CreateStringValue(parcel.TrackingNumber ?? ""));
-            parcelObj.SetNamedValue("openCode", JsonValue.CreateStringValue(parcel.PickupCode ?? ""));
+            parcelObj.SetNamedValue("shipmentNumber", JsonValue.CreateStringValue(parcel.TrackingNumber));
+            parcelObj.SetNamedValue("openCode", JsonValue.CreateStringValue(parcel.PickupCode));
             
             JsonObject phoneObj = new JsonObject();
-            phoneObj.SetNamedValue("prefix", JsonValue.CreateStringValue(parcel.PhoneNumberPrefix ?? "+48")); // Use parcel prefix if available
-            phoneObj.SetNamedValue("value", JsonValue.CreateStringValue(phone ?? ""));
-            parcelObj.SetNamedValue("recieverPhoneNumber", phoneObj); // Matches inpost_api.c (typo in API?)
+            phoneObj.SetNamedValue("prefix", JsonValue.CreateStringValue(parcel.PhoneNumberPrefix ?? "+48")); 
+            phoneObj.SetNamedValue("value", JsonValue.CreateStringValue(phone));
+            parcelObj.SetNamedValue("recieverPhoneNumber", phoneObj); // Typo confirmed in API V2
 
             JsonObject geoObj = new JsonObject();
             geoObj.SetNamedValue("latitude", JsonValue.CreateNumberValue(lat));
             geoObj.SetNamedValue("longitude", JsonValue.CreateNumberValue(lon));
-            geoObj.SetNamedValue("accuracy", JsonValue.CreateNumberValue(13.365));
+            geoObj.SetNamedValue("accuracy", JsonValue.CreateNumberValue(13.2312)); // Updated to match snippet
 
             json.SetNamedValue("parcel", parcelObj);
             json.SetNamedValue("geoPoint", geoObj);
@@ -193,17 +220,26 @@ namespace InPost_Mobile.Models
         }
 
         // METODA 2: V1 Validate (Starsza / Alternatywna)
+        // ... (Keep existing implementation logic if needed, or leave strictly as is)
         private static async Task<string> OpenMethod_ValidateV1(ParcelItem parcel, double lat, double lon, string phone, string token)
         {
+            // Walidacja wymaganych parametrów przed tworzeniem JSON
+            if (string.IsNullOrEmpty(parcel.TrackingNumber))
+                throw new Exception("Błąd: Brak numeru śledzenia paczki.");
+            if (string.IsNullOrEmpty(parcel.PickupCode))
+                throw new Exception("Błąd: Brak kodu odbioru dla tej paczki.");
+            if (string.IsNullOrEmpty(phone))
+                throw new Exception("Błąd: Brak numeru telefonu.");
+
             JsonObject json = new JsonObject();
             JsonObject parcelObj = new JsonObject();
-            parcelObj.SetNamedValue("shipmentNumber", JsonValue.CreateStringValue(parcel.TrackingNumber ?? ""));
-            parcelObj.SetNamedValue("openCode", JsonValue.CreateStringValue(parcel.PickupCode ?? ""));
+            parcelObj.SetNamedValue("shipmentNumber", JsonValue.CreateStringValue(parcel.TrackingNumber));
+            parcelObj.SetNamedValue("openCode", JsonValue.CreateStringValue(parcel.PickupCode));
             
             JsonObject phoneObj = new JsonObject();
-            phoneObj.SetNamedValue("prefix", JsonValue.CreateStringValue("+48"));
-            phoneObj.SetNamedValue("value", JsonValue.CreateStringValue(phone ?? ""));
-            parcelObj.SetNamedValue("recieverPhoneNumber", phoneObj); // Stara literówka (możliwa w V1)
+            phoneObj.SetNamedValue("prefix", JsonValue.CreateStringValue(parcel.PhoneNumberPrefix ?? "+48"));
+            phoneObj.SetNamedValue("value", JsonValue.CreateStringValue(phone));
+            parcelObj.SetNamedValue("recieverPhoneNumber", phoneObj); 
 
             JsonObject geoObj = new JsonObject();
             geoObj.SetNamedValue("latitude", JsonValue.CreateNumberValue(lat));
@@ -249,6 +285,74 @@ namespace InPost_Mobile.Models
             string err = await openResp.Content.ReadAsStringAsync();
             throw new Exception($"Błąd otwarcia skrytki ({openResp.StatusCode}): {err}");
         }
+
+        public static async Task<CompartmentInfo> GetOpenedCompartmentInfoAsync(string sessionUuid)
+        {
+             if (ParcelManager.IsDebugMode)
+             {
+                 await Task.Delay(500);
+                 return new CompartmentInfo { 
+                    Name = "MOCK-01", 
+                    Location = new CompartmentLocation { Side = "Lewa", Row = "2", Column = "1" } 
+                 };
+             }
+
+             try
+             {
+                 string token = _localSettings.Values["AuthToken"].ToString();
+                 JsonObject json = new JsonObject();
+                 json.SetNamedValue("sessionUuid", JsonValue.CreateStringValue(sessionUuid));
+                 json.SetNamedValue("expectedStatus", JsonValue.CreateStringValue("OPENED"));
+
+                 using (var client = CreateHttpClient())
+                 {
+                     client.DefaultRequestHeaders.Authorization = new Windows.Web.Http.Headers.HttpCredentialsHeaderValue("Bearer", token);
+                     var response = await client.PostAsync(
+                         new Uri(AppSecrets.BaseUrl + "v1/collect/compartment/status"),
+                         new HttpStringContent(json.ToString(), Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json"));
+
+                     if (response.IsSuccessStatusCode)
+                     {
+                         string respStr = await response.Content.ReadAsStringAsync();
+                         JsonObject obj = JsonObject.Parse(respStr);
+                         
+                         // Check structure
+                         if (obj.ContainsKey("compartment"))
+                         {
+                            var compObj = obj.GetNamedObject("compartment");
+                            var info = new CompartmentInfo();
+                            info.Name = compObj.ContainsKey("name") ? compObj.GetNamedString("name") : "";
+                            
+                            if (compObj.ContainsKey("location"))
+                            {
+                                var locObj = compObj.GetNamedObject("location");
+                                info.Location = new CompartmentLocation {
+                                    Side = locObj.ContainsKey("side") ? locObj.GetNamedString("side") : "",
+                                    Column = locObj.ContainsKey("column") ? locObj.GetNamedString("column") : "",
+                                    Row = locObj.ContainsKey("row") ? locObj.GetNamedString("row") : ""
+                                };
+                            }
+                            return info;
+                         }
+                     }
+                 }
+             }
+             catch { }
+             return null;
+        }
+    }
+
+    public class CompartmentInfo
+    {
+        public string Name { get; set; }
+        public CompartmentLocation Location { get; set; }
+    }
+
+    public class CompartmentLocation
+    {
+        public string Side { get; set; }
+        public string Column { get; set; }
+        public string Row { get; set; }
     }
 
 }

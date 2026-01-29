@@ -59,7 +59,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Status_created" xml:space="preserve">
-    <value>Wygenerowano etykietę</value>
+    <value>Przesyłka utworzona</value>
   </data>
   <data name="Status_offers_prepared" xml:space="preserve">
     <value>Przygotowana przez nadawcę</value>
@@ -68,19 +68,19 @@
     <value>Odebrana od nadawcy</value>
   </data>
   <data name="Status_adopted_at_source_branch" xml:space="preserve">
-    <value>W oddziale nadawczym</value>
+    <value>Przyjęta w Centrum Logistycznym</value>
   </data>
   <data name="Status_sent_from_source_branch" xml:space="preserve">
-    <value>W drodze (wyjechała)</value>
+    <value>W trasie</value>
   </data>
   <data name="Status_adopted_at_sorting_center" xml:space="preserve">
-    <value>W sortowni</value>
+    <value>Przyjęta w Centrum Logistycznym</value>
   </data>
   <data name="Status_sent_from_sorting_center" xml:space="preserve">
-    <value>W drodze (z sortowni)</value>
+    <value>W trasie</value>
   </data>
   <data name="Status_adopted_at_destination_branch" xml:space="preserve">
-    <value>W oddziale docelowym</value>
+    <value>Przyjęta w Centrum Logistycznym</value>
   </data>
   <data name="Status_out_for_delivery" xml:space="preserve">
     <value>Wydana do doręczenia</value>
@@ -107,12 +107,9 @@
     <value>Wydana do doręczenia</value>
   </data>
   <data name="Status_adopted_at_target_branch" xml:space="preserve">
-    <value>W oddziale docelowym</value>
+    <value>Przyjęta w Centrum Logistycznym</value>
   </data>
   <data name="Status_canceled" xml:space="preserve">
-    <value>Anulowana</value>
-  </data>
-  <data name="Status_Canceled" xml:space="preserve">
     <value>Anulowana</value>
   </data>
   <data name="Status_confirmed" xml:space="preserve">
@@ -130,43 +127,43 @@
   <data name="Status_pickup_reminder_set" xml:space="preserve">
     <value>Przypomnienie o czekającej paczce</value>
   </data>
-  <data name="Status_Doręczona" xml:space="preserve">
+  <data name="Status_doręczona" xml:space="preserve">
     <value>Doręczona</value>
   </data>
-  <data name="Status_Gotowa_do_odbioru" xml:space="preserve">
+  <data name="Status_gotowa_do_odbioru" xml:space="preserve">
     <value>Gotowa do odbioru</value>
   </data>
-  <data name="Status_Wydana_do_doręczenia" xml:space="preserve">
+  <data name="Status_wydana_do_doręczenia" xml:space="preserve">
     <value>Wydana do doręczenia</value>
   </data>
-  <data name="Status_Przyjęta_w_Centrum_Logistycznym" xml:space="preserve">
+  <data name="Status_przyjęta_w_centrum_logistycznym" xml:space="preserve">
     <value>Przyjęta w Centrum Logistycznym</value>
   </data>
-  <data name="Status_W_trasie" xml:space="preserve">
+  <data name="Status_w_trasie" xml:space="preserve">
     <value>W trasie</value>
   </data>
-  <data name="Status_Odebrana_przez_Kuriera" xml:space="preserve">
+  <data name="Status_odebrana_przez_kuriera" xml:space="preserve">
     <value>Odebrana przez Kuriera</value>
   </data>
-  <data name="Status_Nadana_przez_Paczkomat_PaczkoPunkt" xml:space="preserve">
+  <data name="Status_nadana_przez_paczkomat_paczkopunkt" xml:space="preserve">
     <value>Nadana przez Paczkomat/PaczkoPunkt</value>
   </data>
-  <data name="Status_Przesyłka_utworzona" xml:space="preserve">
+  <data name="Status_przesyłka_utworzona" xml:space="preserve">
     <value>Przesyłka utworzona</value>
   </data>
-  <data name="Status_Zwrot_dostarczony" xml:space="preserve">
+  <data name="Status_zwrot_dostarczony" xml:space="preserve">
     <value>Zwrot dostarczony</value>
   </data>
-  <data name="Status_Zwrot_nadany" xml:space="preserve">
+  <data name="Status_zwrot_nadany" xml:space="preserve">
     <value>Zwrot nadany</value>
   </data>
-  <data name="Status_Zwrot_gotowy_do_nadania" xml:space="preserve">
+  <data name="Status_zwrot_gotowy_do_nadania" xml:space="preserve">
     <value>Zwrot gotowy do nadania</value>
   </data>
-  <data name="Status_Umieszczona_w_Paczkomacie_Stack" xml:space="preserve">
+  <data name="Status_umieszczona_w_paczkomacie_stack" xml:space="preserve">
     <value>Umieszczona w Paczkomacie (Stack)</value>
   </data>
-  <data name="Status_Awizowana" xml:space="preserve">
+  <data name="Status_awizowana" xml:space="preserve">
     <value>Awizowana</value>
   </data>
   <data name="Status_stack_in_customer_service_point" xml:space="preserve">
@@ -187,8 +184,8 @@
   <data name="Status_pickup_reminder_sent" xml:space="preserve">
     <value>Przypomnienie o oczekującej paczce</value>
   </data>
-  <data name="Status_W_oddziale_nadawczym" xml:space="preserve">
-    <value>W oddziale nadawczym</value>
+  <data name="Status_w_oddziale_nadawczym" xml:space="preserve">
+    <value>W trasie</value>
   </data>
   <data name="Status_undelivered" xml:space="preserve">
     <value>Niedostarczona</value>
@@ -334,6 +331,9 @@
   <data name="MenuDelete.Label" xml:space="preserve">
     <value>Usuń</value>
   </data>
+  <data name="Btn_NotTaken" xml:space="preserve">
+    <value>Nie, otwórz ponownie</value>
+  </data>
   <data name="Btn_NamePlaceholder" xml:space="preserve">
     <value>Nazwij swoją przesyłkę</value>
   </data>
@@ -389,7 +389,7 @@
     <value>Aplikacja stworzona przez:</value>
   </data>
   <data name="TxtAboutDescription.Text" xml:space="preserve">
-    <value>Nieoficjalna aplikacja InPost Mobile na Windows Phone. Stworona przez niezależnego dewelopera Hexryu. Więcej informacji jest na mojej stronie internetowej ,po kliknięciu na mój awatar przejdziesz na moją stronę
+    <value>Nieoficjalna aplikacja InPost Mobile na Windows Phone. Stworona przez niezależnego dewelopera Hexryu. Więcej informacji jest na mojej stronie internetowej.
   </value>
   </data>
   <data name="Txt_CheckSms" xml:space="preserve">
@@ -503,11 +503,14 @@ Forma prawna: Spółka z ograniczoną odpowiedzialnością. Wszelkie znaki towar
   <data name="BtnLogout.Content" xml:space="preserve">
     <value>WYLOGUJ SIĘ</value>
   </data>
+  <data name="BtnMyWebsite.Content" xml:space="preserve">
+    <value>Moja strona www</value>
+  </data>
   <data name="Section_ReadyForPickup" xml:space="preserve">
-    <value>Gotowe do odbioru</value>
+    <value>Gotowa do odbioru</value>
   </data>
   <data name="Section_OutForDelivery" xml:space="preserve">
-    <value>Wydane do doręczenia</value>
+    <value>Wydana do doręczenia</value>
   </data>
   <data name="Section_InTransit" xml:space="preserve">
     <value>W trakcie dostawy</value>
@@ -535,5 +538,11 @@ Forma prawna: Spółka z ograniczoną odpowiedzialnością. Wszelkie znaki towar
   </data>
   <data name="Notif_ParcelCount" xml:space="preserve">
     <value>Liczba paczek</value>
+  </data>
+  <data name="Tile_ParcelsHeader" xml:space="preserve">
+    <value>Paczki: {0}</value>
+  </data>
+  <data name="Tile_SenderFormat" xml:space="preserve">
+    <value>Paczka od {0}</value>
   </data>
 </root>

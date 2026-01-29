@@ -8,10 +8,11 @@ namespace InPost_Mobile.Models
 {
     public static class TileManager
     {
-        private static ResourceLoader _loader = new ResourceLoader();
-
         public static void Update(List<ParcelItem> allParcels)
         {
+            // Re-instantiate ResourceLoader to pick up any language changes immediately
+            var loader = new ResourceLoader();
+
             try
             {
                 // STEP 1: SAFE COPY (Thread-Safe)
@@ -78,72 +79,80 @@ namespace InPost_Mobile.Models
                 {
                     var p = liveParcels[i];
 
-                    // Prepare Logic for Display Name
-                    string displayName = !string.IsNullOrEmpty(p.CustomName) ? p.CustomName : p.Sender;
-                    if (string.IsNullOrEmpty(displayName) || displayName == "Nadawca") displayName = p.TrackingNumber;
+                    // Prepare Logic for Display Name (Line 2)
+                    // Priority 1: Custom Name (User-defined) -> Display just the name.
+                    // Priority 2: Sender (if known and valid) -> "Paczka od {Sender}".
+                    // Priority 3: Tracking Number (fallback) -> Display just the number.
                     
-                    bool isTracking = (displayName == p.TrackingNumber);
-                    bool isOut = !string.IsNullOrEmpty(p.OriginalStatus) && p.OriginalStatus.ToLower().Contains("out_for_delivery");
-                    
-                    // Determine Status Context (Ready vs Out)
-                    string statusKeyBase = isOut ? "Notif_Out_" : "Notif_Ready_";
-                    
-                    // Determine Content Context (Number vs Name)
-                    // If it is a Tracking Number -> Use "Number" suffix (Paczka o numerze {0}...)
-                    // Otherwise (Custom Name or Sender) -> Use "Name" suffix (Paczka {0}...)
-                    string contentKeySuffix = isTracking ? "Number" : "Name";
-                    
-                    // Fetch Resource
-                    string resourceKey = statusKeyBase + contentKeySuffix;
-                    string formatPattern = _loader.GetString(resourceKey);
-                    
-                    // Construct Full Message
-                    // Fallback to simple concatenation if resource is missing (safety)
-                    string fullStatusMsg = "";
-                    if (!string.IsNullOrEmpty(formatPattern))
+                    string line2Text = "";
+                    if (!string.IsNullOrEmpty(p.CustomName))
                     {
-                        fullStatusMsg = string.Format(formatPattern, displayName);
+                        line2Text = p.CustomName;
+                    }
+                    else if (!string.IsNullOrEmpty(p.Sender) && p.Sender != "Nadawca")
+                    {
+                        string format = loader.GetString("Tile_SenderFormat"); // "Paczka od {0}"
+                        line2Text = !string.IsNullOrEmpty(format) ? string.Format(format, p.Sender) : p.Sender;
                     }
                     else
                     {
-                        fullStatusMsg = string.Format("{0} {1}", displayName, isOut ? ">>" : "OK");
+                        line2Text = p.TrackingNumber;
                     }
 
-                    // Count Message
-                    // "Liczba paczek: X"
-                    string countLabel = _loader.GetString("Notif_ParcelCount");
-                    string countMsg = string.Format("{0}: {1}", countLabel, liveCount);
+                    // Line 3: Status
+                    // Use verified p.Status which pulls from updated resources (Gotowa do odbioru, Wydana do doręczenia)
+                    string line3Text = !string.IsNullOrEmpty(p.Status) ? p.Status : p.OriginalStatus;
 
-                    // -- TEMPLATE: Wide310x150SmallImageAndText04 --
-                    var tileXml = TileUpdateManager.GetTemplateContent(TileTemplateType.TileWide310x150SmallImageAndText04);
+                    // Count Message (Header)
+                    // "Paczki: X" (Localized)
+                    string countFormat = loader.GetString("Tile_ParcelsHeader");
+                    if (string.IsNullOrEmpty(countFormat)) countFormat = "Paczki: {0}";
+                    string countMsg = string.Format(countFormat, liveCount);
+
+                    // -- TEMPLATE: Wide310x150IconWithBadgeAndText --
+                    // Attempts to replicate "Windows Central" style (Iconic).
+                    // Text1: Count
+                    // Text2: Name/Sender/Number
+                    // Text3: Status
+                    
+                    var tileXml = TileUpdateManager.GetTemplateContent(TileTemplateType.TileWide310x150IconWithBadgeAndText);
                     var textNodes = tileXml.GetElementsByTagName("text");
                     
-                    // Line 1: Full Status Message (Automatic Wrap)
-                    // Line 2: Count
-                    string combinedText = string.Format("{0}\n{1}", fullStatusMsg, countMsg);
-                    if (textNodes.Length > 0) textNodes.Item(0).InnerText = combinedText;
+                    if (textNodes.Length > 0) textNodes.Item(0).InnerText = countMsg;
+                    if (textNodes.Length > 1) textNodes.Item(1).InnerText = line2Text;
+                    if (textNodes.Length > 2) textNodes.Item(2).InnerText = line3Text;
 
-                    // Set Image (Bottom Right)
+                    // Set Icon Image
+                    // Using root file 'LiveTileLogo.png' (StoreLogo content) to ensure visibility.
                     var imageNodes = tileXml.GetElementsByTagName("image");
                     if (imageNodes.Length > 0)
                     {
                         var img = imageNodes.Item(0) as XmlElement;
-                        img.SetAttribute("src", "Assets/Square71x71Logo.scale-100.png");
+                        img.SetAttribute("src", "ms-appx:///LiveTileLogo.png");
                     }
 
 
-                    // -- TEMPLATE: Square150x150Text01 --
+                    // -- TEMPLATE: Square150x150Text02 --
                     // Layout Request:
-                    // Header: Count
-                    // Body: Status
-                    var squareXml = TileUpdateManager.GetTemplateContent(TileTemplateType.TileSquare150x150Text01);
+                    // Header: "Paczki: X" (Localized)
+                    // Body: Name/Sender/Number + Status (newlines)
+                    
+                    var squareXml = TileUpdateManager.GetTemplateContent(TileTemplateType.TileSquare150x150Text02);
                     var sqNodes = squareXml.GetElementsByTagName("text");
                     
-                    if (sqNodes.Length > 0) sqNodes.Item(0).InnerText = liveCount.ToString();
-                    // For square, fullStatusMsg might be too long, but Text01 supports wrapping slightly. 
-                    // Let's use it. If it truncates, it truncates.
-                    if (sqNodes.Length > 1) sqNodes.Item(1).InnerText = fullStatusMsg; 
-                    if (sqNodes.Length > 2) sqNodes.Item(2).InnerText = ""; // Clear 3rd line if any
+                    if (sqNodes.Length > 0) sqNodes.Item(0).InnerText = countMsg;
+                    
+                    if (sqNodes.Length > 1) 
+                    {
+                        string squareBody = string.Format("{0}\n{1}", line2Text, line3Text);
+                        sqNodes.Item(1).InnerText = squareBody;
+                    }
+
+                    // Attempt to add Image if template supports it (Text02 usually doesn't, but we can try injecting for 'Peek' or similar if user wants logo)
+                    // User asked: "formalnie loga tutaj już sie nie da dodać?"
+                    // Answer: Standard Text templates don't support side-images. 
+                    // To have image + text on Square, we'd need 'PeekImageAndText' (cycling) or 'IconWithBadge' (but that's for UWP).
+                    // For now, sticking to clean Text layout as requested first.
 
                     // -- MERGE: Import Square into Wide --
                     var node = tileXml.ImportNode(squareXml.GetElementsByTagName("binding").Item(0), true);
@@ -163,20 +172,9 @@ namespace InPost_Mobile.Models
                     tileUpdater.Update(new TileNotification(tileXml));
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                try 
-                {
-                    string msg = ex.ToString();
-                    var dispatcher = Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher;
-#pragma warning disable CS4014
-                    dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
-                    {
-                        var d = new Windows.UI.Popups.MessageDialog(msg, "TileManager Error");
-                        await d.ShowAsync();
-                    });
-#pragma warning restore CS4014
-                } catch { }
+                // Errors silenced - UI may not be available (Background Task)
             }
         }
     }

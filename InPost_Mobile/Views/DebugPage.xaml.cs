@@ -23,6 +23,62 @@ namespace InPost_Mobile.Views
             base.OnNavigatedTo(e);
             PopulateStatuses();
             PopulateDelays();
+            LoadCurrentPhone();
+        }
+
+        private void LoadCurrentPhone()
+        {
+            var localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
+            if (localSettings.Values.ContainsKey("UserPhone"))
+            {
+                string phone = localSettings.Values["UserPhone"]?.ToString() ?? "";
+                TbPhone.Text = phone;
+                TxtPhoneStatus.Text = $"Current: {phone}";
+                TxtPhoneStatus.Foreground = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.LightGreen);
+            }
+            else
+            {
+                TxtPhoneStatus.Text = "No phone set - QR will use fallback";
+                TxtPhoneStatus.Foreground = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.Gray);
+            }
+        }
+
+        private void RandomPhone_Click(object sender, RoutedEventArgs e)
+        {
+            var random = new Random();
+            string phone = $"{random.Next(100, 999)} {random.Next(100, 999)} {random.Next(100, 999)}";
+            TbPhone.Text = phone;
+            TxtPhoneStatus.Text = "Random generated - click Save to apply";
+            TxtPhoneStatus.Foreground = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.Orange);
+        }
+
+        private void SavePhone_Click(object sender, RoutedEventArgs e)
+        {
+            string phone = TbPhone.Text.Trim();
+            
+            if (string.IsNullOrEmpty(phone))
+            {
+                TxtPhoneStatus.Text = "Phone cleared!";
+                TxtPhoneStatus.Foreground = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.Red);
+                Windows.Storage.ApplicationData.Current.LocalSettings.Values.Remove("UserPhone");
+                return;
+            }
+
+            // Clean and validate
+            phone = phone.Replace(" ", "").Replace("-", "");
+            
+            if (phone.Length < 9)
+            {
+                TxtPhoneStatus.Text = "Phone too short (min 9 digits)";
+                TxtPhoneStatus.Foreground = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.Red);
+                return;
+            }
+
+            // Save to LocalSettings
+            Windows.Storage.ApplicationData.Current.LocalSettings.Values["UserPhone"] = phone;
+            
+            TxtPhoneStatus.Text = $"✓ Saved: {phone}";
+            TxtPhoneStatus.Foreground = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.LightGreen);
         }
 
         private void PopulateDelays()

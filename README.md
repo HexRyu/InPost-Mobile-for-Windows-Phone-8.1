@@ -10,10 +10,8 @@
 
 ## ⚠️ PROJECT IN BETA
 **Please Note:** This application is currently under active development. Some features may be incomplete, and you might experience bugs. Stability is not guaranteed yet.
- UPDATED VERSION 0.9.3.0 IS NOW AVAILABLE!!
+ UPDATED VERSION 0.9.5.0 IS NOW AVAILABLE!!
 ---
-
-## 📸 Gallery
 
 ## 📸 Gallery
 
@@ -36,7 +34,7 @@ The application was created for every Windows Phone, even with 512MB of RAM.
 * ✅ **Parcel Tracking.
 * ✅ **Logging in via phone number and adding packages assigned to it to the application.
 * ✅ **Push notifications**
-* ✅ **Live title**
+* ✅ **Live tiles**
 * ✅ **Short status on lock screen
 * ✅ **Archiving packages.
 * ✅ **Opening lockers using a QR code.

@@ -11,10 +11,10 @@ namespace InPost_Mobile.Tasks
 {
     public sealed class BackgroundSyncTask : IBackgroundTask
     {
-        // Interwały (minuty)
-        private const int INTERVAL_URGENT = 30;
-        private const int INTERVAL_NORMAL = 90;
-        private const int INTERVAL_DISCOVERY = 360;
+        // Interwały (minuty) - Zoptymalizowane dla różnych statusów
+        private const int INTERVAL_OUT_FOR_DELIVERY = 20;  // Wydana do doręczenia
+        private const int INTERVAL_STANDARD = 90;           // Standardowe paczki (1.5h)
+        private const int INTERVAL_READY_TO_PICKUP = 360;   // Gotowa do odbioru (6h)
 
         public async void Run(IBackgroundTaskInstance taskInstance)
         {
@@ -34,63 +34,80 @@ namespace InPost_Mobile.Tasks
 
         public async Task RunLogicAsync(bool force)
         {
-                // Inicjalizacja danych localnych
+                // Inicjalizacja danych
                 await ParcelManager.LoadDataAsync();
                 
-                // Pobierz czas ostatniego sprawdzenia z LocalSettings
                 var settings = Windows.Storage.ApplicationData.Current.LocalSettings.Values;
                 
-                long lastCheckUrgent = GetLong(settings, "LastCheck_Urgent");
-                long lastCheckNormal = GetLong(settings, "LastCheck_Normal");
-                long lastCheckDiscovery = GetLong(settings, "LastCheck_Discovery");
+                long lastCheckOutForDelivery = GetLong(settings, "LastCheck_OutForDelivery");
+                long lastCheckStandard = GetLong(settings, "LastCheck_Standard");
+                long lastCheckReady = GetLong(settings, "LastCheck_Ready");
 
                 DateTime now = DateTime.Now;
                 long nowTicks = now.Ticks;
 
-                bool checkUrgent = force || (nowTicks - lastCheckUrgent) >= TimeSpan.FromMinutes(INTERVAL_URGENT).Ticks;
-                bool checkNormal = force || (nowTicks - lastCheckNormal) >= TimeSpan.FromMinutes(INTERVAL_NORMAL).Ticks;
-                bool checkDiscovery = force || (nowTicks - lastCheckDiscovery) >= TimeSpan.FromMinutes(INTERVAL_DISCOVERY).Ticks;
+                bool checkOutForDelivery = force || (nowTicks - lastCheckOutForDelivery) >= TimeSpan.FromMinutes(INTERVAL_OUT_FOR_DELIVERY).Ticks;
+                bool checkStandard = force || (nowTicks - lastCheckStandard) >= TimeSpan.FromMinutes(INTERVAL_STANDARD).Ticks;
+                bool checkReady = force || (nowTicks - lastCheckReady) >= TimeSpan.FromMinutes(INTERVAL_READY_TO_PICKUP).Ticks;
 
-                // 1. Priorytet (30 min): Paczki wydane do doręczenia
-                var urgentParcels = ParcelManager.AllParcels.Where(p => IsOutForDelivery(p)).ToList();
-                if (urgentParcels.Count > 0 && checkUrgent)
+                // 1. Out For Delivery (20 min) - Najwyższy priorytet
+                var outForDeliveryParcels = ParcelManager.AllParcels.Where(p => IsOutForDelivery(p)).ToList();
+                if (outForDeliveryParcels.Count > 0 && checkOutForDelivery)
                 {
-                    foreach (var p in urgentParcels)
+                    bool anyUpdated = false;
+                    foreach (var p in outForDeliveryParcels)
                     {
                         string oldStatus = p.Status;
-                        // W trybie Debug/Force odświeżamy natychmiast
                         if (await ParcelManager.RefreshSingleParcel(p))
                         {
-                            if (p.Status != oldStatus || force) HandleStatusChange(p, force); // W force wysyłamy powiadomienie nawet jeśli status ten sam (do testów)
-                        }
-                    }
-                    settings["LastCheck_Urgent"] = nowTicks;
-                }
-
-                // 2. Standard (90 min): Pozostałe aktywne paczki
-                var normalParcels = ParcelManager.AllParcels.Where(p => !p.IsArchived && !IsOutForDelivery(p) && !ParcelManager.IsDeliveredStatus(p.Status)).ToList();
-                if (normalParcels.Count > 0 && checkNormal)
-                {
-                    foreach (var p in normalParcels)
-                    {
-                        string oldStatus = p.Status;
-                        // Jeśli to manualna paczka (brak telefonu zalogowanego lub dodana ręcznie) - refresh
-                        if (await ParcelManager.RefreshSingleParcel(p))
-                        {
+                            anyUpdated = true;
                             if (p.Status != oldStatus || force) HandleStatusChange(p, force);
                         }
                     }
-                    settings["LastCheck_Normal"] = nowTicks;
+                    if (anyUpdated) ParcelManager.ShouldUIUpdate = true;
+                    settings["LastCheck_OutForDelivery"] = nowTicks;
                 }
 
-                // 3. Discovery (6h): Pełna synchronizacja konta
+                // 2. Standard (1.5h) - Pozostałe aktywne paczki
+                var standardParcels = ParcelManager.AllParcels.Where(p => IsStandardParcel(p)).ToList();
+                if (standardParcels.Count > 0 && checkStandard)
                 {
-                    // UpdateAllParcelsAsync robi full sync
+                    bool anyUpdated = false;
+                    foreach (var p in standardParcels)
+                    {
+                        string oldStatus = p.Status;
+                        if (await ParcelManager.RefreshSingleParcel(p))
+                        {
+                            anyUpdated = true;
+                            if (p.Status != oldStatus || force) HandleStatusChange(p, force);
+                        }
+                    }
+                    if (anyUpdated) ParcelManager.ShouldUIUpdate = true;
+                    settings["LastCheck_Standard"] = nowTicks;
+                }
+
+                // 3. Ready To Pickup (6h) - Paczki gotowe do odbioru
+                var readyParcels = ParcelManager.AllParcels.Where(p => IsReadyToPickup(p)).ToList();
+                if (readyParcels.Count > 0 && checkReady)
+                {
+                    bool anyUpdated = false;
+                    foreach (var p in readyParcels)
+                    {
+                        string oldStatus = p.Status;
+                        if (await ParcelManager.RefreshSingleParcel(p))
+                        {
+                            anyUpdated = true;
+                            if (p.Status != oldStatus || force) HandleStatusChange(p, force);
+                        }
+                    }
+                    if (anyUpdated) ParcelManager.ShouldUIUpdate = true;
+                    settings["LastCheck_Ready"] = nowTicks;
+                }
+
+                // 4. Discovery - Szukanie nowych paczek (tylko gdy zalogowany)
+                if (ParcelManager.IsLoggedIn())
+                {
                     await ParcelManager.UpdateAllParcelsAsync();
-                    // Tutaj notyfikacje o *nowych* paczkach są trudniejsze do wykrycia bez porównania list,
-                    // ale UpdateAllParcelsAsync dodaje je na początek listy.
-                    // Można by sprawdzić, czy liczba paczek wzrosła, ale na razie skupmy się na zmianach statusu.
-                    settings["LastCheck_Discovery"] = nowTicks;
                 }
 
                 await ParcelManager.SaveDataAsync();
@@ -105,10 +122,21 @@ namespace InPost_Mobile.Tasks
 
         private bool IsOutForDelivery(ParcelItem p)
         {
-            // Sprawdza czy status to "Wydana do doręczenia" (lub z angielska)
-            // Używamy helpera z ParcelManager lub prostego stringa
-            // "Wydana do doręczenia" status API to zazwyczaj "out_for_delivery"
+            if (p.IsArchived || p.ParcelType != "Receive") return false;
             return p.OriginalStatus != null && p.OriginalStatus.ToLower().Contains("out_for_delivery");
+        }
+
+        private bool IsReadyToPickup(ParcelItem p)
+        {
+            if (p.IsArchived || p.ParcelType != "Receive") return false;
+            string s = p.OriginalStatus?.ToLower() ?? "";
+            return s.Contains("ready_to_pickup") || s.Contains("pickup_ready");
+        }
+
+        private bool IsStandardParcel(ParcelItem p)
+        {
+            if (p.IsArchived || ParcelManager.IsDeliveredStatus(p.Status)) return false;
+            return !IsOutForDelivery(p) && !IsReadyToPickup(p);
         }
 
         private void HandleStatusChange(ParcelItem p, bool force = false)

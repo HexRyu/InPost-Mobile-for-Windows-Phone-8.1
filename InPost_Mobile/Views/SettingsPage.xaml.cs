@@ -125,6 +125,15 @@ namespace InPost_Mobile.Views
 
                 // Fix: Force immediate translation of cached parcels
                 await ParcelManager.ReloadAllParcelsTranslation();
+                
+                // Force Tile Update immediately
+                System.Collections.Generic.List<ParcelItem> currentParcels;
+                lock (ParcelManager.AllParcels)
+                {
+                    currentParcels = new System.Collections.Generic.List<ParcelItem>(ParcelManager.AllParcels);
+                }
+                TileManager.Update(currentParcels);
+                ParcelManager.ShouldUIUpdate = true; // Force Main Page refresh on return
             }
         }
     }

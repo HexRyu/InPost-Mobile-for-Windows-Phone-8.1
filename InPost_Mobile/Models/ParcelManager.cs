@@ -40,6 +40,8 @@ namespace InPost_Mobile.Models
             set { _localSettings.Values["IsDebugMode"] = value; }
         }
 
+        public static bool ShouldUIUpdate { get; set; } = true;
+
         private static HttpClient CreateHttpClient()
         {
             var filter = new HttpBaseProtocolFilter();
@@ -56,19 +58,7 @@ namespace InPost_Mobile.Models
 
         public static bool IsLoggedIn() => _localSettings.Values.ContainsKey("AuthToken") || IsDebugMode;
 
-        public static async void Logout()
-        {
-            _localSettings.Values.Remove("AuthToken");
-            _localSettings.Values.Remove("RefreshToken");
-            _localSettings.Values.Remove("UserPhone");
-            _localSettings.Values.Remove("IsDebugMode");
-            foreach (var p in AllParcels)
-            {
-                p.PickupCode = "";
-                p.PickupPointAddress = _loader.GetString("Txt_CheckSms");
-            }
-            await SaveDataAsync();
-        }
+        // Logout is now defined below with SaveDataInternal linkage
 
         // --- ZMIANA: PUBLIC (żeby LockerManager mógł tego użyć) ---
         public static async Task<bool> RefreshAuthTokenAsync()
@@ -84,7 +74,7 @@ namespace InPost_Mobile.Models
                 using (var client = CreateHttpClient())
                 {
                     var content = new HttpStringContent(json.ToString(), Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json");
-                    var response = await client.PostAsync(new Uri(AppSecrets.BaseUrl + "v1/account/token/refresh"), content);
+                    var response = await client.PostAsync(new Uri(AppSecrets.BaseUrl + "v1/authenticate"), content);
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -120,7 +110,11 @@ namespace InPost_Mobile.Models
             {
                 if (await RefreshSingleParcel(parcel)) wasUpdated = true;
             }
-            if (wasUpdated) await SaveDataAsync();
+            if (wasUpdated) 
+            {
+                await SaveDataAsync();
+                ShouldUIUpdate = true;
+            }
         }
 
         public static bool IsDeliveredStatus(string status)
@@ -379,6 +373,12 @@ namespace InPost_Mobile.Models
                 {
                     string originalStatusName = item.Status;
                     string translatedDesc = GetTranslatedStatus(originalStatusName);
+                    
+                    if (finalHistory.Count > 0 && finalHistory.Last().Description == translatedDesc)
+                    {
+                        continue;
+                    }
+
                     finalHistory.Add(new ParcelEvent { 
                         Description = translatedDesc, 
                         OriginalStatus = originalStatusName,
@@ -398,7 +398,7 @@ namespace InPost_Mobile.Models
         public static string GetTranslatedStatus(string apiStatus)
         {
             if (string.IsNullOrEmpty(apiStatus)) return "";
-            string cleanStatus = apiStatus.Replace(" ", "_").Replace("/", "_").Replace("(", "").Replace(")", "").Trim();
+            string cleanStatus = apiStatus.Replace(" ", "_").Replace("/", "_").Replace("(", "").Replace(")", "").Trim().ToLower();
             string key = "Status_" + cleanStatus;
             string translated = _loader.GetString(key);
             if (!string.IsNullOrEmpty(translated)) return translated;
@@ -455,7 +455,7 @@ namespace InPost_Mobile.Models
                     using (var dataReader = DataReader.FromBuffer(buffer)) { dataReader.UnicodeEncoding = Windows.Storage.Streams.UnicodeEncoding.Utf8; jsonString = dataReader.ReadString(buffer.Length); }
                     JsonObject json = JsonObject.Parse(jsonString);
                     var newParcel = new ParcelItem { TrackingNumber = trackingNumber, IsArchived = false, PickupCode = pickupCode, History = new List<ParcelEvent>(), ParcelType = "Receive" };
-                    ParseApiObjectToParcel(newParcel, json); AllParcels.Insert(0, newParcel); await SaveDataAsync(); return true;
+                    ParseApiObjectToParcel(newParcel, json); AllParcels.Insert(0, newParcel); await SaveDataAsync(); ShouldUIUpdate = true; return true;
                 }
             }
             catch { return false; }
@@ -463,7 +463,11 @@ namespace InPost_Mobile.Models
         public static async Task UpdateSingleParcelAsync(string trackingNumber)
         {
             var parcel = AllParcels.FirstOrDefault(p => p.TrackingNumber == trackingNumber);
-            if (parcel != null && await RefreshSingleParcel(parcel)) await SaveDataAsync();
+            if (parcel != null && await RefreshSingleParcel(parcel)) 
+            {
+                await SaveDataAsync();
+                ShouldUIUpdate = true;
+            }
         }
         public static async Task<bool> RefreshSingleParcel(ParcelItem parcel)
         {
@@ -487,18 +491,76 @@ namespace InPost_Mobile.Models
         public static async Task<bool> RequestSmsCode(string p) { try { using (var c = CreateHttpClient()) { string j = "{\"phoneNumber\":{\"prefix\":\"+48\",\"value\":\"" + p + "\"}}"; var ct = new HttpStringContent(j, Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json"); var r = await c.PostAsync(new Uri(AppSecrets.BaseUrl + "v1/account"), ct); return r.IsSuccessStatusCode; } } catch { return false; } }
         public static async Task<bool> VerifySmsCode(string p, string s) { try { using (var c = CreateHttpClient()) { string j = "{\"phoneNumber\":{\"prefix\":\"+48\",\"value\":\"" + p + "\"},\"smsCode\":\"" + s + "\",\"devicePlatform\":\"Android\"}"; var ct = new HttpStringContent(j, Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json"); var r = await c.PostAsync(new Uri(AppSecrets.BaseUrl + "v1/account/verification"), ct); if (r.IsSuccessStatusCode) { string t = await r.Content.ReadAsStringAsync(); JsonObject o = JsonObject.Parse(t); if (o.ContainsKey("authToken")) { _localSettings.Values["AuthToken"] = o.GetNamedString("authToken"); if (o.ContainsKey("refreshToken")) _localSettings.Values["RefreshToken"] = o.GetNamedString("refreshToken"); _localSettings.Values["UserPhone"] = "+48 " + p; return true; } } return false; } } catch { return false; } }
         
+        public static async void Logout()
+        {
+            // 1. Strip sensitive data (PickupCode) from current list
+            foreach (var p in AllParcels)
+            {
+                p.PickupCode = "";
+                // Note: We keep history and other details as requested ("restore data when logged back in")
+            }
+
+            // 2. Save current state to the USER SPECIFIC file
+            await SaveDataAsync();
+
+            // 3. Clear memory and settings
+            AllParcels.Clear();
+            _localSettings.Values.Remove("AuthToken");
+            _localSettings.Values.Remove("RefreshToken");
+            _localSettings.Values.Remove("UserPhone");
+            _localSettings.Values.Remove("IsDebugMode");
+        }
+
+        private static string GetFileName()
+        {
+            if (IsDebugMode) return DEBUG_DATA_FILENAME;
+            
+            string phone = _localSettings.Values.ContainsKey("UserPhone") ? _localSettings.Values["UserPhone"].ToString() : "";
+            // Sanitize phone: +48 123 456 789 -> 48123456789
+            var sb = new StringBuilder();
+            foreach(char c in phone) { if (char.IsDigit(c)) sb.Append(c); }
+            string p = sb.ToString();
+            
+            if (!string.IsNullOrEmpty(p)) return $"parcels_{p}.json";
+            
+            // Fallback for non-logged in or legacy
+            return DATA_FILENAME;   
+        }
+
         public static async Task LoadDataAsync() 
         { 
-            string fileName = IsDebugMode ? DEBUG_DATA_FILENAME : DATA_FILENAME;
+            string fileName = GetFileName();
+            
             await _fileLock.WaitAsync();
             try 
             { 
+                 // MIGRATION: If specific file doesn't exist, but legacy data exists AND we are logged in
+                 // Move legacy data to new specific file
+                 if (fileName != DATA_FILENAME && fileName != DEBUG_DATA_FILENAME)
+                 {
+                     try
+                     {
+                         StorageFile specific = await ApplicationData.Current.LocalFolder.GetFileAsync(fileName);
+                     }
+                     catch (FileNotFoundException)
+                     {
+                         // Specific file missing. Check legacy.
+                         try
+                         {
+                             StorageFile legacy = await ApplicationData.Current.LocalFolder.GetFileAsync(DATA_FILENAME);
+                             await legacy.RenameAsync(fileName);
+                         }
+                         catch { }
+                     }
+                 }
+
                 StorageFile f = await ApplicationData.Current.LocalFolder.GetFileAsync(fileName); 
                 using (var s = await f.OpenStreamForReadAsync()) 
                 { 
                     var ser = new DataContractJsonSerializer(typeof(List<ParcelItem>)); 
                     AllParcels = (List<ParcelItem>)ser.ReadObject(s); 
                 } 
+                ShouldUIUpdate = true; 
             } 
             catch { AllParcels = new List<ParcelItem>(); }
             finally { _fileLock.Release(); }
@@ -506,7 +568,12 @@ namespace InPost_Mobile.Models
 
         public static async Task SaveDataAsync() 
         { 
-            string fileName = IsDebugMode ? DEBUG_DATA_FILENAME : DATA_FILENAME;
+            string fileName = GetFileName();
+            await SaveDataInternal(fileName);
+        }
+
+        private static async Task SaveDataInternal(string fileName)
+        {
             await _fileLock.WaitAsync();
             try 
             { 
@@ -521,9 +588,9 @@ namespace InPost_Mobile.Models
             finally { _fileLock.Release(); }
         }
 
-        public static async Task ForceSave() { await SaveDataAsync(); }
-        public static async void RemoveParcel(ParcelItem p) { if (AllParcels.Contains(p)) { AllParcels.Remove(p); await SaveDataAsync(); } }
-        public static async Task RenameParcel(string t, string n) { var p = AllParcels.FirstOrDefault(x => x.TrackingNumber == t); if (p != null) { p.CustomName = n; await SaveDataAsync(); } }
+        public static async Task ForceSave() { await SaveDataAsync(); ShouldUIUpdate = true; }
+        public static async void RemoveParcel(ParcelItem p) { if (AllParcels.Contains(p)) { AllParcels.Remove(p); await SaveDataAsync(); ShouldUIUpdate = true; } }
+        public static async Task RenameParcel(string t, string n) { var p = AllParcels.FirstOrDefault(x => x.TrackingNumber == t); if (p != null) { p.CustomName = n; await SaveDataAsync(); ShouldUIUpdate = true; } }
         public static void InitializeData() { }
         public static ObservableCollection<ParcelItem> GetActiveParcels(string t) => new ObservableCollection<ParcelItem>(AllParcels.Where(p => !p.IsArchived && p.ParcelType == t).ToList());
         public static ObservableCollection<ParcelItem> GetArchivedParcels(string t) => new ObservableCollection<ParcelItem>(AllParcels.Where(p => p.IsArchived && p.ParcelType == t).ToList());
