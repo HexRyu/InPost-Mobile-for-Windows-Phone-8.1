@@ -211,6 +211,54 @@
   <data name="Status_dispatched_by_sender_to_pok" xml:space="preserve">
     <value>Dispatched at POK</value>
   </data>
+  <data name="Status_oversized" xml:space="preserve">
+    <value>Oversized parcel</value>
+  </data>
+  <data name="Status_readdressed" xml:space="preserve">
+    <value>Readdressed</value>
+  </data>
+  <data name="Status_pickup_reminder_sent_address" xml:space="preserve">
+    <value>Pickup reminder sent - delivery to address</value>
+  </data>
+  <data name="Status_pickup_time_expired" xml:space="preserve">
+    <value>Pickup time expired</value>
+  </data>
+  <data name="Status_rejected_by_receiver" xml:space="preserve">
+    <value>Rejected by receiver</value>
+  </data>
+  <data name="Status_delay_in_delivery" xml:space="preserve">
+    <value>Delay in delivery</value>
+  </data>
+  <data name="Status_claimed" xml:space="preserve">
+    <value>Claimed</value>
+  </data>
+  <data name="Status_stack_parcel_pickup_time_expired" xml:space="preserve">
+    <value>Stack parcel pickup time expired</value>
+  </data>
+  <data name="Status_unstack_from_customer_service_point" xml:space="preserve">
+    <value>Unstacked from customer service point</value>
+  </data>
+  <data name="Status_courier_avizo_in_customer_service_point" xml:space="preserve">
+    <value>Courier notice in customer service point</value>
+  </data>
+  <data name="Status_taken_by_courier_from_customer_service_point" xml:space="preserve">
+    <value>Taken by courier from customer service point</value>
+  </data>
+  <data name="Status_undelivered_wrong_address" xml:space="preserve">
+    <value>Undelivered - wrong address</value>
+  </data>
+  <data name="Status_undelivered_cod_cash_receiver" xml:space="preserve">
+    <value>Undelivered - COD payment issue</value>
+  </data>
+  <data name="Status_redirect_to_box" xml:space="preserve">
+    <value>Redirect to parcel locker</value>
+  </data>
+  <data name="Status_canceled_redirect_to_box" xml:space="preserve">
+    <value>Canceled redirect to parcel locker</value>
+  </data>
+  <data name="Status_ready_to_pickup_from_branch" xml:space="preserve">
+    <value>Ready to pickup from branch</value>
+  </data>
   <data name="Msg_Copied" xml:space="preserve">
     <value>Tracking number copied to clipboard</value>
   </data>
@@ -459,6 +507,15 @@
   </data>
   <data name="Dialog_TermsRequiredContent" xml:space="preserve">
     <value>To log in with a phone number, you need to accept the legal information and terms of use.</value>
+  </data>
+  <data name="Dialog_SessionExpiredTitle" xml:space="preserve">
+    <value>Session Expired</value>
+  </data>
+  <data name="Dialog_SessionExpiredContent" xml:space="preserve">
+    <value>Your session has expired. Please log in again to continue.</value>
+  </data>
+  <data name="Status_SessionExpired" xml:space="preserve">
+    <value>Session expired. Please log in again.</value>
   </data>
   <data name="TxtLegalTitle.Text" xml:space="preserve">
     <value>LEGAL INFORMATION</value>

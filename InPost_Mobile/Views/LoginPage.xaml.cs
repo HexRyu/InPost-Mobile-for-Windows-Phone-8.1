@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -16,6 +17,7 @@ namespace InPost_Mobile.Views
     public sealed partial class LoginPage : Page
     {
         private bool _isPl;
+        private bool _isDebugLogin = false;
 
         public LoginPage()
         {
@@ -23,6 +25,23 @@ namespace InPost_Mobile.Views
             string lang = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
             _isPl = (lang == "pl");
             UpdateTexts();
+        }
+
+        protected override async void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+            
+            // Check if coming from expired session
+            if (e.Parameter != null && e.Parameter.ToString() == "expired")
+            {
+                var loader = new ResourceLoader();
+                var dialog = new MessageDialog(
+                    loader.GetString("Dialog_SessionExpiredContent"), 
+                    loader.GetString("Dialog_SessionExpiredTitle")
+                );
+                await dialog.ShowAsync();
+                StatusText.Text = loader.GetString("Status_SessionExpired");
+            }
         }
 
         private void UpdateTexts()
@@ -118,7 +137,19 @@ namespace InPost_Mobile.Views
             TogglePanel(StepPhone, false);
             LoginProgress.Visibility = Visibility.Visible;
 
-            bool success = await ParcelManager.RequestSmsCode(phone);
+            // Check for debug mode phone (starts with 000)
+            bool success = false;
+            if (phone.StartsWith("000"))
+            {
+                _isDebugLogin = true;
+                await Task.Delay(500); // Simulate network delay
+                success = true; // Skip API, go straight to SMS step
+            }
+            else
+            {
+                _isDebugLogin = false;
+                success = await ParcelManager.RequestSmsCode(phone);
+            }
 
             LoginProgress.Visibility = Visibility.Collapsed;
             TogglePanel(StepPhone, true);
@@ -149,7 +180,27 @@ namespace InPost_Mobile.Views
             TogglePanel(StepSms, false);
             LoginProgress.Visibility = Visibility.Visible;
 
-            bool success = await ParcelManager.VerifySmsCode(phone, code);
+            bool success = false;
+            
+            // Debug mode - accept any 6-digit code
+            if (_isDebugLogin)
+            {
+                await Task.Delay(500); // Simulate network delay
+                
+                // Set fake tokens and enable debug mode
+                var settings = ApplicationData.Current.LocalSettings;
+                settings.Values["AuthToken"] = "debug_auth_token_" + phone;
+                settings.Values["RefreshToken"] = "debug_refresh_token_" + phone;
+                settings.Values["UserPhone"] = "+48 " + phone;
+                settings.Values["IsDebugMode"] = true;
+                ParcelManager.IsDebugMode = true;
+                
+                success = true;
+            }
+            else
+            {
+                success = await ParcelManager.VerifySmsCode(phone, code);
+            }
 
             LoginProgress.Visibility = Visibility.Collapsed;
             TogglePanel(StepSms, true);

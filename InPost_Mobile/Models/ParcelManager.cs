@@ -41,6 +41,7 @@ namespace InPost_Mobile.Models
         }
 
         public static bool ShouldUIUpdate { get; set; } = true;
+        public static bool SessionExpired { get; set; } = false;
 
         private static HttpClient CreateHttpClient()
         {
@@ -91,6 +92,8 @@ namespace InPost_Mobile.Models
                 }
             }
             catch { }
+            SessionExpired = true;
+            Logout();
             return false;
         }
 
@@ -504,11 +507,21 @@ namespace InPost_Mobile.Models
             await SaveDataAsync();
 
             // 3. Clear memory and settings
+            bool wasDebugMode = IsDebugMode; // Preserve debug mode for testing
             AllParcels.Clear();
             _localSettings.Values.Remove("AuthToken");
             _localSettings.Values.Remove("RefreshToken");
             _localSettings.Values.Remove("UserPhone");
-            _localSettings.Values.Remove("IsDebugMode");
+            
+            // Restore debug mode if it was enabled (for session expiration testing)
+            if (wasDebugMode)
+            {
+                _localSettings.Values["IsDebugMode"] = true;
+            }
+            else
+            {
+                _localSettings.Values.Remove("IsDebugMode");
+            }
         }
 
         private static string GetFileName()

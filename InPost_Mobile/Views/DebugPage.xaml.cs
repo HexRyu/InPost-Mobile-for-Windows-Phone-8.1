@@ -81,6 +81,16 @@ namespace InPost_Mobile.Views
             TxtPhoneStatus.Foreground = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.LightGreen);
         }
 
+        private void TestSessionExpired_Click(object sender, RoutedEventArgs e)
+        {
+            // Trigger session expiration and logout
+            ParcelManager.SessionExpired = true;
+            ParcelManager.Logout();
+            
+            // Navigate directly to LoginPage with "expired" parameter to show dialog
+            Frame.Navigate(typeof(LoginPage), "expired");
+        }
+
         private void PopulateDelays()
         {
             CbNotifDelay.Items.Clear();

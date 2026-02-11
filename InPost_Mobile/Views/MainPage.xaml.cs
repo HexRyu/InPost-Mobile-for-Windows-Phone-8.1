@@ -40,6 +40,14 @@ namespace InPost_Mobile.Views
 
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
+            // Check for expired session first
+            if (ParcelManager.SessionExpired)
+            {
+                ParcelManager.SessionExpired = false; // Reset flag
+                Frame.Navigate(typeof(LoginPage), "expired");
+                return;
+            }
+
             // Subscribe to Resuming event (fixed memory leak)
             Application.Current.Resuming += App_Resuming;
 
@@ -126,8 +134,8 @@ namespace InPost_Mobile.Views
         private void RefreshLists()
         {
             RefreshReceiveList();
-            if (_sendingList != null) _sendingList.ItemsSource = ParcelManager.GetActiveParcels("Send");
-            if (_returnsList != null) _returnsList.ItemsSource = ParcelManager.GetActiveParcels("Return");
+            RefreshSendList();
+            RefreshReturnList();
             TileManager.Update(ParcelManager.AllParcels);
         }
 
@@ -161,6 +169,26 @@ namespace InPost_Mobile.Views
              if (cvs != null) cvs.Source = groups;
         }
 
+        private async void RefreshSendList()
+        {
+            if (_sendingList != null)
+            {
+                _sendingList.ItemsSource = null; // Clear first
+                await System.Threading.Tasks.Task.Delay(50); // Brief delay to prevent flicker
+                _sendingList.ItemsSource = ParcelManager.GetActiveParcels("Send");
+            }
+        }
+
+        private async void RefreshReturnList()
+        {
+            if (_returnsList != null)
+            {
+                _returnsList.ItemsSource = null; // Clear first
+                await System.Threading.Tasks.Task.Delay(50); // Brief delay to prevent flicker
+                _returnsList.ItemsSource = ParcelManager.GetActiveParcels("Return");
+            }
+        }
+
         private async void Refresh_Click(object sender, RoutedEventArgs e)
         {
             LoadingBar.Visibility = Visibility.Visible;
@@ -191,13 +219,13 @@ namespace InPost_Mobile.Views
         private void SendingList_Loaded(object sender, RoutedEventArgs e)
         {
             _sendingList = sender as ListView;
-            if (_sendingList != null) _sendingList.ItemsSource = ParcelManager.GetActiveParcels("Send");
+            RefreshSendList();
         }
 
         private void ReturnsList_Loaded(object sender, RoutedEventArgs e)
         {
             _returnsList = sender as ListView;
-            if (_returnsList != null) _returnsList.ItemsSource = ParcelManager.GetActiveParcels("Return");
+            RefreshReturnList();
         }
 
         private async void AddParcel_Click(object sender, RoutedEventArgs e)

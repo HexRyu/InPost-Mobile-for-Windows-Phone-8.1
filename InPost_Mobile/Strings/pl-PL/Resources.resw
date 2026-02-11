@@ -208,6 +208,54 @@
   <data name="Status_dispatched_by_sender_to_pok" xml:space="preserve">
     <value>Nadana w POK</value>
   </data>
+  <data name="Status_oversized" xml:space="preserve">
+    <value>Przesyłka ponadgabarytowa</value>
+  </data>
+  <data name="Status_readdressed" xml:space="preserve">
+    <value>Przekierowana</value>
+  </data>
+  <data name="Status_pickup_reminder_sent_address" xml:space="preserve">
+    <value>Przypomnienie - doręczenie pod adres</value>
+  </data>
+  <data name="Status_pickup_time_expired" xml:space="preserve">
+    <value>Upłynął termin odbioru</value>
+  </data>
+  <data name="Status_rejected_by_receiver" xml:space="preserve">
+    <value>Odmowa odbioru paczki przez odbiorcę</value>
+  </data>
+  <data name="Status_delay_in_delivery" xml:space="preserve">
+    <value>Opóźnienie w doręczeniu</value>
+  </data>
+  <data name="Status_claimed" xml:space="preserve">
+    <value>Zgłoszono reklamację</value>
+  </data>
+  <data name="Status_stack_parcel_pickup_time_expired" xml:space="preserve">
+    <value>Upłynął termin odbioru z punktu</value>
+  </data>
+  <data name="Status_unstack_from_customer_service_point" xml:space="preserve">
+    <value>Usunięta z Punktu Obsługi Klienta</value>
+  </data>
+  <data name="Status_courier_avizo_in_customer_service_point" xml:space="preserve">
+    <value>Awizo kuriera w Punkcie Obsługi</value>
+  </data>
+  <data name="Status_taken_by_courier_from_customer_service_point" xml:space="preserve">
+    <value>Odebrana przez kuriera z Punktu Obsługi Klienta</value>
+  </data>
+  <data name="Status_undelivered_wrong_address" xml:space="preserve">
+    <value>Niedostarczona - błędny adres</value>
+  </data>
+  <data name="Status_undelivered_cod_cash_receiver" xml:space="preserve">
+    <value>Niedostarczona - brak płatności pobraniowej</value>
+  </data>
+  <data name="Status_redirect_to_box" xml:space="preserve">
+    <value>Przekierowanie do paczkomatu</value>
+  </data>
+  <data name="Status_canceled_redirect_to_box" xml:space="preserve">
+    <value>Anulowano przekierowanie do paczkomatu</value>
+  </data>
+  <data name="Status_ready_to_pickup_from_branch" xml:space="preserve">
+    <value>Gotowa do odbioru w oddziale</value>
+  </data>
   <data name="Msg_Copied" xml:space="preserve">
     <value>Numer przesyłki został skopiowany do schowka</value>
   </data>
@@ -454,6 +502,15 @@
   </data>
   <data name="Dialog_TermsRequiredContent" xml:space="preserve">
     <value>Do zalogowania się numerem telefonu potrzeba akceptacji informacji prawnych i warunków użytkowania.</value>
+  </data>
+  <data name="Dialog_SessionExpiredTitle" xml:space="preserve">
+    <value>Sesja wygasła</value>
+  </data>
+  <data name="Dialog_SessionExpiredContent" xml:space="preserve">
+    <value>Twoja sesja wygasła. Zaloguj się ponownie aby kontynuować.</value>
+  </data>
+  <data name="Status_SessionExpired" xml:space="preserve">
+    <value>Sesja wygasła. Zaloguj się ponownie.</value>
   </data>
 
   <data name="TxtLegalTitle.Text" xml:space="preserve">
