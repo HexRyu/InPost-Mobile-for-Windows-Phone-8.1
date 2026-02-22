@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest" xmlns:m3="http://schemas.microsoft.com/appx/2014/manifest" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest">
-  <Identity Name="db87c5da-51de-4f7a-9f37-b20e2e0be1ab" Publisher="CN=HexRyu" Version="0.9.6.0" />
+  <Identity Name="db87c5da-51de-4f7a-9f37-b20e2e0be1ab" Publisher="CN=HexRyu" Version="0.9.6.3" />
   <mp:PhoneIdentity PhoneProductId="db87c5da-51de-4f7a-9f37-b20e2e0be1ab" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>InPost Mobile</DisplayName>

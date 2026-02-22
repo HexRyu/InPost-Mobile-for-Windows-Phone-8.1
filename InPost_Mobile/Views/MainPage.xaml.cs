@@ -40,11 +40,11 @@ namespace InPost_Mobile.Views
 
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
-            // Check for expired session first
-            if (ParcelManager.SessionExpired)
+            // Check if re-login is needed (token expired)
+            if (ParcelManager.NeedsRelogin)
             {
-                ParcelManager.SessionExpired = false; // Reset flag
-                Frame.Navigate(typeof(LoginPage), "expired");
+                ParcelManager.NeedsRelogin = false; // Reset flag
+                Frame.Navigate(typeof(LoginPage));
                 return;
             }
 
@@ -139,7 +139,7 @@ namespace InPost_Mobile.Views
             TileManager.Update(ParcelManager.AllParcels);
         }
 
-        private void RefreshReceiveList()
+        private async void RefreshReceiveList()
         {
              var allReceive = ParcelManager.GetActiveParcels("Receive");
              var groups = new System.Collections.Generic.List<ParcelGroup>();
@@ -166,7 +166,12 @@ namespace InPost_Mobile.Views
              if (deliveredParcels.Any()) groups.Add(new ParcelGroup(deliveredName, deliveredParcels));
 
              var cvs = this.Resources["ReceivedParcelsCVS"] as Windows.UI.Xaml.Data.CollectionViewSource;
-             if (cvs != null) cvs.Source = groups;
+             if (cvs != null)
+             {
+                 cvs.Source = null; // Clear first
+                 await System.Threading.Tasks.Task.Delay(50); // Brief delay to prevent flicker
+                 cvs.Source = groups;
+             }
         }
 
         private async void RefreshSendList()

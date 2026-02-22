@@ -41,7 +41,8 @@ namespace InPost_Mobile.Models
         }
 
         public static bool ShouldUIUpdate { get; set; } = true;
-        public static bool SessionExpired { get; set; } = false;
+        public static bool NeedsRelogin { get; set; } = false;
+        public static string DebugApiResponse { get; set; } = "";
 
         private static HttpClient CreateHttpClient()
         {
@@ -92,8 +93,10 @@ namespace InPost_Mobile.Models
                 }
             }
             catch { }
-            SessionExpired = true;
-            Logout();
+            
+            // Refresh token failed - logout (keep parcels) and signal re-login needed
+            LogoutKeepParcels();
+            NeedsRelogin = true;
             return false;
         }
 
@@ -159,6 +162,13 @@ namespace InPost_Mobile.Models
                         IBuffer buffer = await response.Content.ReadAsBufferAsync();
                         string jsonString;
                         using (var dataReader = DataReader.FromBuffer(buffer)) { dataReader.UnicodeEncoding = Windows.Storage.Streams.UnicodeEncoding.Utf8; jsonString = dataReader.ReadString(buffer.Length); }
+                        
+                        // Debug: Store returns response for viewing in DebugPage
+                        if (parcelType == "Return")
+                        {
+                            DebugApiResponse = $"URL: {url}\n\nResponse:\n{jsonString}";
+                        }
+                        
                         JsonObject json = JsonObject.Parse(jsonString);
                         ParseAndAddParcels(json, parcelType);
                         return true;
@@ -186,6 +196,7 @@ namespace InPost_Mobile.Models
                         string tracking = "";
                         if (obj.ContainsKey("shipmentNumber")) tracking = obj.GetNamedString("shipmentNumber");
                         else if (obj.ContainsKey("tracking_number")) tracking = obj.GetNamedString("tracking_number");
+                        else if (obj.ContainsKey("returnCode")) tracking = obj.GetNamedString("returnCode"); // Returns API
 
                         if (string.IsNullOrEmpty(tracking)) continue;
 
@@ -221,6 +232,7 @@ namespace InPost_Mobile.Models
             }
 
             if (json.ContainsKey("openCode")) parcel.PickupCode = json.GetNamedString("openCode");
+            else if (json.ContainsKey("qrCode")) parcel.PickupCode = json.GetNamedString("qrCode"); // Returns API
 
             if (json.ContainsKey("parcelSize"))
             {
@@ -254,6 +266,7 @@ namespace InPost_Mobile.Models
             JsonObject pickupObj = null;
             if (json.ContainsKey("pickUpPoint") && json["pickUpPoint"].ValueType == JsonValueType.Object) pickupObj = json.GetNamedObject("pickUpPoint");
             else if (json.ContainsKey("pickup_point") && json["pickup_point"].ValueType == JsonValueType.Object) pickupObj = json.GetNamedObject("pickup_point");
+            else if (json.ContainsKey("parcelMachine") && json["parcelMachine"].ValueType == JsonValueType.Object) pickupObj = json.GetNamedObject("parcelMachine"); // Returns API
 
             if (pickupObj != null)
             {
@@ -350,6 +363,18 @@ namespace InPost_Mobile.Models
                 {
                     var evObj = item.GetObject();
                     string name = evObj.ContainsKey("eventTitle") ? evObj.GetNamedString("eventTitle") : "Status";
+                    string dateStr = evObj.ContainsKey("date") ? evObj.GetNamedString("date") : DateTime.Now.ToString("o");
+                    DateTimeOffset realDate; if (!DateTimeOffset.TryParse(dateStr, out realDate)) realDate = DateTimeOffset.MinValue;
+                    tempList.Add(new TempEvent { Status = name, RealDate = realDate });
+                }
+            }
+            else if (json.ContainsKey("operations")) // Returns API
+            {
+                var operationsArr = json.GetNamedArray("operations");
+                foreach (var item in operationsArr)
+                {
+                    var evObj = item.GetObject();
+                    string name = evObj.ContainsKey("name") ? evObj.GetNamedString("name") : "Status";
                     string dateStr = evObj.ContainsKey("date") ? evObj.GetNamedString("date") : DateTime.Now.ToString("o");
                     DateTimeOffset realDate; if (!DateTimeOffset.TryParse(dateStr, out realDate)) realDate = DateTimeOffset.MinValue;
                     tempList.Add(new TempEvent { Status = name, RealDate = realDate });
@@ -494,6 +519,21 @@ namespace InPost_Mobile.Models
         public static async Task<bool> RequestSmsCode(string p) { try { using (var c = CreateHttpClient()) { string j = "{\"phoneNumber\":{\"prefix\":\"+48\",\"value\":\"" + p + "\"}}"; var ct = new HttpStringContent(j, Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json"); var r = await c.PostAsync(new Uri(AppSecrets.BaseUrl + "v1/account"), ct); return r.IsSuccessStatusCode; } } catch { return false; } }
         public static async Task<bool> VerifySmsCode(string p, string s) { try { using (var c = CreateHttpClient()) { string j = "{\"phoneNumber\":{\"prefix\":\"+48\",\"value\":\"" + p + "\"},\"smsCode\":\"" + s + "\",\"devicePlatform\":\"Android\"}"; var ct = new HttpStringContent(j, Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json"); var r = await c.PostAsync(new Uri(AppSecrets.BaseUrl + "v1/account/verification"), ct); if (r.IsSuccessStatusCode) { string t = await r.Content.ReadAsStringAsync(); JsonObject o = JsonObject.Parse(t); if (o.ContainsKey("authToken")) { _localSettings.Values["AuthToken"] = o.GetNamedString("authToken"); if (o.ContainsKey("refreshToken")) _localSettings.Values["RefreshToken"] = o.GetNamedString("refreshToken"); _localSettings.Values["UserPhone"] = "+48 " + p; return true; } } return false; } } catch { return false; } }
         
+        /// <summary>
+        /// Logout when token expires - clear tokens only, keep parcels in memory
+        /// </summary>
+        public static void LogoutKeepParcels()
+        {
+            // Clear authentication tokens only
+            _localSettings.Values.Remove("AuthToken");
+            _localSettings.Values.Remove("RefreshToken");
+            
+            // Keep AllParcels in memory (UI still shows data)
+            // Keep UserPhone (needed for reload on next login)
+            // Keep IsDebugMode (preserve debug state)
+            // Parcel data remains on disk (already saved by previous SaveDataAsync calls)
+        }
+
         public static async void Logout()
         {
             // 1. Strip sensitive data (PickupCode) from current list
@@ -507,21 +547,11 @@ namespace InPost_Mobile.Models
             await SaveDataAsync();
 
             // 3. Clear memory and settings
-            bool wasDebugMode = IsDebugMode; // Preserve debug mode for testing
             AllParcels.Clear();
             _localSettings.Values.Remove("AuthToken");
             _localSettings.Values.Remove("RefreshToken");
             _localSettings.Values.Remove("UserPhone");
-            
-            // Restore debug mode if it was enabled (for session expiration testing)
-            if (wasDebugMode)
-            {
-                _localSettings.Values["IsDebugMode"] = true;
-            }
-            else
-            {
-                _localSettings.Values.Remove("IsDebugMode");
-            }
+            _localSettings.Values.Remove("IsDebugMode");
         }
 
         private static string GetFileName()

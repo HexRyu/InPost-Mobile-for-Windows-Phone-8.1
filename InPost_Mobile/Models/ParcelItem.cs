@@ -325,5 +325,46 @@ namespace InPost_Mobile.Models
                 }
             }
         }
+
+        [IgnoreDataMember]
+        public Visibility IsReturnVisibility
+        {
+            get { return ParcelType == "return" ? Visibility.Visible : Visibility.Collapsed; }
+        }
+
+        [IgnoreDataMember]
+        public Visibility IsNotReturnVisibility
+        {
+            get { return ParcelType != "return" ? Visibility.Visible : Visibility.Collapsed; }
+        }
+
+        [IgnoreDataMember]
+        public string SizeDescription
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(Size)) return "max. 8 x 38 x 64 cm do 25 kg";
+                switch (Size.ToUpper())
+                {
+                    case "A": return "max. 8 x 38 x 64 cm do 25 kg";
+                    case "B": return "max. 19 x 38 x 64 cm do 25 kg";
+                    case "C": return "max. 41 x 38 x 64 cm do 25 kg";
+                    default: return "max. 8 x 38 x 64 cm do 25 kg";
+                }
+            }
+        }
+
+        [IgnoreDataMember]
+        public string CreationDateText
+        {
+            get
+            {
+                if (History != null && History.Count > 0)
+                {
+                    return History[History.Count - 1].Date;
+                }
+                return LastUpdateDate;
+            }
+        }
     }
 }

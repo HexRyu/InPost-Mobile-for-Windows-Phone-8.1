@@ -172,33 +172,44 @@
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <Border Background="#1F1F1F" Margin="0,0,0,20" Padding="15">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
-                                        <StackPanel Grid.Column="0">
-                                            <TextBlock Text="{Binding Status}" FontSize="22" FontWeight="SemiBold" Foreground="White" TextWrapping="Wrap" Margin="0,0,0,15"/>
-
-                                            <StackPanel Visibility="{Binding SenderSectionVisibility}" Margin="0,0,0,12">
-                                                <TextBlock Text="{Binding SenderLabel}" FontSize="11" Foreground="Gray" Opacity="0.8"/>
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Status}" FontSize="22" FontWeight="SemiBold" Foreground="White" TextWrapping="Wrap" Margin="0,0,0,15"/>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+                                            
+                                            <!-- ZWROT DO -->
+                                            <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,0,12">
+                                                <TextBlock x:Uid="Lbl_ReturnTo" Text="ZWROT DO" FontSize="11" Foreground="#AAAAAA" Opacity="0.8"/>
                                                 <TextBlock Text="{Binding SenderDisplay}" FontSize="15" Foreground="#EEEEEE" TextTrimming="CharacterEllipsis"/>
                                             </StackPanel>
+                                            
+                                            <!-- ROZMIAR -->
+                                            <StackPanel Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" Margin="10,0,0,0">
+                                                <TextBlock x:Uid="LblSizeText" Text="ROZMIAR" FontSize="11" Foreground="#AAAAAA" Opacity="0.8" HorizontalAlignment="Right"/>
+                                                <TextBlock Text="{Binding SizeName}" FontSize="15" Foreground="White" HorizontalAlignment="Right"/>
+                                            </StackPanel>
 
-                                            <TextBlock x:Uid="LblReturnCode" FontSize="11" Foreground="Gray" Opacity="0.8"/>
-                                            <TextBlock Text="{Binding TrackingNumber}" FontSize="15" Foreground="#EEEEEE"/>
-                                        </StackPanel>
-                                        <StackPanel Grid.Column="1" VerticalAlignment="Top" Margin="10,0,0,0">
-                                            <Border BorderBrush="White" BorderThickness="2" Width="46" Height="36" Margin="0,0,0,5">
-                                                <Grid>
-                                                    <TextBlock Text="{Binding Icon}" FontFamily="Segoe UI Symbol" FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" Visibility="{Binding IsFontIcon}"/>
-                                                    <Image Source="{Binding IconImage}" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding IsBitmapIcon}" Margin="3"/>
-                                                </Grid>
-                                            </Border>
-                                            <TextBlock x:Uid="LblSize" FontSize="10" Foreground="Gray" HorizontalAlignment="Center"/>
-                                            <TextBlock Text="{Binding SizeName}" FontSize="15" Foreground="White" HorizontalAlignment="Center" FontWeight="Bold"/>
-                                        </StackPanel>
-                                    </Grid>
+                                            <!-- NR PRZESYŁKI -->
+                                            <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,0,12">
+                                                <TextBlock x:Uid="Lbl_TrackingNum" Text="NR PRZESYŁKI" FontSize="11" Foreground="#AAAAAA" Opacity="0.8"/>
+                                                <TextBlock Text="{Binding TrackingNumber}" FontSize="15" Foreground="#EEEEEE"/>
+                                            </StackPanel>
+
+                                            <!-- ZWROT NADANO -->
+                                            <StackPanel Grid.Row="2" Grid.Column="0" Margin="0,0,0,0">
+                                                <TextBlock x:Uid="Lbl_ReturnDate" Text="ZWROT NADANO" FontSize="11" Foreground="#AAAAAA" Opacity="0.8"/>
+                                                <TextBlock Text="{Binding CreationDateText}" FontSize="15" Foreground="#EEEEEE"/>
+                                            </StackPanel>
+                                        </Grid>
+                                    </StackPanel>
                                 </Border>
                             </DataTemplate>
                         </ListView.ItemTemplate>

@@ -13,7 +13,8 @@
             <Border Padding="20">
                 <StackPanel>
 
-                    <Border Background="#2D2D2D" Padding="15" Margin="0,0,0,20">
+                    <!-- STANDARD PARCEL DETAILS -->
+                    <Border Background="#2D2D2D" Padding="15" Margin="0,0,0,20" Visibility="{Binding IsNotReturnVisibility}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
@@ -66,6 +67,76 @@
                             </StackPanel>
                         </Grid>
                     </Border>
+
+                    <!-- RETURN PARCEL DETAILS -->
+                    <StackPanel Visibility="{Binding IsReturnVisibility}">
+                        <!-- Card 1: Main Return Info -->
+                        <Border Background="#2D2D2D" Padding="15" Margin="0,0,0,20">
+                            <StackPanel>
+                                <TextBlock Text="{Binding Status}" FontSize="24" FontWeight="Bold" Foreground="White" TextWrapping="Wrap" Margin="0,0,0,20"/>
+                                
+                                <Grid Margin="0,0,0,15">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock x:Uid="Lbl_ReturnTo" Text="ZWROT DO" FontSize="11" Foreground="#AAAAAA" Opacity="0.8"/>
+                                        <TextBlock Text="{Binding SenderDisplay}" FontSize="15" Foreground="#EEEEEE" TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1" HorizontalAlignment="Right">
+                                        <TextBlock x:Uid="LblSizeText" Text="ROZMIAR" FontSize="11" Foreground="#AAAAAA" Opacity="0.8" HorizontalAlignment="Right"/>
+                                        <TextBlock Text="{Binding SizeName}" FontSize="15" Foreground="White" HorizontalAlignment="Right"/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <StackPanel Margin="0,0,0,15">
+                                    <TextBlock x:Uid="Lbl_TrackingNum" Text="NR PRZESYŁKI" FontSize="11" Foreground="#AAAAAA" Opacity="0.8"/>
+                                    <TextBlock Text="{Binding TrackingNumber}" FontSize="15" Foreground="#EEEEEE"/>
+                                    
+                                    <TextBlock x:Uid="Lbl_NameHeader_Return" Text="NAZWA ZWROTU" FontSize="11" Foreground="#AAAAAA" Opacity="0.8" Margin="0,15,0,0"/>
+                                    <Button x:Name="BtnRenameReturn" Click="Rename_Click" HorizontalAlignment="Left" Background="Transparent" Padding="0" BorderThickness="0" Margin="-2,0,0,0">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding NameButtonText}" Foreground="{Binding NameButtonColor}" FontSize="19" FontWeight="SemiBold" Margin="0,0,10,0"/>
+                                            <TextBlock Text="&#xE104;" FontFamily="Segoe UI Symbol" Foreground="White" FontSize="16" VerticalAlignment="Center" Opacity="0.7"/>
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+
+                                <StackPanel Margin="0,0,0,0">
+                                    <TextBlock x:Uid="Lbl_ReturnDate" Text="ZWROT NADANO" FontSize="11" Foreground="#AAAAAA" Opacity="0.8"/>
+                                    <TextBlock Text="{Binding CreationDateText}" FontSize="15" Foreground="#EEEEEE"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Card 2: Size Info -->
+                        <Border Background="#2D2D2D" Padding="15" Margin="0,0,0,20">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock x:Uid="Lbl_ParcelSizeHeader" Text="ROZMIAR PRZESYŁKI" FontSize="11" Foreground="#AAAAAA" Opacity="0.8"/>
+                                    <TextBlock Text="{Binding SizeName}" FontSize="16" FontWeight="Bold" Foreground="White" Margin="0,2,0,2"/>
+                                    <TextBlock Text="{Binding SizeDescription}" FontSize="14" Foreground="#CCCCCC"/>
+                                </StackPanel>
+                                <Border Grid.Column="1" BorderBrush="White" BorderThickness="2" Width="40" Height="40" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                   <!-- The generic box icon in segoe UI symbol is E18B -->
+                                   <TextBlock Text="&#xE18B;" FontFamily="Segoe UI Symbol" FontSize="20" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                            </Grid>
+                        </Border>
+                        
+                        <!-- Card 3: Details (optional) -->
+                        <Border Background="#2D2D2D" Padding="15" Margin="0,0,0,20">
+                            <StackPanel>
+                                <TextBlock x:Uid="Lbl_DetailsHeader" Text="ZWROT UTWORZONO" FontSize="11" Foreground="#AAAAAA" Opacity="0.8"/>
+                                <TextBlock Text="{Binding CreationDateText}" FontSize="15" Foreground="#EEEEEE"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
 
                     <StackPanel Visibility="{Binding PickupSectionVisibility}" Margin="0,0,0,20">
                         <TextBlock x:Uid="Lbl_PickupPoint" Text="MIEJSCE ODBIORU" FontSize="15" FontWeight="Bold" Foreground="#888888" Margin="0,0,0,5"/>

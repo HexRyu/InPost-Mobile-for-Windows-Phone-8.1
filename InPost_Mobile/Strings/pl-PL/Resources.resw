@@ -112,6 +112,9 @@
   <data name="Status_canceled" xml:space="preserve">
     <value>Anulowana</value>
   </data>
+  <data name="Status_accepted" xml:space="preserve">
+    <value>Zaakceptowana</value>
+  </data>
   <data name="Status_confirmed" xml:space="preserve">
     <value>Przesyłka utworzona</value>
   </data>
@@ -502,15 +505,6 @@
   </data>
   <data name="Dialog_TermsRequiredContent" xml:space="preserve">
     <value>Do zalogowania się numerem telefonu potrzeba akceptacji informacji prawnych i warunków użytkowania.</value>
-  </data>
-  <data name="Dialog_SessionExpiredTitle" xml:space="preserve">
-    <value>Sesja wygasła</value>
-  </data>
-  <data name="Dialog_SessionExpiredContent" xml:space="preserve">
-    <value>Twoja sesja wygasła. Zaloguj się ponownie aby kontynuować.</value>
-  </data>
-  <data name="Status_SessionExpired" xml:space="preserve">
-    <value>Sesja wygasła. Zaloguj się ponownie.</value>
   </data>
 
   <data name="TxtLegalTitle.Text" xml:space="preserve">

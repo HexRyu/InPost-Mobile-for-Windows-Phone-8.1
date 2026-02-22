@@ -27,23 +27,6 @@ namespace InPost_Mobile.Views
             UpdateTexts();
         }
 
-        protected override async void OnNavigatedTo(NavigationEventArgs e)
-        {
-            base.OnNavigatedTo(e);
-            
-            // Check if coming from expired session
-            if (e.Parameter != null && e.Parameter.ToString() == "expired")
-            {
-                var loader = new ResourceLoader();
-                var dialog = new MessageDialog(
-                    loader.GetString("Dialog_SessionExpiredContent"), 
-                    loader.GetString("Dialog_SessionExpiredTitle")
-                );
-                await dialog.ShowAsync();
-                StatusText.Text = loader.GetString("Status_SessionExpired");
-            }
-        }
-
         private void UpdateTexts()
         {
             if (TbTerms != null) TbTerms.Inlines.Clear();
